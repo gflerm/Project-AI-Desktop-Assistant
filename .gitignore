@@ -4,6 +4,7 @@ Thumbs.db
 Desktop.ini
 .idea/
 .vscode/
+.obsidian/
 *.swp
 *.swo
 *~
@@ -74,8 +75,11 @@ benchmarks/results/
 *.tar
 *.tar.gz
 *.7z
+*.pdf
 .tox/
 .nox/
 
 # Local project reference material
 archive/
+PROJECT-WORKFLOW.md
+PROJECT-ORIGIN-PROMPTS.md
