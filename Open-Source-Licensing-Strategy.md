@@ -121,7 +121,7 @@ One licence should not be forced onto every type of project material.
 
 ## 4. Relationship to Project IP Policy
 
-`Project-TARS-License-and-IP-Policy.md` v0.3 reconciled the project-level
+`License-and-IP-Policy.md` v0.3 reconciled the project-level
 policy: private/unreleased material remains All Rights Reserved, while
 original software deliberately selected for public open-source release
 defaults to Apache-2.0. Models, voices, assets, hardware designs,

@@ -97,29 +97,29 @@ Wi-Fi / LAN        Wi-Fi / LAN
 
 The following documents are the current design source of truth:
 
--   [Design Specification](Project-TARS-Design-Specification.md) ---
+-   [Design Specification](Design-Specification.md) ---
     overall goals, architecture, modules, interfaces and design
     requirements.
 -   [Hardware Architecture &
-    Inventory](Project-TARS-Hardware-Architecture-and-Inventory.md) ---
+    Inventory](Hardware-Architecture-and-Inventory.md) ---
     hardware inventory, Pi/NUC roles, display, audio, networking and
     verification plans.
 -   [Firmware & Software
-    Roadmap](Project-TARS-Firmware-Software-Roadmap.md) --- development
+    Roadmap](Firmware-Software-Roadmap.md) --- development
     work packages, milestones, modular implementation plan and
     multi-agent workflow.
 -   [Speech & AI Runtime
-    Evaluation](Project-TARS-Speech-and-AI-Runtime-Evaluation.md) ---
+    Evaluation](Speech-and-AI-Runtime-Evaluation.md) ---
     STT, TTS, wake/VAD, Ollama, llama.cpp and cloud/local AI evaluation
     and benchmark strategy.
--   [Personality Distillation](Project-TARS-Personality-Distillation.md)
+-   [Personality Distillation](Personality-Distillation.md)
     --- behavioural/personality design distilled into original reusable
     traits rather than copied character expression.
--   [License & IP Policy](Project-TARS-License-and-IP-Policy.md) ---
+-   [License & IP Policy](License-and-IP-Policy.md) ---
     ownership, third-party IP, fictional-character boundaries and staged
     private/open-source policy.
 -   [Open-Source Licensing
-    Strategy](Project-TARS-Open-Source-Licensing-Strategy.md) ---
+    Strategy](Open-Source-Licensing-Strategy.md) ---
     software licence choice, dependency/model/asset boundaries and
     release compliance.
 -   [Licence Selection](LICENSE-SELECTION.md) --- concise record of the
@@ -144,9 +144,9 @@ protected intellectual property.
 
 See:
 
--   [License & IP Policy](Project-TARS-License-and-IP-Policy.md)
+-   [License & IP Policy](License-and-IP-Policy.md)
 -   [Open-Source Licensing
-    Strategy](Project-TARS-Open-Source-Licensing-Strategy.md)
+    Strategy](Open-Source-Licensing-Strategy.md)
 -   [Licence Selection](LICENSE-SELECTION.md)
 
 ## Project Status

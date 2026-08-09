@@ -2,7 +2,7 @@
 
 **Status:** Version 0.1 --- Original Identity Definition\
 **Date:** 2026-08-09\
-**Companion document to:** `Project-TARS-Design-Specification.md`
+**Companion document to:** `Design-Specification.md`
 
 ------------------------------------------------------------------------
 

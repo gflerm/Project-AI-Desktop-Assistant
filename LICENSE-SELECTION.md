@@ -29,5 +29,5 @@ Important boundaries:
   release still requires component-level scope, provenance, notice and
   compatibility checks.
 
-See `Project-TARS-Open-Source-Licensing-Strategy.md` for the project-wide
+See `Open-Source-Licensing-Strategy.md` for the project-wide
 licensing architecture and release checklist.

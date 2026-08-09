@@ -1,10 +1,10 @@
 # Project TARS --- Hardware Architecture & Inventory
 
-**Status:** Version 0.9 --- Living Work in Progress\
+**Status:** Version 0.10 --- Living Work in Progress\
 **Date:** 2026-08-09\
 **Document role:** Hardware inventory, node roles, interfaces,
 constraints and hardware evolution plan\
-**Companion to:** `Project-TARS-Design-Specification.md`
+**Companion to:** `Design-Specification.md`
 
 ------------------------------------------------------------------------
 
@@ -120,15 +120,20 @@ damage responsiveness, including:
 
 ## 4.4 Exact hardware details
 
-  Item           Current status
-  -------------- ------------------------------------------
-  Board          Raspberry Pi 5
-  RAM            **To verify**
-  Storage        **To verify**
-  Cooling        **To verify**
-  Power supply   **To verify**
-  OS             Raspberry Pi OS Lite 64-bit (current baseline)
-  Network        Direct private Pi↔NUC Ethernet plus independent Wi-Fi
+  Item                 Current status
+  -------------------- -------------------------------------------------
+  Board                Raspberry Pi 5 Model B, revision 1.0
+  CPU                  Four-core ARM Cortex-A76, up to 2.4 GHz
+  RAM                  8 GB
+  Primary storage      Samsung 256 GB NVMe boot drive
+  Additional storage   64 GB microSD card
+  Cooling              PWM-controlled cooling fan
+  Ethernet             Gigabit Ethernet
+  Wi-Fi                Built-in Wi-Fi
+  Bluetooth            Built-in Bluetooth
+  Hostname             `titanium`
+  Power supply         **To verify**
+  OS baseline          Raspberry Pi OS Lite 64-bit
 
 ------------------------------------------------------------------------
 
@@ -1017,7 +1022,7 @@ This section should become the authoritative inventory.
 
 | ID | Hardware | Status | Intended role | Known model/details | Remaining verification |
 |---|---|---|---|---|---|
-| HW-001 | Raspberry Pi 5 | Available | Physical companion | Raspberry Pi 5 | RAM, storage, cooling and PSU |
+| HW-001 | Raspberry Pi 5 | Available | Physical companion | Model B Rev 1.0; 8 GB RAM; 4-core Cortex-A76 up to 2.4 GHz; Samsung 256 GB NVMe; 64 GB microSD; PWM fan; Gigabit Ethernet; Wi-Fi; Bluetooth; hostname `titanium` | PSU |
 | HW-002 | Raspberry Pi 7-inch Touch Display Gen 1 | Available | Prototype UI | Exact revision to verify | Pi 5 cable, touch and UI benchmarks |
 | HW-003 | Raspberry Pi Camera | Believed available | Future vision | To identify | Locate, identify and test |
 | HW-004 | Intel NUC | Available | Primary local-compute baseline | NUC8i5BEH; Core i5-8259U; 16 GB RAM | Storage, RAM layout, BIOS, OS and benchmarks |
@@ -1209,9 +1214,13 @@ Measure only what is relevant to tasks Project TARS may delegate.
 
 # 22. Immediate Hardware Verification Checklist
 
--   [ ] Record Pi 5 RAM size.
--   [ ] Record Pi 5 storage.
--   [ ] Record Pi 5 cooling.
+-   [x] Record exact Pi model: Raspberry Pi 5 Model B, revision 1.0.
+-   [x] Record Pi CPU: four-core ARM Cortex-A76, up to 2.4 GHz.
+-   [x] Record Pi 5 RAM size: 8 GB.
+-   [x] Record Pi 5 storage: Samsung 256 GB NVMe boot drive and 64 GB microSD.
+-   [x] Record Pi 5 cooling: PWM-controlled cooling fan.
+-   [x] Record Pi networking: Gigabit Ethernet, built-in Wi-Fi and Bluetooth.
+-   [x] Record Pi hostname: `titanium`.
 -   [ ] Record Pi 5 PSU.
 -   [ ] Install/verify Raspberry Pi OS Lite 64-bit baseline.
 -   [ ] Record kernel/OS release used for the prototype.
@@ -1448,7 +1457,7 @@ CPU inference performance and supported acceleration paths.
 
 # 24. Open Hardware Questions
 
--   Exact Pi 5 RAM/storage/cooling?
+-   Exact Pi 5 power-supply model and rating?
 -   Which minimal graphics path best suits the final UI framework: lightweight Wayland, X/Wayland session, or direct DRM/KMS?
 -   What is the minimum package set required for display, touch, audio and networking?
 -   Which OS should the NUC run?
@@ -1659,6 +1668,13 @@ accidental collection of installed software.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
+  0.10                    2026-08-09              Recorded confirmed Pi 5
+                                                  Model B Rev 1.0 hardware,
+                                                  8 GB RAM, Cortex-A76 CPU,
+                                                  NVMe/microSD storage,
+                                                  PWM fan, Ethernet, Wi-Fi,
+                                                  Bluetooth and hostname
+
   0.9                     2026-08-09              Reconciled the authoritative
                                                   inventory, Acer identity,
                                                   completed NUC facts,

@@ -112,7 +112,7 @@ The authoritative rule is therefore:
 > explicitly released as open source uses Apache-2.0; everything else keeps
 > its expressly stated licence or rights status.**
 
-The companion `Project-TARS-Open-Source-Licensing-Strategy.md` defines the
+The companion `Open-Source-Licensing-Strategy.md` defines the
 engineering process, dependency boundaries and release gate for this model.
 
 ------------------------------------------------------------------------
@@ -567,9 +567,9 @@ material.
 
 Companion documents currently include:
 
--   `Project-TARS-Design-Specification.md`
--   `Project-TARS-Personality-Distillation.md`
--   `Project-TARS-Open-Source-Licensing-Strategy.md`
+-   `Design-Specification.md`
+-   `Personality-Distillation.md`
+-   `Open-Source-Licensing-Strategy.md`
 -   `LICENSE-SELECTION.md`
 
 Technical or personality specifications do not grant permission to use
