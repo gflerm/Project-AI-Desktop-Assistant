@@ -76,3 +76,6 @@ benchmarks/results/
 *.7z
 .tox/
 .nox/
+
+# Local project reference material
+archive/
