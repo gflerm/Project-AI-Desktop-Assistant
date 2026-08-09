@@ -1,6 +1,6 @@
 # Project TARS --- License & Intellectual Property Policy
 
-**Status:** Version 0.3 — Living Work in Progress\
+**Status:** Version 0.4 — Living Work in Progress\
 **Date:** 2026-08-09\
 **License model:** Staged / component-specific — private development now; Apache-2.0 default for original software selected for open-source release\
 **Applies to:** Project TARS source code, documentation, specifications,
@@ -493,7 +493,7 @@ The adopted policy is:
 > **Private while developing; Apache-2.0 for original software deliberately
 > opened; separate licensing for assets, hardware, models and identity.**
 
-The intended structure is:
+The intended structure is component-specific:
 
 ``` text
 KEEP PROPRIETARY
@@ -502,18 +502,19 @@ KEEP PROPRIETARY
         +-- paid source licence
         +-- OEM licence
 
-OPEN SELECTED SOFTWARE COMPONENTS
+OPEN SELECTED SOFTWARE COMPONENTS UNDER APACHE-2.0
         |
         +-- SDK
         +-- protocol
         +-- plugins
         +-- hardware interface
         +-- example clients
+        +-- reusable orchestrator components explicitly selected for release
 
-WHILE KEEPING CORE PROPRIETARY
+KEEP SEPARATELY LICENSED OR PRIVATE UNLESS EXPLICITLY RELEASED
         |
         +-- personality engine
-        +-- orchestration
+        +-- application-specific orchestration/policy
         +-- original assets
         +-- commercial integrations
 ```
@@ -521,6 +522,8 @@ WHILE KEEPING CORE PROPRIETARY
 Opening one component does not change the licensing of the rest of the
 project. The Apache-2.0 selection is the default for original software
 chosen for release, not a blanket relicensing of every Project TARS asset.
+The orchestrator is not categorically open or proprietary: each reusable
+component requires an explicit release-scope decision and licence marking.
 
 ------------------------------------------------------------------------
 
@@ -582,6 +585,10 @@ component's licence should govern that component only.
   ---------------------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- ---------------------------------
+  0.4                     2026-08-09              Clarified that orchestrator
+                                                  release scope is decided
+                                                  component by component
+
   0.3                     2026-08-09              Reconciled proprietary
                                                   development policy with
                                                   adopted Apache-2.0 default

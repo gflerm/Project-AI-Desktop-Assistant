@@ -1,6 +1,6 @@
 # Project TARS --- Hardware Architecture & Inventory
 
-**Status:** Version 0.8 --- Living Work in Progress\
+**Status:** Version 0.9 --- Living Work in Progress\
 **Date:** 2026-08-09\
 **Document role:** Hardware inventory, node roles, interfaces,
 constraints and hardware evolution plan\
@@ -128,7 +128,7 @@ damage responsiveness, including:
   Cooling        **To verify**
   Power supply   **To verify**
   OS             Raspberry Pi OS Lite 64-bit (current baseline)
-  Network        Ethernet/Wi-Fi; exact topology to define
+  Network        Direct private Pi↔NUC Ethernet plus independent Wi-Fi
 
 ------------------------------------------------------------------------
 
@@ -758,17 +758,18 @@ a useful default.
 
 ---
 
-# 10. Node D --- Windows Workstation
+# 10. Node D --- Acer Development Workstation
 
-## 9.1 Role
+## 10.1 Role
 
 **User workstation / heavyweight interactive compute / development
 node**
 
-The desktop PC is not merely another server. It is the machine on which
-the user works.
+The known Acer i7 / 32 GB / NVIDIA system is the primary development
+workstation. It is not merely another server; it is the machine on which
+the user works. Exact model, CPU, GPU and storage remain to be recorded.
 
-## 9.2 Candidate responsibilities
+## 10.2 Candidate responsibilities
 
 -   Codex/development-agent execution;
 -   IDE integration;
@@ -782,7 +783,7 @@ the user works.
 -   project repository;
 -   debugging and deployment.
 
-## 9.3 Boundary
+## 10.3 Boundary
 
 Project TARS should not silently take control of workstation
 applications.
@@ -793,7 +794,7 @@ Permissions and visible tool activity remain mandatory.
 
 # 11. Node E --- Cloud Services
 
-## 10.1 Role
+## 11.1 Role
 
 **Elastic high-capability intelligence**
 
@@ -805,7 +806,7 @@ Cloud providers may supply:
 -   web/search services;
 -   specialised APIs.
 
-## 10.2 Design requirement
+## 11.2 Design requirement
 
 Cloud is a capability tier, not the identity of the assistant.
 
@@ -1014,41 +1015,24 @@ casually.
 
 This section should become the authoritative inventory.
 
-  ------------------------------------------------------------------------------------------------
-  ID          Hardware     Status      Intended role             Exact model Notes
-  ----------- ------------ ----------- ------------------------- ----------- ---------------------
-  HW-001      Raspberry Pi Available   Physical companion        To record   RAM/storage/cooling
-              5                                                              to verify
-
-  HW-002      Raspberry Pi Available   Primary UI                To verify   Known working on Pi 4
-              7-inch Touch                                       revision    
-              Display Gen                                                    
-              1                                                              
-
-  HW-003      Raspberry Pi Believed    Future vision             To identify Locate and test
-              Camera       available                                         
-
-  HW-004      Intel NUC /  Available   Local compute node        i5 model to 16 GB RAM
-              mini PC                                            identify    
-
-  HW-005      Windows PC   Available   Workstation/development   To          GPU/CPU/RAM useful
-                                                                 inventory   later
-                                                                 relevant    
-                                                                 specs       
-
-  HW-006      Microphone   To define   Voice input               TBD         Inventory existing
-                                                                             devices
-
-  HW-007      Speaker      To define   Voice output              TBD         Inventory existing
-                                                                             devices
-  ------------------------------------------------------------------------------------------------
+| ID | Hardware | Status | Intended role | Known model/details | Remaining verification |
+|---|---|---|---|---|---|
+| HW-001 | Raspberry Pi 5 | Available | Physical companion | Raspberry Pi 5 | RAM, storage, cooling and PSU |
+| HW-002 | Raspberry Pi 7-inch Touch Display Gen 1 | Available | Prototype UI | Exact revision to verify | Pi 5 cable, touch and UI benchmarks |
+| HW-003 | Raspberry Pi Camera | Believed available | Future vision | To identify | Locate, identify and test |
+| HW-004 | Intel NUC | Available | Primary local-compute baseline | NUC8i5BEH; Core i5-8259U; 16 GB RAM | Storage, RAM layout, BIOS, OS and benchmarks |
+| HW-005 | Acer development system | Available | Workstation/development | i7; 32 GB RAM; NVIDIA GPU | Exact model, CPU, GPU, storage and OS |
+| HW-006 | Microphone | To define | Voice input | TBD | Inventory and benchmark existing devices |
+| HW-007 | Speaker | To define | Voice output | TBD | Inventory and benchmark existing devices |
+| HW-008 | NVIDIA Jetson Nano | Available | Vision/edge evaluation | First-generation 4 GB class | Exact board revision and JetPack |
+| HW-009 | Creality K2 Pro + CFS | Available | Enclosure fabrication | K2 Pro with CFS | Firmware and slicer workflow |
 
 ------------------------------------------------------------------------
 
 
-# 14A. Pi 5 ↔ NUC Network Architecture
+# 20A. Pi 5 ↔ NUC Network Architecture
 
-## 14A.1 Design intent
+## 20A.1 Design intent
 
 Project TARS should use two logically distinct network paths:
 
@@ -1069,7 +1053,7 @@ backbone.
 The **Wi-Fi interfaces** remain available independently for development,
 normal LAN access and cloud/internet services.
 
-## 14A.2 Direct Ethernet role
+## 20A.2 Direct Ethernet role
 
 The point-to-point Ethernet connection should carry latency-sensitive and
 internal TARS traffic such as:
@@ -1086,7 +1070,7 @@ internal TARS traffic such as:
 A normal Ethernet patch cable should be sufficient on modern
 auto-MDI/MDIX interfaces.
 
-## 14A.3 Private subnet
+## 20A.3 Private subnet
 
 Use a dedicated static subnet for the point-to-point connection.
 
@@ -1104,7 +1088,7 @@ The exact addresses may change during implementation.
 This prevents normal internet traffic from accidentally preferring the
 private link.
 
-## 14A.4 Wi-Fi role
+## 20A.4 Wi-Fi role
 
 Pi 5 and NUC Wi-Fi should connect to the normal trusted LAN and may be used
 for:
@@ -1123,7 +1107,7 @@ the orchestrator's routing policy.
 
 The NUC is therefore **not required to act as the Pi's internet gateway**.
 
-## 14A.5 Service exposure
+## 20A.5 Service exposure
 
 Where practical, NUC-hosted internal TARS services should bind to the
 private Ethernet interface rather than being exposed broadly on the home
@@ -1143,7 +1127,7 @@ Candidate private services include:
 
 Actual service/API structure remains a firmware/software design decision.
 
-## 14A.6 Failure behaviour
+## 20A.6 Failure behaviour
 
 Loss of one network path should degrade gracefully.
 
@@ -1161,7 +1145,7 @@ NUC FAILS
     -> use Pi-local functions and/or cloud via Pi Wi-Fi
 ```
 
-## 14A.7 Network principle
+## 20A.7 Network principle
 
 > **Ethernet is the internal TARS backbone; Wi-Fi is the external/development path.**
 
@@ -1264,8 +1248,6 @@ Measure only what is relevant to tasks Project TARS may delegate.
 -   [ ] Record NUC RAM module arrangement/speed.
 -   [ ] Record NUC storage devices/capacities.
 -   [ ] Record NUC BIOS version.
--   [ ] Record exact i5 CPU.
--   [ ] Record NUC storage.
 -   [ ] Decide initial NUC operating system.
 -   [ ] Record relevant Windows workstation specs.
 -   [ ] Confirm wired-network options between nodes.
@@ -1296,12 +1278,13 @@ Measure only what is relevant to tasks Project TARS may delegate.
 The addition of more powerful computers does not move the
 UI/device-control role away from the Pi.
 
-## H002 --- Intel NUC becomes an optional local compute node
+## H002 --- Intel NUC is the local-compute node
 
 **Status:** Adopted for prototyping.
 
-The existing i5/16 GB NUC should be evaluated for local AI, speech,
-embeddings, databases and background services.
+The identified NUC8i5BEH is the primary local-compute baseline for local
+AI, speech, embeddings, databases and background services. Its services
+remain optional to the Pi's basic physical-companion operation.
 
 ## H003 --- Distributed operation must degrade gracefully
 
@@ -1339,13 +1322,12 @@ The available large-volume 3D printer enables rapid enclosure, bracket
 and jig iteration. Mechanical design should prioritise maintainability
 and modular replacement.
 
-## H008 --- Prefer existing in-house hardware
+## H008 --- New purchases require measured justification
 
 **Status:** Project strategy.
 
-A substantial proportion of the likely prototype hardware is already
-available. New purchases should solve a demonstrated requirement rather
-than precede benchmarking.
+Existing hardware should be benchmarked first. New purchases must solve a
+demonstrated limitation rather than precede measurement.
 
 ## H009 --- Development environments should be reproducible
 
@@ -1372,24 +1354,49 @@ DSI versus HDMI should not be decided on assumed interface speed alone.
 Project TARS should measure actual frame timing, input latency, resource
 usage and usability with the intended UI.
 
+## H012 --- Touch Display 2 is the preferred official display upgrade candidate
 
-## H020 --- NUC8i5BEH is the primary local compute baseline
+**Status:** Candidate; do not purchase until prototype benchmarking.
+
+If the Gen-1 800×480 display proves limiting, evaluate Raspberry Pi
+Touch Display 2 before moving to a generic HDMI panel. HDMI remains
+available if resolution, size or integration requirements still are not
+met.
+
+## H013 --- Raspberry Pi OS Lite 64-bit is the baseline runtime OS
 
 **Status:** Adopted for prototyping.
 
-The identified Intel NUC8i5BEH with Core i5-8259U and 16 GB RAM becomes
-the baseline local compute node for Project TARS.
+The Pi should use Raspberry Pi OS Lite 64-bit with only the graphical,
+input, audio and service components required by Project TARS.
 
-Its initial evaluation should prioritize local LLM serving, STT, TTS,
-memory/index services and sustained CPU performance.
+A complete desktop environment should not be installed unless a measured
+requirement later justifies it.
 
-## H021 --- Treat NUC AI workloads as CPU-first
+## H014 --- Pi is a runtime appliance, not the primary development desktop
 
-**Status:** Architectural guidance.
+**Status:** Adopted.
 
-The integrated Intel Iris Plus Graphics 655 should not be relied upon as a
-CUDA-class AI accelerator. Workload decisions should be based on measured
-CPU inference performance and supported acceleration paths.
+Development should primarily occur on the Acer development machine, with
+the Pi treated as a reproducible deployment target administered via SSH
+and automated tooling.
+
+## H015 --- USB audio is the first-prototype baseline
+
+**Status:** Adopted for prototyping.
+
+Where suitable existing USB audio hardware is available, use USB
+microphone/audio devices to establish the first reliable voice loop before
+committing to custom integrated audio electronics.
+
+## H016 --- I2S audio is the preferred integrated-design candidate
+
+**Status:** Candidate pending acoustic and driver testing.
+
+Evaluate I2S microphone/codec/DAC/amplifier hardware after the voice
+software stack is stable. Final selection must account for echo
+cancellation, microphone/speaker geometry, Linux support and enclosure
+constraints.
 
 ## H017 --- Direct Ethernet is the preferred Pi-to-NUC transport
 
@@ -1419,40 +1426,23 @@ Where practical, internal TARS APIs should bind to or firewall toward the
 private Pi↔NUC network rather than being unnecessarily exposed across the
 general LAN.
 
-## H015 --- USB audio is the first-prototype baseline
+## H020 --- NUC8i5BEH is the primary local compute baseline
 
 **Status:** Adopted for prototyping.
 
-Where suitable existing USB audio hardware is available, use USB
-microphone/audio devices to establish the first reliable voice loop before
-committing to custom integrated audio electronics.
+The identified Intel NUC8i5BEH with Core i5-8259U and 16 GB RAM becomes
+the baseline local compute node for Project TARS.
 
-## H016 --- I2S audio is the preferred integrated-design candidate
+Its initial evaluation should prioritize local LLM serving, STT, TTS,
+memory/index services and sustained CPU performance.
 
-**Status:** Candidate pending acoustic and driver testing.
+## H021 --- Treat NUC AI workloads as CPU-first
 
-Evaluate I2S microphone/codec/DAC/amplifier hardware after the voice
-software stack is stable. Final selection must account for echo
-cancellation, microphone/speaker geometry, Linux support and enclosure
-constraints.
+**Status:** Architectural guidance.
 
-## H013 --- Raspberry Pi OS Lite 64-bit is the baseline runtime OS
-
-**Status:** Adopted for prototyping.
-
-The Pi should use Raspberry Pi OS Lite 64-bit with only the graphical,
-input, audio and service components required by Project TARS.
-
-A complete desktop environment should not be installed unless a measured
-requirement later justifies it.
-
-## H014 --- Pi is a runtime appliance, not the primary development desktop
-
-**Status:** Adopted.
-
-Development should primarily occur on the Acer development machine, with
-the Pi treated as a reproducible deployment target administered via SSH
-and automated tooling.
+The integrated Intel Iris Plus Graphics 655 should not be relied upon as a
+CUDA-class AI accelerator. Workload decisions should be based on measured
+CPU inference performance and supported acceleration paths.
 
 ------------------------------------------------------------------------
 
@@ -1461,9 +1451,9 @@ and automated tooling.
 -   Exact Pi 5 RAM/storage/cooling?
 -   Which minimal graphics path best suits the final UI framework: lightweight Wayland, X/Wayland session, or direct DRM/KMS?
 -   What is the minimum package set required for display, touch, audio and networking?
--   Exact NUC model and CPU generation?
 -   Which OS should the NUC run?
--   Does the NUC have hardware useful for accelerated inference?
+-   Which supported Intel CPU/iGPU acceleration paths materially improve
+    measured NUC inference without harming stability?
 -   Exact workstation specifications?
 -   Which microphone gives acceptable desk-range capture?
 -   Which speaker arrangement minimises echo?
@@ -1669,6 +1659,12 @@ accidental collection of installed software.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
+  0.9                     2026-08-09              Reconciled the authoritative
+                                                  inventory, Acer identity,
+                                                  completed NUC facts,
+                                                  decision ordering and
+                                                  section numbering
+
   0.8                     2026-08-09              Identified Intel NUC8i5BEH,
                                                   Core i5-8259U, 16 GB RAM,
                                                   platform I/O/network/storage

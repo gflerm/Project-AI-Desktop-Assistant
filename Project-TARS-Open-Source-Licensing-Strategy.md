@@ -1,6 +1,6 @@
 # Project TARS --- Open-Source Licensing Strategy
 
-**Status:** Version 0.2 --- Adopted licensing strategy / Living Work in Progress\
+**Status:** Version 0.3 --- Adopted licensing strategy / Living Work in Progress\
 **Date:** 2026-08-09\
 **Default open-source software licence:** Apache License 2.0\
 **Working project name:** Project TARS\
@@ -11,8 +11,8 @@ Obtain qualified IP/legal review before public or commercial release.
 
 ## 1. Decision
 
-For original Project TARS **software source code**, the recommended
-open-source licence is:
+For original Project TARS **software source code explicitly selected for
+open-source release**, the adopted default licence is:
 
 > **Apache License 2.0 — adopted default for original software explicitly released as open source.**
 
@@ -121,26 +121,26 @@ One licence should not be forced onto every type of project material.
 
 ## 4. Relationship to Project IP Policy
 
-The existing `Project-TARS-License-and-IP-Policy.md` currently states
-that original Project TARS material is proprietary / All Rights
-Reserved.
+`Project-TARS-License-and-IP-Policy.md` v0.3 reconciled the project-level
+policy: private/unreleased material remains All Rights Reserved, while
+original software deliberately selected for public open-source release
+defaults to Apache-2.0. Models, voices, assets, hardware designs,
+documentation, branding and third-party materials retain separate terms.
 
-That policy must **not silently coexist** with an Apache-2.0 repository
-release.
-
-Before public open-source publication:
+That policy-level reconciliation does not automatically license any file.
+Before each public open-source publication:
 
 1.  make a deliberate release decision;
 2.  identify which files/components are being opened;
 3.  confirm ownership/provenance;
-4.  replace or revise conflicting All-Rights-Reserved statements for
-    those components;
+4.  mark the released files/components explicitly and remove conflicting
+    notices from that release scope;
 5.  add the Apache-2.0 `LICENSE` file;
 6.  add `NOTICE` and `THIRD_PARTY_NOTICES` where applicable;
 7.  tag the first open-source release.
 
-Until that transition is intentionally made, the existing private
-repository policy remains the conservative working state.
+Until a component passes that release-specific audit and is explicitly
+marked, it remains under the private/unreleased policy.
 
 ------------------------------------------------------------------------
 
@@ -443,26 +443,44 @@ engineering and makes licence provenance easier to audit.
 
 ------------------------------------------------------------------------
 
-## 15. Recommended Open-Source Position
+## 15. Adopted Open-Source Position
 
-The recommended direction is:
+The adopted direction is:
 
 > **Open the reusable engineering platform; keep identity and
 > third-party rights cleanly separated.**
 
-A sensible public structure is:
+A sensible candidate public structure is:
 
-**Open under Apache-2.0** - orchestrator framework; - provider
-interfaces; - Pi/NUC service protocol; - hardware abstraction; -
-deployment tooling; - example plugins; - diagnostics; - tests.
+**Candidate software for Apache-2.0 release:**
 
-**Separately licensed / reviewed** - personality content; - voice
-models; - wake models; - original art/audio; - CAD/hardware design; -
-branding.
+- provider interfaces;
+- Pi/NUC service protocols;
+- hardware abstraction;
+- deployment tooling;
+- example plugins;
+- diagnostics and tests;
+- reusable orchestrator components selected through a component-level
+  release decision.
 
-**Never claimed as Project TARS IP** - fictional characters and their
-assets; - third-party models; - third-party APIs; - third-party
-libraries.
+**Separately licensed or reviewed:**
+
+- personality and identity content;
+- application-specific orchestration/policy that has not been selected
+  for release;
+- voice and wake-word models;
+- original art/audio;
+- CAD/hardware design;
+- branding.
+
+**Never claimed as Project TARS IP:**
+
+- fictional characters and their assets;
+- third-party models and APIs;
+- third-party libraries.
+
+The release scope of the orchestrator is therefore **component-specific**,
+not categorically open or categorically proprietary.
 
 ------------------------------------------------------------------------
 
@@ -498,10 +516,9 @@ files.
 
 ## 17. Licensing Decisions
 
-### LIC-001 --- Apache-2.0 is the recommended default software licence
+### LIC-001 --- Apache-2.0 is the adopted default software licence
 
-**Status:** Proposed for adoption before first public open-source
-release.
+**Status:** Adopted for original software explicitly selected for release.
 
 ### LIC-002 --- Third-party components retain their own licences
 
@@ -519,7 +536,7 @@ release.
 
 **Status:** Required.
 
-### LIC-006 --- Open-source release requires reconciliation of the existing proprietary policy
+### LIC-006 --- Policy-level reconciliation is complete; each release still requires an audit
 
 **Status:** Reconciled at policy level; release-specific audit remains required.
 
@@ -534,6 +551,17 @@ release.
   ------------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- ------------------------
+  0.3                     2026-08-09              Removed stale reconciliation
+                                                  wording, aligned adopted
+                                                  status and made orchestrator
+                                                  release scope explicitly
+                                                  component-specific
+
+  0.2                     2026-08-09              Adopted Apache-2.0 as the
+                                                  default for original software
+                                                  explicitly selected for
+                                                  open-source release
+
   0.1                     2026-08-09              Initial open-source
                                                   licensing strategy;
                                                   recommends Apache-2.0

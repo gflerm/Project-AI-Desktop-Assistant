@@ -1,6 +1,6 @@
 # Project TARS --- Firmware & Software Development Roadmap
 
-**Status:** Version 0.3 --- Living Work in Progress\
+**Status:** Version 0.4 --- Living Work in Progress\
 **Date:** 2026-08-09\
 **Scope:** Firmware/software only; mechanical enclosure and hardware
 construction are tracked separately\
@@ -59,9 +59,9 @@ not raw lines-of-code production time.
                           available               refactoring and
                                                   repetitive coding
 
-  Cloud LLM               Gemini/Gemma-family API Early conversational
-                          already experimented    backend and provider
-                          with                    testing
+  Cloud provider          Gemini/Gemma-family API Initial adapter,
+                          already experimented    comparison and capability
+                          with                    escalation testing
 
   Additional cloud AI     Provider-swappable      Can be introduced
                           architecture            without redesigning
@@ -75,8 +75,8 @@ not raw lines-of-code production time.
                           runtime                 handling and device
                                                   services
 
-  Intel NUC               i5 / 16 GB available    Optional local
-                                                  AI/services node
+  Intel NUC8i5BEH         i5-8259U / 16 GB        Primary CPU-first local
+                                                  AI/services baseline
 
   Jetson Nano             First-generation / 4 GB Optional CUDA/vision
                           available               experimentation
@@ -147,7 +147,7 @@ deployments pushed to the Pi.
 foundation\
 **First major target:** M5 --- Usable voice companion\
 **First useful companion target:** approximately **20--32 FDD**\
-**More complete v1 software target:** approximately **40--65 FDD**\
+**More complete v1 software target:** approximately **50--75 FDD**\
 **Optional vision:** deliberately outside the critical path
 
   -------------------------------------------------------------------------------------
@@ -156,9 +156,8 @@ foundation\
   Architecture/specification   In progress                        Yes Continue refining
                                                                       interfaces
 
-  Repository/dev environment   Not started                        Yes Establish
-                                                                      canonical
-                                                                      repo/toolchain
+  Repository/dev environment   Repository/docs                    Yes Scaffold runtime,
+                               checkpoint complete                    toolchain and CI
 
   Core event/state runtime     Not started                        Yes Interfaces to
                                                                       define
@@ -193,7 +192,7 @@ foundation\
   Workstation bridge           Designed                            No Local
                                conceptually                           RPC/security
 
-  Local NUC AI                 Candidate                           No Benchmark
+  Local NUC AI                 Baseline selected                   No Benchmark
                                                                       hardware/models
 
   Vision                       Deferred                            No Camera/compute
@@ -259,7 +258,7 @@ mechanisms: components can be developed and tested independently.
   M0          Repo + dev/runtime foundation                      2--4 FDD
   M1          Event bus + state machine                          4--7 FDD
   M2          Animated display + touch                          7--12 FDD
-  M3          Cloud brain/orchestrator text loop               10--16 FDD
+  M3          Provider/orchestrator text loop                  10--16 FDD
   M4          Voice in + voice out                             16--25 FDD
   **M5**      **First usable desk companion**              **20--32 FDD**
   M6          Memory + personality/policy                      25--39 FDD
@@ -413,7 +412,7 @@ than bypassing the architecture.
 
 ------------------------------------------------------------------------
 
-# 10. WP04 --- AI Provider Abstraction / "Cloud Brain"
+# 10. WP04 --- AI / Intelligence Provider Abstraction
 
 **Priority:** Critical\
 **Prototype:** 1--2 FDD\
@@ -431,7 +430,9 @@ health_check()
 ```
 
 Initial implementation may wrap the already-tested Gemini/Gemma-family
-cloud endpoint.
+cloud endpoint, but cloud is an adapter and capability-escalation tier,
+not the architectural owner of intelligence. NUC-local and mock providers
+must fit the same contract.
 
 Other providers remain adapters rather than architectural changes.
 
@@ -691,6 +692,18 @@ layer.
 -   structured result return;
 -   audit log.
 
+## Pi↔NUC network requirements
+
+-   use dedicated point-to-point Ethernet as the preferred internal
+    service path;
+-   use static private addressing with no default gateway;
+-   bind or firewall internal NUC services toward the private interface
+    where practical;
+-   retain independent Wi-Fi for trusted-LAN development, updates and
+    cloud access;
+-   test policy-approved Wi-Fi/LAN fallback without making it the default
+    service route.
+
 ## Definition of done
 
 The Pi can safely request one useful service from the workstation
@@ -707,6 +720,8 @@ without exposing an unrestricted remote shell.
 
 Candidate services:
 
+-   Ollama local-LLM serving;
+-   `llama.cpp` as the low-level comparison/reference;
 -   local STT;
 -   local TTS;
 -   embeddings;
@@ -715,12 +730,18 @@ Candidate services:
 -   background indexing;
 -   local tool services.
 
+The baseline hardware is the Intel NUC8i5BEH with Core i5-8259U and
+16 GB RAM. Treat it as CPU-first: do not assume CUDA-class acceleration.
+Benchmark model load, tokens/second, speech latency, storage, thermals and
+power before assigning default workloads.
+
 Do not build every service merely because the NUC exists.
 
 ## Definition of done
 
-At least one workload can route Pi -\> NUC -\> Pi with health detection
-and automatic fallback.
+At least one workload can route Pi -\> private Ethernet -\> NUC -\> Pi
+with health detection, interface-restricted exposure, automatic fallback,
+and independent Wi-Fi/cloud operation verified.
 
 ------------------------------------------------------------------------
 
@@ -950,8 +971,8 @@ block M5**.
 
 Goal:
 
-> The system boots, displays state, passes events and can talk to a
-> cloud AI through typed interfaces.
+> The system boots, displays state, passes events and can talk to a mock,
+> NUC-local or cloud AI through the same typed interfaces.
 
 Includes WP00, WP01, early WP02, WP04 and early WP05.
 
@@ -1584,9 +1605,12 @@ The correct schedule is the one that changes when evidence changes.
 
 # 36. Current Next Actions
 
--   [ ] Establish canonical private code repository.
+-   [x] Establish canonical private code repository and documentation
+    checkpoint.
 -   [ ] Record actual development toolchain and versions.
--   [ ] Decide initial Pi OS/runtime/Python baseline.
+-   [x] Adopt Raspberry Pi OS Lite 64-bit as the Pi OS baseline.
+-   [ ] Select Python version and the minimum graphics/audio/input package
+    set; capture it in reproducible provisioning.
 -   [ ] Define repository/module layout.
 -   [ ] Define event schema.
 -   [ ] Define service interfaces.
@@ -1686,6 +1710,30 @@ rather than carrying the overhead of a complete desktop environment.
 The Acer development machine is the primary engineering environment; the
 Pi is a reproducible deployment target and appliance runtime.
 
+## R013 --- Private Ethernet is the default Pi-to-NUC service path
+
+**Status:** Adopted for prototyping.
+
+The software deployment and acceptance tests must assume a dedicated
+static Pi↔NUC subnet with no default gateway, interface-restricted internal
+services and independently functioning Wi-Fi.
+
+## R014 --- NUC8i5BEH is the CPU-first local-compute baseline
+
+**Status:** Adopted for benchmarking.
+
+Ollama, `llama.cpp`, STT, TTS, memory and background services should be
+benchmarked on the identified i5-8259U / 16 GB node before default routing
+is selected.
+
+## R015 --- Cloud is capability escalation, not the architectural brain
+
+**Status:** Adopted.
+
+Cloud providers, NUC-local providers and mocks share the same interfaces;
+the orchestrator chooses among them by policy, availability and measured
+fitness.
+
 ------------------------------------------------------------------------
 
 # 38. Version History
@@ -1693,6 +1741,20 @@ Pi is a reproducible deployment target and appliance runtime.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
+  0.4                     2026-08-09              Reconciled NUC8i5BEH
+                                                  baseline, private Pi↔NUC
+                                                  networking, provider naming,
+                                                  repository state and v1
+                                                  estimate
+
+  0.3                     2026-08-09              Adopted Raspberry Pi OS Lite
+                                                  64-bit and separated Acer
+                                                  development from Pi runtime
+
+  0.2                     2026-08-09              Added multi-agent ownership,
+                                                  testing, review and
+                                                  integration strategy
+
   0.1                     2026-08-09              Initial modular
                                                   firmware/software
                                                   roadmap, dashboard,

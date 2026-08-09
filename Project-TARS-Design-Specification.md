@@ -1,6 +1,6 @@
 # Project TARS --- Design Specification
 
-**Status:** Version 0.5 — Living Work in Progress --- Concept, Comparative Analysis & Initial
+**Status:** Version 0.6 — Living Work in Progress --- Concept, Comparative Analysis & Initial
 Architecture\
 **Date:** 2026-08-09\
 **Working concept:** A desk-resident, hybrid AI workstation companion
@@ -25,7 +25,6 @@ The governing development principle is:
 ---
 
 ## 1. Purpose
-## Project Goal
 
 The goal of Project TARS is to develop an **original, desk-resident AI companion and workstation partner** that combines a responsive physical interface with local control, optional cloud intelligence, voice interaction, expressive but restrained visual/audio feedback, tool use, and carefully bounded proactive assistance.
 
@@ -34,7 +33,8 @@ The system should:
 - live primarily on a Raspberry Pi 5-based desk device;
 - remain useful even when cloud services are degraded or unavailable;
 - use replaceable AI providers rather than depend on one model vendor;
-- cooperate with the adjacent PC for heavier compute and development tasks;
+- use the Intel NUC as the primary local-compute partner and the adjacent
+  Acer system as the development workstation;
 - feel responsive through local event handling and pre-built expressive states;
 - provide a consistent original personality independent of the underlying model;
 - favour competence, truthfulness, privacy, operator control and low interruption;
@@ -681,7 +681,7 @@ The implementation should extract principles from these references and deliberat
 
 # Part II --- Project Identity
 
-## 6. Product Vision
+## 20. Product Vision
 
 > A small, persistent AI presence on the desk that can listen, think,
 > speak, see when authorised, operate tools, assist with development,
@@ -690,7 +690,7 @@ The implementation should extract principles from these references and deliberat
 It is not intended to replace the desktop PC. It is a **dedicated
 physical front-end to the user's personal AI environment**.
 
-### 6.1 Design principles
+### 20.1 Design principles
 
 1.  **Pi-first:** Raspberry Pi 5 is the primary device.
 2.  **Cloud-optional, not cloud-shaped:** cloud models may supply
@@ -716,11 +716,12 @@ physical front-end to the user's personal AI environment**.
 
 # Part III --- Initial Hardware Specification
 
-## 7. Baseline Hardware
+## 21. Baseline Hardware
 
 ### Required / already considered
 
 -   Raspberry Pi 5
+-   Intel NUC8i5BEH with Core i5-8259U and 16 GB RAM
 -   Official first-generation 7-inch Raspberry Pi touchscreen (800×480)
 -   Correct Pi 5-compatible DSI cable/adapter arrangement
 -   suitable Pi 5 power supply
@@ -742,26 +743,54 @@ physical front-end to the user's personal AI environment**.
 -   ESP32/M5 device as a peripheral controller
 -   external accelerator if a later workload justifies it
 
-## 8. Hardware Responsibility Split
+## 22. Hardware Responsibility Split
 
 ### Raspberry Pi 5
 
-The Pi should own:
+The Pi should own the companion identity, real-time interaction and
+hardware-facing control path:
 
 -   operating system;
 -   touchscreen UI;
 -   animation engine;
 -   audio capture/playback;
 -   wake-word/VAD;
--   speech pipeline;
 -   assistant orchestrator;
--   API calls;
--   memory/state database;
--   tools;
--   camera processing;
+-   provider/service routing and policy enforcement;
+-   basic Pi-local speech and fallback functions;
+-   immediate device and conversation state;
+-   camera acquisition and privacy indication;
 -   networking;
 -   logging;
 -   updates.
+
+The Pi must remain visibly responsive and retain basic local functions if
+the NUC or internet is unavailable.
+
+### Intel NUC8i5BEH
+
+The NUC is the primary local-compute partner. It should provide heavier or
+more persistent services behind explicit, replaceable interfaces:
+
+-   Ollama as the first operational local-LLM server candidate;
+-   `llama.cpp` as the low-level local-inference reference;
+-   larger STT models and CPU-intensive transcription;
+-   local TTS candidates;
+-   embeddings, memory, indexing and databases;
+-   background jobs and optional local vision processing.
+
+The NUC is a CPU-first node; its integrated graphics must not be treated as
+a CUDA-class accelerator. The NUC adds capability but does not own the
+companion's identity or physical presence.
+
+### Network responsibility split
+
+The preferred Pi-to-NUC transport is a dedicated point-to-point Ethernet
+link on a private static subnet with no default gateway. Internal NUC
+services should bind to or be firewalled toward that interface where
+practical. Both machines retain independent Wi-Fi for trusted-LAN access,
+development, updates and cloud services. Loss of either path must degrade
+gracefully.
 
 ### Optional microcontroller
 
@@ -782,7 +811,7 @@ necessary.
 
 # Part IV --- Software Architecture
 
-## 9. High-Level Flow
+## 23. High-Level Flow
 
 ``` text
 Microphone / Touch / Camera
@@ -791,11 +820,11 @@ Microphone / Touch / Camera
    Input & Event Layer
           |
           v
-  Assistant Orchestrator
-   /       |        \
-  /        |         \
-Local    Cloud AI    Tools
-Services  Adapters   / Actions
+   Assistant Orchestrator
+    /       |        \
+   /        |         \
+Pi-local  NUC AI    Cloud / Tools
+fallback  services   escalation
   \        |         /
    \       |        /
       Response Bus
@@ -804,9 +833,9 @@ Services  Adapters   / Actions
    Display     Speech
 ```
 
-## 10. Proposed Services
+## 24. Proposed Services
 
-### 10.1 UI Service
+### 24.1 UI Service
 
 Responsibilities:
 
@@ -822,7 +851,7 @@ Possible implementation: Python + Qt/PySide, or a lightweight web UI in
 kiosk mode. Selection should be made after a small latency/resource
 prototype.
 
-### 10.2 Animation State Machine
+### 24.2 Animation State Machine
 
 Initial states:
 
@@ -847,7 +876,7 @@ Animations should be pre-rendered or procedurally lightweight and
 triggered by events. This gives the device EMO-like responsiveness
 without expensive generative graphics.
 
-### 10.3 Audio Service
+### 24.3 Audio Service
 
 Pipeline:
 
@@ -866,7 +895,7 @@ Important requirements:
 -   visual indication whenever the microphone is actively processing
     speech.
 
-### 10.4 Assistant Orchestrator
+### 24.4 Assistant Orchestrator
 
 The orchestrator is the heart of the system. It should:
 
@@ -880,7 +909,7 @@ The orchestrator is the heart of the system. It should:
 -   enforce permissions;
 -   handle timeouts and fallback.
 
-### 10.5 AI Provider Layer
+### 24.5 AI Provider Layer
 
 Define a common provider interface so that model choice is
 configuration, not architecture.
@@ -897,13 +926,14 @@ health_check()
 
 Initial candidates:
 
--   Gemini/Gemma-family cloud endpoint already being experimented with;
--   OpenAI API as an optional provider;
--   small local model for offline/simple commands;
--   future LAN-hosted model running on the desktop PC or another
-    machine.
+-   Ollama on the NUC as the first operational local-LLM server candidate;
+-   `llama.cpp` on the NUC as the portable low-level reference;
+-   Gemini/Gemma-family and OpenAI cloud endpoints as interchangeable
+    escalation or comparison providers;
+-   small Pi-local models or deterministic handlers for offline/simple
+    commands.
 
-### 10.6 Local Intelligence
+### 24.6 Local Intelligence
 
 The Pi should not be forced to run a large conversational model merely
 to claim that the project is "local."
@@ -921,10 +951,12 @@ Useful local workloads include:
 -   caching;
 -   fallback responses.
 
-A larger local model can later run on the adjacent PC or a dedicated
-mini-PC and be exposed to the Pi over the LAN.
+A larger local model should first be evaluated on the identified
+NUC8i5BEH and exposed to the Pi over the private Ethernet link. The Acer
+development system may provide additional model testing or workstation
+services, but is not the companion's primary local-compute baseline.
 
-### 10.7 Tool Layer
+### 24.7 Tool Layer
 
 Tools should be explicit modules with schemas, permissions and timeouts.
 
@@ -943,7 +975,7 @@ Candidate modules:
 -   future calendar/email integrations where credentials and permissions
     allow.
 
-### 10.8 Attention Manager
+### 24.8 Attention Manager
 
 Classify system events by interruption value:
 
@@ -958,37 +990,37 @@ URGENT
 The attention manager decides whether an event becomes only a screen
 change, a small sound, a notification, or spoken interruption.
 
-### 10.9 Epistemic State
+### 24.9 Epistemic State
 
 Where technically useful, the orchestrator should preserve provenance
 such as whether a statement came from direct observation, a tool result,
 model inference or an assumption.
 
-### 10.10 Specialist Mode Manager
+### 24.10 Specialist Mode Manager
 
 Specialist modes select domain prompts, tools, retrieval sources and UI
 shortcuts while preserving the same core assistant identity.
 
-### 10.11 Non-Verbal Feedback Service
+### 24.11 Non-Verbal Feedback Service
 
 A compact audio/animation vocabulary should acknowledge common events
 without invoking TTS. Sounds must be original and configurable.
 
-### 10.12 Severity and Tone Governor
+### 24.12 Severity and Tone Governor
 
 Consequential events should receive a severity classification. As severity rises, humour and sarcasm ceilings fall, ambiguity tolerance falls, confirmation requirements rise, and clarity priority rises.
 
 This policy should operate independently of the selected LLM provider.
 
-### 10.13 Persistent Behavioural State
+### 24.13 Persistent Behavioural State
 
 A lightweight state manager may influence idle animation and conversational initiative. State changes should be event-driven and bounded and must never interfere with task execution.
 
-### 10.14 Workstation Partnership Layer
+### 24.14 Workstation Partnership Layer
 
 The Pi may subscribe to selected telemetry and events from the adjacent PC, subject to explicit permissions. This creates persistent machine partnership without requiring the Pi to perform all compute locally.
 
-### 10.15 Memory
+### 24.15 Memory
 
 Separate memory into:
 
@@ -1006,7 +1038,7 @@ can be added only when there is enough material to justify it.
 
 # Part V --- Personality Architecture
 
-## 11. Personality Must Not Be One Giant Prompt
+## 25. Personality Must Not Be One Giant Prompt
 
 Personality should be represented as configuration plus policies.
 
@@ -1028,7 +1060,7 @@ personality:
 The system then translates these values into prompt instructions and
 local behavioural decisions.
 
-## 12. Behaviour Examples
+## 26. Behaviour Examples
 
 ### Idle
 
@@ -1064,7 +1096,7 @@ state and continue supporting local functions.
 
 # Part VI --- Vision Roadmap
 
-## 13. Camera Support
+## 27. Camera Support
 
 Vision is explicitly **not required for the first useful version**.
 
@@ -1092,7 +1124,7 @@ Potential modes:
 
 # Part VII --- Codex / Development Integration
 
-## 14. Role of Codex-style tooling
+## 28. Role of Codex-style tooling
 
 Development agents should be treated as tools used by the assistant, not
 as the assistant's personality engine.
@@ -1125,9 +1157,11 @@ substantially greater resources.
 
 # Part VIII --- Delivery Roadmap
 
-## 15. Phase 0 --- Hardware Verification
+## 29. Phase 0 --- Hardware Verification
 
 -   [ ] Verify exact Pi 5 model/RAM.
+-   [x] Record NUC8i5BEH, Core i5-8259U and 16 GB RAM baseline.
+-   [ ] Verify NUC storage, BIOS, thermals and operating system.
 -   [ ] Verify first-generation 7-inch touchscreen with Pi 5.
 -   [ ] Obtain correct DSI cable.
 -   [ ] Confirm touchscreen input.
@@ -1136,11 +1170,13 @@ substantially greater resources.
 -   [ ] Select microphone.
 -   [ ] Select speaker/audio interface.
 -   [ ] Locate and identify Raspberry Pi camera.
+-   [ ] Configure and test the private Pi↔NUC Ethernet link with no
+    default gateway.
 
 **Exit criterion:** Pi boots reliably into a touchscreen interface with
 working audio I/O.
 
-## 16. Phase 1 --- The Face on the Desk
+## 30. Phase 1 --- The Face on the Desk
 
 -   [ ] Fullscreen application.
 -   [ ] Basic idle animation.
@@ -1154,26 +1190,29 @@ working audio I/O.
 **Exit criterion:** the device visibly feels responsive even without an
 LLM.
 
-## 17. Phase 2 --- Voice Companion
+## 31. Phase 2 --- Voice Companion
 
 -   [ ] Microphone capture.
 -   [ ] VAD.
 -   [ ] Wake word or push-to-talk.
--   [ ] STT.
--   [ ] Cloud model adapter.
+-   [ ] Replaceable STT adapter with Pi and NUC benchmark paths.
+-   [ ] Ollama NUC provider adapter and `llama.cpp` comparison path.
+-   [ ] At least one cloud provider adapter for escalation/comparison.
 -   [ ] Streaming response.
--   [ ] TTS.
+-   [ ] Replaceable local/cloud TTS adapter.
 -   [ ] Barge-in/interruption.
 -   [ ] Personality configuration.
+-   [ ] NUC health/capability discovery and graceful fallback.
 
 **Exit criterion:** natural end-to-end conversation with useful
 perceived latency.
 
-## 18. Phase 3 --- Useful Assistant
+## 32. Phase 3 --- Useful Assistant
 
 -   [ ] Tool framework.
 -   [ ] Local system tools.
--   [ ] PC communication.
+-   [ ] Authenticated NUC/workstation communication over the appropriate
+    private or trusted network path.
 -   [ ] Project/file context.
 -   [ ] Development/Codex integration.
 -   [ ] MQTT/automation if desired.
@@ -1183,7 +1222,7 @@ perceived latency.
 **Exit criterion:** the device performs useful desk/workstation tasks,
 not merely chat.
 
-## 19. Phase 4 --- Vision
+## 33. Phase 4 --- Vision
 
 -   [ ] Camera driver/test.
 -   [ ] Presence detection.
@@ -1192,20 +1231,21 @@ not merely chat.
 -   [ ] Privacy indicator.
 -   [ ] Optional recognition features.
 
-## 20. Phase 5 --- Ambient Intelligence
+## 34. Phase 5 --- Ambient Intelligence
 
 -   [ ] Context-sensitive idle behaviour.
 -   [ ] Carefully bounded proactive suggestions.
 -   [ ] Scheduled/background events.
 -   [ ] Sensor expansion.
 -   [ ] Optional microcontroller peripherals.
--   [ ] Optional local/LAN LLM.
+-   [ ] Additional local models or accelerators only when benchmarks
+    justify them.
 
 ------------------------------------------------------------------------
 
 # Part IX --- Initial Technical Decisions
 
-## 21. Decisions Made So Far
+## 35. Decisions Made So Far
 
 ### D001 --- Raspberry Pi 5 is the primary runtime
 
@@ -1214,13 +1254,17 @@ microcontroller from the critical conversational path.
 
 ### D002 --- 7-inch Raspberry Pi display remains viable for the prototype
 
-**Reason:** 800×480 is sufficient for expressive animation, status and
-touch controls.
+**Reason:** the owned 800×480 display is the correct baseline for real UI
+verification. If measured readability, layout or rendering results show a
+limitation, Raspberry Pi Touch Display 2 is the preferred official upgrade
+candidate; HDMI remains an option for requirements it cannot meet.
 
-### D003 --- Heavy LLM inference may use the cloud
+### D003 --- Heavy LLM inference may use the NUC or cloud
 
 **Reason:** forcing a Pi-sized local model to provide the main
-conversational quality would unnecessarily constrain the project.
+conversational quality would unnecessarily constrain the project. The NUC
+is the first local-compute path; cloud providers remain capability
+escalation and comparison paths.
 
 ### D004 --- AI backends must be swappable
 
@@ -1236,25 +1280,33 @@ complexity.
 **Reason:** voice, display, personality and useful actions provide a
 complete first product without camera complexity.
 
-### D007 --- Desktop PC may become a compute peer
+### D007 --- NUC is the primary local-compute peer
 
-**Reason:** it sits beside the device and can provide local
-high-performance inference or development-agent execution.
+**Reason:** the NUC8i5BEH provides a stable CPU-first service node for local
+LLM, speech, memory and background work while the Acer remains the primary
+development workstation.
+
+### D008 --- Private Ethernet is the preferred Pi-to-NUC transport
+
+**Reason:** a dedicated static subnet with no default gateway gives
+internal TARS traffic predictable latency and a clearer trust boundary;
+independent Wi-Fi remains available for development and cloud access.
 
 ------------------------------------------------------------------------
 
 # Part X --- Open Questions
 
-## 22. Decisions to Resolve During Prototyping
+## 36. Decisions to Resolve During Prototyping
 
 -   Python/Qt versus web/kiosk UI?
 -   Which microphone gives acceptable far-field pickup?
 -   USB speaker, HDMI/display audio, HAT, or external DAC?
--   Local vs cloud STT?
--   Local vs cloud TTS?
+-   Which measured Pi/NUC/cloud STT route should be preferred for each
+    operating mode?
+-   Which measured local/cloud TTS route and voice should be preferred?
 -   Preferred wake-word engine?
--   Gemini as primary model, or provider selected dynamically?
--   Should the adjacent Windows PC expose a small local agent API?
+-   What routing policy should choose NUC-local versus cloud providers?
+-   Which workstation services, if any, should the Acer expose?
 -   How much initiative should the assistant have by default?
 -   Should the final personality retain the "TARS" working name or
     receive an original name?
@@ -1267,7 +1319,7 @@ high-performance inference or development-agent execution.
 
 # Part XI --- Lessons Learned
 
-## 23. Living Record
+## 37. Living Record
 
 This section should be updated throughout development.
 
@@ -1289,17 +1341,20 @@ This section should be updated throughout development.
 
 # Part XII --- Immediate Next Actions
 
-## 24. Next Build Session
+## 38. Next Build Session
 
 1.  Identify the exact Raspberry Pi 5 RAM configuration.
 2.  Confirm the touchscreen part/version and obtain the correct Pi 5 DSI
     cable.
 3.  Decide microphone and speaker hardware.
-4.  Install current Raspberry Pi OS.
+4.  Install Raspberry Pi OS Lite 64-bit and the minimum graphics, input
+    and audio packages required by the chosen UI.
 5.  Build a tiny fullscreen 800×480 animation/state-machine prototype.
 6.  Measure idle CPU/RAM usage and animation responsiveness.
-7.  Add microphone capture and a visible listening state.
-8.  Only then connect the existing cloud-model experiment to the UI.
+7.  Configure the private Pi↔NUC Ethernet link and health endpoint.
+8.  Add microphone capture and a visible listening state.
+9.  Benchmark the initial NUC-local and cloud provider paths through the
+    same interface.
 
 The first milestone is deliberately simple:
 
@@ -1310,7 +1365,7 @@ If that loop feels good, the project has a strong foundation.
 
 ------------------------------------------------------------------------
 
-## 25. Source Notes
+## 39. Source Notes
 
 This first pass uses the following external references for the
 inspiration study:
@@ -1327,11 +1382,39 @@ architecture, not claims about EMO's internal implementation.
 
 ------------------------------------------------------------------------
 
-## 26. Version History
+## 40. Version History
 
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
+  0.6                     2026-08-09              Reconciled the top-level
+                                                  design with the Pi/NUC/
+                                                  cloud compute hierarchy,
+                                                  private Ethernet,
+                                                  Raspberry Pi OS Lite,
+                                                  benchmark-driven display
+                                                  choice and current build
+                                                  sequence
+
+  0.5                     2026-08-09              Consolidated the expanded
+                                                  inspiration study, product
+                                                  architecture and living
+                                                  specification
+
+  0.4                     2026-08-09              Expanded personality and
+                                                  inspiration analysis while
+                                                  preserving an original
+                                                  project identity
+
+  0.3                     2026-08-09              Added modular services,
+                                                  workstation partnership and
+                                                  optional vision/tooling
+                                                  architecture
+
+  0.2                     2026-08-09              Refined product goals,
+                                                  behavioural requirements and
+                                                  implementation phases
+
   0.1                     2026-08-08              Initial concept,
                                                   TARS/EMO comparison,
                                                   architecture and phased

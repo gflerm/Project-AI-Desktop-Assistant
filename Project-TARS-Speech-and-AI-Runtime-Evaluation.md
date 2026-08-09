@@ -1,6 +1,6 @@
 # Project TARS — Speech & AI Runtime Evaluation
 
-**Status:** Version 0.1 — Living Work in Progress  
+**Status:** Version 0.2 — Living Work in Progress\
 **Date:** 2026-08-09  
 **Scope:** Speech-to-text, text-to-speech, wake-word/VAD, local LLM runtimes, cloud speech/AI services, compatibility and benchmark strategy  
 **Companion documents:** Project TARS Design Specification, Hardware Architecture & Inventory, Firmware & Software Development Roadmap, Personality Distillation Specification
@@ -82,8 +82,8 @@ Gemini, OpenAI or another vendor-specific implementation.
 
 | Platform | Primary role | Speech / AI relevance |
 |---|---|---|
-| Raspberry Pi 5 | Physical companion | Wake/VAD, light STT/TTS, UI, local fallback |
-| Intel NUC i5 / 16 GB | Local compute node | Local LLM, STT/TTS, embeddings, background AI |
+| Raspberry Pi 5 | Physical companion | Orchestration/routing, wake/VAD, light STT/TTS, UI, local fallback |
+| Intel NUC8i5BEH / i5-8259U / 16 GB | Primary CPU-first local-compute node | Ollama/llama.cpp, STT/TTS, embeddings, memory and background AI; no CUDA-class assumption |
 | NVIDIA Jetson Nano / 4 GB | Optional edge node | CUDA/TensorRT vision; limited modern LLM role |
 | Acer i7 / 32 GB / NVIDIA 4 GB | Development workstation | Development, local-model testing, Codex, LM Studio |
 | Cloud | High-capability tier | Frontier LLM, premium STT/TTS, multimodal AI |
@@ -292,9 +292,11 @@ Important licensing note:
 
 **Current Piper code is GPL-3.0.**
 
-Because Project TARS is currently proprietary, Piper should be evaluated as
-a **separate executable/service boundary**, and legal/license compatibility
-must be reviewed before any distribution.
+Because private/unreleased Project TARS material remains All Rights
+Reserved while explicitly released original software defaults to
+Apache-2.0, Piper should initially be evaluated as a **separate
+executable/service boundary**. GPL and voice-model compatibility must be
+reviewed for the exact distribution model before release.
 
 Individual voice-model licences must also be checked separately.
 
@@ -516,7 +518,9 @@ Project TARS fit:
 | Jetson Nano | Candidate with CUDA constraints |
 | Acer | **High** |
 
-**Decision:** LLM-002 — Benchmark/reference backend and fallback to Ollama.
+**Decision:** LLM-002 — Low-level reference and alternative/fallback behind
+the same provider interface; Ollama remains the operational default
+candidate.
 
 ---
 
@@ -577,7 +581,7 @@ to provide sufficient benefit during early development.
 
 # 13. Local LLM Runtime Comparison
 
-| Runtime | Pi 5 | NUC i5/16GB | Jetson Nano | Acer/NVIDIA | Headless/API fit | Project priority |
+| Runtime | Pi 5 | NUC8i5BEH / i5-8259U / 16 GB (CPU-first) | Jetson Nano | Acer/NVIDIA | Headless/API fit | Project priority |
 |---|---:|---:|---:|---:|---:|---|
 | Ollama | Good | **Excellent** | Low/experimental | Excellent | **Excellent** | **P1** |
 | llama.cpp | **Excellent flexibility** | **Excellent** | Candidate | **Excellent** | **Excellent** | **P1** |
@@ -614,6 +618,12 @@ llm:
 
 Changing the runtime should not change the orchestrator contract.
 
+Internal NUC endpoints should use the dedicated private Pi↔NUC Ethernet
+interface where practical. The subnet has static addressing and no default
+gateway; services should bind to or be firewalled toward it. Independent
+Wi-Fi remains the development/cloud path and may provide a policy-approved
+fallback.
+
 ---
 
 # 15. Initial Recommended Stack
@@ -627,14 +637,16 @@ PI 5
 +-- VAD candidate
 +-- whisper.cpp STT
 +-- local display/audio
-+-- Piper OR sherpa TTS local fallback
++-- Piper TTS first isolated local baseline
++-- sherpa-family TTS high-priority alternative
 +-- Project TARS orchestrator
         |
-        +-- Cloud LLM
-        |    Gemini / OpenAI adapter
+        +-- NUC8i5BEH (preferred private Ethernet path)
+        |    Ollama operational local-LLM candidate
+        |    llama.cpp low-level reference/alternative
         |
-        +-- NUC
-             Ollama / llama.cpp experimental local LLM
+        +-- Cloud escalation / comparison
+             Gemini / OpenAI adapter
 ```
 
 This minimizes early dependencies.
@@ -1020,6 +1032,20 @@ Use push-to-talk/touch first if needed.
 
 **Status:** Adopted.
 
+## SAI-009 — Piper is the first isolated local TTS benchmark baseline
+
+**Status:** Adopted for benchmarking.
+
+Sherpa-family TTS remains a high-priority replaceable alternative. Piper
+code and each selected voice model must pass the applicable release audit.
+
+## SAI-010 — Internal NUC AI services prefer the private Ethernet interface
+
+**Status:** Adopted for prototyping.
+
+Speech and LLM endpoints should use interface-restricted private Ethernet
+by default, with health-aware policy-approved fallback.
+
 ---
 
 # 26. Immediate Next Actions
@@ -1067,4 +1093,5 @@ must be rechecked before production release.
 
 | Version | Date | Notes |
 |---|---|---|
+| 0.2 | 2026-08-09 | Reconciled exact NUC hardware and CPU-first assumptions, local-first LLM routing, Piper baseline wording, private-network deployment and staged licensing language |
 | 0.1 | 2026-08-09 | Initial STT/TTS/local-LLM runtime comparison, compatibility matrices, licensing cautions, benchmark methodology, fallback strategy and recommended first-build stack |
