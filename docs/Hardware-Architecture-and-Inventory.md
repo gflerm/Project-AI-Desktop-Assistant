@@ -1,6 +1,6 @@
 # Project TARS --- Hardware Architecture & Inventory
 
-**Status:** Version 0.12 --- Living Work in Progress\
+**Status:** Version 0.13 --- Living Work in Progress\
 **Date:** 2026-08-19\
 **Document role:** Hardware inventory, node roles, interfaces,
 constraints and hardware evolution plan\
@@ -158,7 +158,20 @@ module quantity on hand and physical operation are **to be verified**.
 
 ![ESP32-P4 three-LCD wiring reference](../images/ESP32%20LCD%20Wiring%20Reference%20Schematic.png)
 
-### 4.5.1 Proposed bus allocation and pin map
+### 4.5.1 Face-layout concept
+
+The current visual concept arranges the left-eye and right-eye LCDs in
+portrait orientation above a centrally aligned mouth LCD in landscape
+orientation. Facial graphics are rendered inside the three displays rather
+than relying on a single continuous face panel.
+
+![Three-LCD face mockup with portrait eyes and landscape mouth](../images/Three-LCD-Face-Mockup.png)
+
+This image is a **concept mockup**, not a dimensionally accurate mechanical
+drawing. Final spacing, bezel treatment, mounting, viewing angle and enclosure
+geometry must be determined from physical measurements and prototype testing.
+
+### 4.5.2 Proposed bus allocation and pin map
 
 | Display role | SPI host | VCC | GND | MOSI / DIN | SCLK / CLK | CS | DC / A0 | Reset | Backlight |
 |---|---|---|---|---|---|---|---|---|---|
@@ -172,7 +185,7 @@ The right-eye module uses SPI3. Separate chip-select lines allow the three
 displays to be addressed independently, subject to driver and signal-integrity
 verification.
 
-### 4.5.2 Electrical and integration notes
+### 4.5.3 Electrical and integration notes
 
 - The reference specifies 3.3 V logic and recommends powering each module
   from the board's 3V3 rail.
@@ -186,7 +199,7 @@ verification.
   SPI mode, maximum reliable clock rate and ESP-IDF pin conflicts must be
   checked before assembly.
 
-### 4.5.3 Verification required
+### 4.5.4 Verification required
 
 - confirm the exact 1.83-inch LCD module model and controller;
 - confirm all three modules use 3.3 V power and 3.3 V-tolerant logic;
@@ -1720,6 +1733,13 @@ accidental collection of installed software.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
+  0.13                    2026-08-19              Added the three-LCD face
+                                                  concept with portrait eye
+                                                  displays, a landscape mouth
+                                                  display and a clear note
+                                                  that the render is not a
+                                                  mechanical drawing
+
   0.12                    2026-08-19              Added the image-inventory
                                                   wiring reference for the
                                                   proposed left-eye,
