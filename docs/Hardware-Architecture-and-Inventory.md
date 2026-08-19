@@ -1,7 +1,7 @@
 # Project TARS --- Hardware Architecture & Inventory
 
-**Status:** Version 0.11 --- Living Work in Progress\
-**Date:** 2026-08-18\
+**Status:** Version 0.12 --- Living Work in Progress\
+**Date:** 2026-08-19\
 **Document role:** Hardware inventory, node roles, interfaces,
 constraints and hardware evolution plan\
 **Companion to:** `Design-Specification.md`
@@ -147,8 +147,63 @@ Revisions 3+ require different settings.
 
 ------------------------------------------------------------------------
 
+## 4.5 Auxiliary 1.83-inch LCD modules
 
-## 4.5 ESP32-P4 Firmware Baseline (ESP-IDF / FreeRTOS)
+The image inventory contains a reference schematic for three 1.83-inch
+SPI LCD modules intended to act as the companion's left eye, right eye and
+mouth displays.
+
+**Inventory status:** Wiring design documented; exact LCD controller/model,
+module quantity on hand and physical operation are **to be verified**.
+
+![ESP32-P4 three-LCD wiring reference](../images/ESP32%20LCD%20Wiring%20Reference%20Schematic.png)
+
+### 4.5.1 Proposed bus allocation and pin map
+
+| Display role | SPI host | VCC | GND | MOSI / DIN | SCLK / CLK | CS | DC / A0 | Reset | Backlight |
+|---|---|---|---|---|---|---|---|---|---|
+| Left eye | SPI2_HOST | 3V3 | GND | GPIO42 | GPIO43 | GPIO44 | GPIO45 | GPIO19 | GPIO18 |
+| Right eye | SPI3_HOST | 3V3 | GND | GPIO16 | GPIO17 | GPIO5 | GPIO4 | GPIO15 | GPIO18 |
+| Mouth | SPI2_HOST | 3V3 | GND | GPIO42 | GPIO43 | GPIO2 | GPIO45 | GPIO19 | GPIO18 |
+
+The left-eye and mouth modules share the SPI2 MOSI and clock lines, as
+well as DC, reset and backlight control, but use separate chip-select lines.
+The right-eye module uses SPI3. Separate chip-select lines allow the three
+displays to be addressed independently, subject to driver and signal-integrity
+verification.
+
+### 4.5.2 Electrical and integration notes
+
+- The reference specifies 3.3 V logic and recommends powering each module
+  from the board's 3V3 rail.
+- Backlight control may be driven with PWM for brightness control.
+- The schematic labels the module connector pins, top to bottom, as VCC,
+  GND, DIN, CLK, CS, DC, RST and BL.
+- GPIO18 is shown as a shared backlight signal for all three modules; this
+  implies common brightness control unless the wiring is revised.
+- GPIO19 is shown as a shared reset for the two SPI2 modules.
+- Total 3V3 current, backlight current, connector pinout, LCD controller,
+  SPI mode, maximum reliable clock rate and ESP-IDF pin conflicts must be
+  checked before assembly.
+
+### 4.5.3 Verification required
+
+- confirm the exact 1.83-inch LCD module model and controller;
+- confirm all three modules use 3.3 V power and 3.3 V-tolerant logic;
+- measure combined logic and backlight current against the board's 3V3
+  supply capacity;
+- check GPIO2, GPIO4, GPIO5, GPIO15--GPIO19 and GPIO42--GPIO45 against all
+  other board peripherals and boot constraints;
+- bench-test each module individually before connecting the shared SPI2 bus;
+- verify independent chip selection with the left eye and mouth connected;
+- test simultaneous animation, frame rate, bus contention and signal integrity;
+- decide whether shared reset/backlight control is acceptable for the final
+  enclosure and fault-recovery design.
+
+------------------------------------------------------------------------
+
+
+## 4.6 ESP32-P4 Firmware Baseline (ESP-IDF / FreeRTOS)
 
 **Current baseline:** ESP-IDF / FreeRTOS.
 
@@ -173,7 +228,7 @@ firmware task supervision / watchdog
 A complete desktop environment is **not required** (and is not applicable)
 on the ESP32-P4.
 
-### 4.5.1 Why the RTOS baseline is preferred
+### 4.6.1 Why the RTOS baseline is preferred
 
 Potential benefits:
 
@@ -185,7 +240,7 @@ Potential benefits:
 - appliance-style deployment;
 - predictable, low-latency runtime behaviour.
 
-### 4.5.2 Display/rendering stack decision remains open
+### 4.6.2 Display/rendering stack decision remains open
 
 The UI still needs a display/rendering stack.
 
@@ -197,7 +252,7 @@ Candidate approaches include:
 The exact choice should be driven by the selected UI framework and measured
 latency/stability, not ideology.
 
-### 4.5.3 Development model
+### 4.6.3 Development model
 
 Primary development should occur on the Acer development machine.
 
@@ -208,7 +263,7 @@ shell administration.
 This reduces configuration drift and helps keep the firmware image
 reproducible.
 
-### 4.5.4 Appliance behaviour
+### 4.6.4 Appliance behaviour
 
 The ESP32-P4 should eventually:
 
@@ -1665,6 +1720,15 @@ accidental collection of installed software.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
+  0.12                    2026-08-19              Added the image-inventory
+                                                  wiring reference for the
+                                                  proposed left-eye,
+                                                  right-eye and mouth
+                                                  1.83-inch SPI LCD modules,
+                                                  including GPIO allocation,
+                                                  electrical notes and
+                                                  verification requirements
+
   0.11                    2026-08-18              Repurposed ESP32-P4 as the
                                                   primary physical companion,
                                                   Raspberry Pi 5 as the
