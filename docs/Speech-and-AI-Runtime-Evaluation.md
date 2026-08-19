@@ -1,7 +1,7 @@
-# Project TARS — Speech & AI Runtime Evaluation
+# Project TARS ΓÇö Speech & AI Runtime Evaluation
 
-**Status:** Version 0.2 — Living Work in Progress\
-**Date:** 2026-08-09  
+**Status:** Version 0.3 ΓÇö Living Work in Progress\
+**Date:** 2026-08-18  
 **Scope:** Speech-to-text, text-to-speech, wake-word/VAD, local LLM runtimes, cloud speech/AI services, compatibility and benchmark strategy  
 **Companion documents:** Project TARS Design Specification, Hardware Architecture & Inventory, Firmware & Software Development Roadmap, Personality Distillation Specification
 
@@ -82,8 +82,8 @@ Gemini, OpenAI or another vendor-specific implementation.
 
 | Platform | Primary role | Speech / AI relevance |
 |---|---|---|
-| Raspberry Pi 5 | Physical companion | Orchestration/routing, wake/VAD, light STT/TTS, UI, local fallback |
-| Intel NUC8i5BEH / i5-8259U / 16 GB | Primary CPU-first local-compute node | Ollama/llama.cpp, STT/TTS, embeddings, memory and background AI; no CUDA-class assumption |
+| ESP32-P4 | Physical companion / edge controller | Orchestration/routing, wake/VAD, UI, audio capture/playback, lightweight local speech; ESP-IDF / FreeRTOS; MB-class memory |
+| Raspberry Pi 5 / CPU-first | Primary CPU-first local-compute node | Ollama/llama.cpp, STT/TTS, embeddings, memory and background AI; no CUDA-class assumption |
 | NVIDIA Jetson Nano / 4 GB | Optional edge node | CUDA/TensorRT vision; limited modern LLM role |
 | Acer i7 / 32 GB / NVIDIA 4 GB | Development workstation | Development, local-model testing, Codex, LM Studio |
 | Cloud | High-capability tier | Frontier LLM, premium STT/TTS, multimodal AI |
@@ -106,30 +106,30 @@ Strengths:
 - CUDA builds available;
 - ARM64 builds are actively published;
 - low dependency overhead;
-- appropriate for Pi and NUC benchmarking.
+- appropriate for Pi 5 benchmarking (audio routed from ESP32-P4).
 
 Project TARS fit:
 
 | Platform | Fit |
 |---|---|
+| ESP32-P4 | Route audio to Pi 5 / cloud |
 | Pi 5 | **High** |
-| NUC | **High** |
 | Jetson Nano | Medium / test CUDA compatibility |
 | Acer | High |
 
 Risks / questions:
 
-- model size versus latency on Pi;
+- model size versus latency on Pi 5;
 - endpoint/VAD integration still required;
 - benchmark actual realtime factor rather than relying on third-party numbers.
 
-**Decision:** STT-001 — Include in first benchmark suite.
+**Decision:** STT-001 ΓÇö Include in first benchmark suite.
 
 ---
 
 ## 5.2 faster-whisper
 
-**Current position:** Strong NUC/workstation candidate.
+**Current position:** Strong Pi 5/workstation candidate.
 
 faster-whisper uses CTranslate2 and its project reports substantial speed
 and memory improvements over the original Python Whisper implementation,
@@ -139,8 +139,8 @@ Project TARS fit:
 
 | Platform | Fit |
 |---|---|
-| Pi 5 | Medium / not first choice |
-| NUC | **High** |
+| ESP32-P4 | Route audio to Pi 5 / cloud |
+| Pi 5 | **High** |
 | Jetson Nano | Medium / CUDA-version constraints to test |
 | Acer | **High** |
 
@@ -151,7 +151,7 @@ Strengths:
 - GPU support where CTranslate2/CUDA stack is compatible;
 - practical batch/streaming application ecosystem.
 
-**Decision:** STT-002 — Benchmark on NUC and Acer against whisper.cpp.
+**Decision:** STT-002 ΓÇö Benchmark on Pi 5 and Acer against whisper.cpp.
 
 ---
 
@@ -172,8 +172,8 @@ Project TARS fit:
 
 | Platform | Fit |
 |---|---|
+| ESP32-P4 | Route audio to Pi 5 / cloud |
 | Pi 5 | **High** |
-| NUC | **High** |
 | Jetson Nano | Medium-high |
 | Acer | High |
 
@@ -181,7 +181,7 @@ Its breadth makes it particularly interesting if a single runtime can
 provide multiple offline speech components without tightly coupling them at
 the Project TARS interface layer.
 
-**Decision:** STT-003 — Include as a streaming/offline comparison candidate.
+**Decision:** STT-003 ΓÇö Include as a streaming/offline comparison candidate.
 
 ---
 
@@ -194,11 +194,11 @@ Raspberry Pi among supported platforms.
 
 Potential role:
 
-- compact Pi-native streaming STT;
+- compact Pi 5 streaming STT;
 - VAD;
 - comparison against whisper.cpp for response latency.
 
-**Decision:** STT-004 — Secondary Pi benchmark candidate.
+**Decision:** STT-004 ΓÇö Secondary Pi 5 benchmark candidate.
 
 ---
 
@@ -229,7 +229,7 @@ Trade-offs:
 - API cost;
 - privacy policy considerations.
 
-**Decision:** STT-005 — Cloud reference candidate.
+**Decision:** STT-005 ΓÇö Cloud reference candidate.
 
 ---
 
@@ -249,7 +249,7 @@ Potential advantages:
 - contextual endpointing;
 - lower orchestration burden for conversational speech.
 
-**Decision:** STT-006 — High-priority cloud conversational benchmark.
+**Decision:** STT-006 ΓÇö High-priority cloud conversational benchmark.
 
 ---
 
@@ -260,18 +260,18 @@ Both remain mature cloud speech candidates.
 They should be treated as provider adapters rather than architectural
 dependencies.
 
-**Decision:** STT-007 — Retain as optional future comparison providers.
+**Decision:** STT-007 ΓÇö Retain as optional future comparison providers.
 
 ---
 
 # 7. STT Comparison Matrix
 
-| Candidate | Offline | Streaming | Pi 5 | NUC | Cloud | Initial priority |
+| Candidate | Offline | Streaming | ESP32-P4 | Pi 5 | Cloud | Initial priority |
 |---|---:|---:|---:|---:|---:|---|
-| whisper.cpp | Yes | Application-dependent | **High** | **High** | No | **P1** |
-| faster-whisper | Yes | Yes/application layer | Medium | **High** | No | P1 NUC |
-| sherpa-onnx | Yes | **Yes** | **High** | **High** | No | **P1** |
-| sherpa-ncnn | Yes | Yes | **High** | High | No | P2 |
+| whisper.cpp | Yes | Application-dependent | Routed | **High** | No | **P1** |
+| faster-whisper | Yes | Yes/application layer | Routed | **High** | No | P1 Pi 5 |
+| sherpa-onnx | Yes | **Yes** | Routed | **High** | No | **P1** |
+| sherpa-ncnn | Yes | Yes | Routed | **High** | No | P2 |
 | OpenAI STT | No | **Yes** | Client | Client | **Yes** | **P1 cloud** |
 | Deepgram Flux | No | **Yes** | Client | Client | **Yes** | **P1 cloud** |
 | Google STT | No | Yes | Client | Client | Yes | P2 |
@@ -313,7 +313,7 @@ Project TARS role:
 - immediate fallback;
 - low-cost local response path.
 
-**Decision:** TTS-001 — Benchmark, but preserve process/service isolation
+**Decision:** TTS-001 ΓÇö Benchmark, but preserve process/service isolation
 because of licensing.
 
 ---
@@ -328,9 +328,9 @@ Advantages:
 - shared speech runtime;
 - offline;
 - ARM64 support;
-- potentially attractive Pi/NUC deployment.
+- potentially attractive Pi 5 deployment.
 
-**Decision:** TTS-002 — High-priority local alternative.
+**Decision:** TTS-002 ΓÇö High-priority local alternative.
 
 ---
 
@@ -344,13 +344,12 @@ rather than tightly coupling to a one-off implementation.
 
 Questions:
 
-- Pi latency;
-- NUC latency;
+- Pi 5 latency;
 - voice quality;
 - streaming/chunking behaviour;
 - licence of runtime and selected model.
 
-**Decision:** TTS-003 — Benchmark primarily on NUC; test Pi if practical.
+**Decision:** TTS-003 ΓÇö Benchmark primarily on Pi 5.
 
 ---
 
@@ -367,7 +366,7 @@ Potential role:
 - low-latency streamed speech;
 - personality-quality benchmark.
 
-**Decision:** TTS-004 — P1 cloud benchmark.
+**Decision:** TTS-004 ΓÇö P1 cloud benchmark.
 
 ---
 
@@ -386,7 +385,7 @@ Potential role:
 - style-controlled responses;
 - comparison with OpenAI streaming TTS.
 
-**Decision:** TTS-005 — P1 personality/quality benchmark.
+**Decision:** TTS-005 ΓÇö P1 personality/quality benchmark.
 
 ---
 
@@ -399,7 +398,7 @@ Potential advantage:
 - one vendor can provide low-latency voice-agent speech path;
 - natural pairing with Flux STT.
 
-**Decision:** TTS-006 — Include when benchmarking end-to-end cloud voice
+**Decision:** TTS-006 ΓÇö Include when benchmarking end-to-end cloud voice
 latency.
 
 ---
@@ -413,11 +412,11 @@ quality, regional availability or operational requirements.
 
 # 10. TTS Comparison Matrix
 
-| Candidate | Offline | Streaming | Pi 5 | NUC | Cloud | Initial priority |
+| Candidate | Offline | Streaming | ESP32-P4 | Pi 5 | Cloud | Initial priority |
 |---|---:|---:|---:|---:|---:|---|
-| Piper | Yes | Service-dependent | **High** | **High** | No | **P1 local** |
-| sherpa-onnx TTS | Yes | Model-dependent | High | **High** | No | **P1 local** |
-| Kokoro via supported runtime | Yes | Runtime-dependent | Candidate | **High** | No | P1/P2 |
+| Piper | Yes | Service-dependent | Client | **High** | No | **P1 local** |
+| sherpa-onnx TTS | Yes | Model-dependent | Client | **High** | No | **P1 local** |
+| Kokoro via supported runtime | Yes | Runtime-dependent | Client | **High** | No | P1/P2 |
 | OpenAI TTS | No | **Yes** | Client | Client | **Yes** | **P1 cloud** |
 | Gemini TTS | No | API-driven | Client | Client | **Yes** | **P1 cloud** |
 | Deepgram TTS | No | Yes | Client | Client | Yes | P2/P1 voice-agent test |
@@ -441,7 +440,7 @@ decide when to send audio
 STT
 ```
 
-This prevents expensive STT from running unnecessarily and permits the Pi
+This prevents expensive STT from running unnecessarily and permits the ESP32-P4
 to react immediately before any network call.
 
 Candidates for evaluation:
@@ -462,7 +461,7 @@ stable.
 
 ## 12.1 Ollama
 
-**Current position:** Preferred operational local-model server for the NUC.
+**Current position:** Preferred operational local-model server for the Pi 5.
 
 Official Ollama Linux installation supports ARM64 as well as AMD64.
 
@@ -473,21 +472,21 @@ Advantages:
 - straightforward local API;
 - easy experimentation;
 - ARM64 availability;
-- good fit for dedicated NUC service.
+- good fit for dedicated Pi 5 service.
 
 Project TARS fit:
 
 | Platform | Fit |
 |---|---|
-| Pi 5 | Good for small models / experimentation |
-| NUC | **Excellent operational fit** |
+| ESP32-P4 | Not applicable / routes LLM to Pi 5 |
+| Pi 5 | **Excellent operational fit** |
 | Jetson Nano | Low priority |
 | Acer | Excellent development/testing fit |
 
-The Pi should not run an LLM simply because Ollama can run there. It should
+The Pi 5 should not run an LLM simply because Ollama can run there. It should
 only do so if latency and RAM measurements justify it.
 
-**Decision:** LLM-001 — Preferred first local server on NUC.
+**Decision:** LLM-001 ΓÇö Preferred first local server on Pi 5.
 
 ---
 
@@ -513,12 +512,12 @@ Project TARS fit:
 
 | Platform | Fit |
 |---|---|
-| Pi 5 | **High** for small quantized models |
-| NUC | **High** |
+| ESP32-P4 | Routes to Pi 5 / cloud |
+| Pi 5 | **High** |
 | Jetson Nano | Candidate with CUDA constraints |
 | Acer | **High** |
 
-**Decision:** LLM-002 — Low-level reference and alternative/fallback behind
+**Decision:** LLM-002 ΓÇö Low-level reference and alternative/fallback behind
 the same provider interface; Ollama remains the operational default
 candidate.
 
@@ -543,7 +542,7 @@ Project TARS role:
 Current LM Studio APIs include native REST as well as OpenAI-compatible and
 Anthropic-compatible endpoints.
 
-**Decision:** LLM-003 — Preferred interactive model laboratory on Acer.
+**Decision:** LLM-003 ΓÇö Preferred interactive model laboratory on Acer.
 
 ---
 
@@ -562,7 +561,7 @@ Potential roles:
 
 The project should not add it merely to add another abstraction layer.
 
-**Decision:** LLM-004 — Evaluate later only if unified local serving solves
+**Decision:** LLM-004 ΓÇö Evaluate later only if unified local serving solves
 a demonstrated operational problem.
 
 ---
@@ -575,19 +574,19 @@ to substantially stronger compute infrastructure.
 For the currently known Project TARS hardware, this complexity is unlikely
 to provide sufficient benefit during early development.
 
-**Decision:** LLM-005 — Defer.
+**Decision:** LLM-005 ΓÇö Defer.
 
 ---
 
 # 13. Local LLM Runtime Comparison
 
-| Runtime | Pi 5 | NUC8i5BEH / i5-8259U / 16 GB (CPU-first) | Jetson Nano | Acer/NVIDIA | Headless/API fit | Project priority |
+| Runtime | ESP32-P4 | Raspberry Pi 5 (CPU-first) | Jetson Nano | Acer/NVIDIA | Headless/API fit | Project priority |
 |---|---:|---:|---:|---:|---:|---|
-| Ollama | Good | **Excellent** | Low/experimental | Excellent | **Excellent** | **P1** |
-| llama.cpp | **Excellent flexibility** | **Excellent** | Candidate | **Excellent** | **Excellent** | **P1** |
-| LM Studio | Possible but not preferred | Possible | No | **Excellent** | Good | **P1 dev tool** |
-| LocalAI | Good | High | Candidate | High | **Excellent** | P2 |
-| vLLM | Low relevance | Low relevance CPU-only | Poor fit | Depends on GPU | Excellent | Deferred |
+| Ollama | Not applicable | **Excellent** | Low/experimental | Excellent | **Excellent** | **P1** |
+| llama.cpp | Not applicable | **Excellent** | Candidate | **Excellent** | **Excellent** | **P1** |
+| LM Studio | Not applicable | Possible | No | **Excellent** | Good | **P1 dev tool** |
+| LocalAI | Not applicable | High | Candidate | High | **Excellent** | P2 |
+| vLLM | Not applicable | Low relevance CPU-only | Poor fit | Depends on GPU | Excellent | Deferred |
 
 ---
 
@@ -604,7 +603,7 @@ Configuration example:
 llm:
   provider: ollama
   model: qwen-example
-  endpoint: http://nuc:11434
+  endpoint: http://pi5:11434
 ```
 
 Alternative:
@@ -613,16 +612,14 @@ Alternative:
 llm:
   provider: llama_cpp
   model: local-model.gguf
-  endpoint: http://nuc:8080
+  endpoint: http://pi5:8080
 ```
 
 Changing the runtime should not change the orchestrator contract.
 
-Internal NUC endpoints should use the dedicated private Pi↔NUC Ethernet
-interface where practical. The subnet has static addressing and no default
-gateway; services should bind to or be firewalled toward it. Independent
-Wi-Fi remains the development/cloud path and may provide a policy-approved
-fallback.
+Internal Pi 5 endpoints are reached over the trusted Wi-Fi LAN ESP32-P4ΓåöPi 5
+service path. Services should bind to or be firewalled toward the trusted
+LAN. The cloud remains the policy-approved fallback path.
 
 ---
 
@@ -631,17 +628,18 @@ fallback.
 ## 15.1 First usable companion
 
 ```text
-PI 5
+ESP32-P4
 |
 +-- touch / push-to-talk
-+-- VAD candidate
-+-- whisper.cpp STT
++-- wake-word / VAD candidate
 +-- local display/audio
-+-- Piper TTS first isolated local baseline
-+-- sherpa-family TTS high-priority alternative
++-- lightweight local speech functions
 +-- Project TARS orchestrator
         |
-        +-- NUC8i5BEH (preferred private Ethernet path)
+        +-- Raspberry Pi 5 (trusted Wi-Fi LAN path)
+        |    whisper.cpp STT
+        |    Piper TTS first isolated local baseline
+        |    sherpa-family TTS high-priority alternative
         |    Ollama operational local-LLM candidate
         |    llama.cpp low-level reference/alternative
         |
@@ -658,8 +656,7 @@ Benchmark in parallel:
 ### STT
 
 ```text
-whisper.cpp on Pi
-whisper.cpp / faster-whisper on NUC
+whisper.cpp / faster-whisper on Pi 5
 sherpa-onnx
 OpenAI cloud STT
 Deepgram Flux
@@ -678,8 +675,8 @@ Deepgram cloud TTS
 ### LLM
 
 ```text
-Ollama on NUC
-llama.cpp on NUC
+Ollama on Pi 5
+llama.cpp on Pi 5
 LM Studio on Acer for development comparison
 Gemini/OpenAI cloud providers
 ```
@@ -695,7 +692,7 @@ Create samples covering:
 - quiet desk speech;
 - conversational speech;
 - technical vocabulary;
-- Raspberry Pi / Linux terminology;
+- ESP32-P4 / Raspberry Pi 5 / Linux terminology;
 - names used frequently in Project TARS;
 - background fan noise;
 - speaker playback occurring nearby;
@@ -877,10 +874,10 @@ The architecture should eventually support policy profiles.
 ## Local-first
 
 ```text
-wake/VAD -> Pi
-STT -> Pi/NUC
-LLM -> NUC
-TTS -> Pi/NUC
+wake/VAD -> ESP32-P4
+STT -> Pi 5
+LLM -> Pi 5
+TTS -> Pi 5
 ```
 
 Maximum local processing, reduced cloud capability.
@@ -888,7 +885,7 @@ Maximum local processing, reduced cloud capability.
 ## Balanced
 
 ```text
-wake/VAD -> Pi
+wake/VAD -> ESP32-P4
 STT -> local
 LLM -> cloud when complexity requires
 TTS -> local or cloud
@@ -899,7 +896,7 @@ Likely default development target.
 ## Quality-first
 
 ```text
-wake/VAD -> Pi
+wake/VAD -> ESP32-P4
 STT -> premium cloud
 LLM -> frontier cloud
 TTS -> premium cloud
@@ -925,14 +922,14 @@ SECONDARY STT
 Similarly:
 
 ```text
-NUC LLM unavailable
+Pi 5 LLM unavailable
    -> cloud provider
 
 cloud unavailable
-   -> local NUC model
+   -> local Pi 5 model
 
-NUC unavailable
-   -> Pi deterministic/local capability
+Pi 5 unavailable
+   -> ESP32-P4 deterministic/local capability
 
 cloud TTS unavailable
    -> local TTS
@@ -961,11 +958,11 @@ benchmark files.
 
 # 24. Current Shortlist
 
-## P1 — Build/test early
+## P1 ΓÇö Build/test early
 
 - whisper.cpp;
 - sherpa-onnx;
-- faster-whisper on NUC;
+- faster-whisper on Pi 5;
 - OpenAI cloud STT;
 - Deepgram Flux;
 - Piper as isolated local TTS candidate;
@@ -976,7 +973,7 @@ benchmark files.
 - llama.cpp;
 - LM Studio on Acer.
 
-## P2 — Evaluate after first voice loop
+## P2 ΓÇö Evaluate after first voice loop
 
 - sherpa-ncnn;
 - Deepgram cloud TTS;
@@ -987,80 +984,81 @@ benchmark files.
 ## Deferred
 
 - vLLM on current hardware;
-- heavyweight models directly on Pi merely for the sake of being local;
+- heavyweight models directly on the ESP32-P4 merely for the sake of being local;
 - tightly coupled single-vendor voice/LLM architecture.
 
 ---
 
 # 25. Current Decisions
 
-## SAI-001 — Speech and LLM components remain independently replaceable
+## SAI-001 ΓÇö Speech and LLM components remain independently replaceable
 
 **Status:** Adopted.
 
 No single STT/TTS/LLM vendor owns the Project TARS architecture.
 
-## SAI-002 — whisper.cpp is the first local STT baseline
+## SAI-002 ΓÇö whisper.cpp is the first local STT baseline
 
 **Status:** Adopted for benchmarking.
 
-## SAI-003 — Ollama is the first operational NUC LLM server candidate
+## SAI-003 ΓÇö Ollama is the first operational Pi 5 LLM server candidate
 
 **Status:** Adopted for benchmarking.
 
-## SAI-004 — llama.cpp remains the universal low-level local reference
+## SAI-004 ΓÇö llama.cpp remains the universal low-level local reference
 
 **Status:** Adopted.
 
-## SAI-005 — Local TTS must have a cloud-quality comparison
+## SAI-005 ΓÇö Local TTS must have a cloud-quality comparison
 
 **Status:** Adopted.
 
 Do not select a local voice purely because it is offline.
 
-## SAI-006 — Perceived end-to-end latency is more important than isolated model speed
+## SAI-006 ΓÇö Perceived end-to-end latency is more important than isolated model speed
 
 **Status:** Adopted.
 
-## SAI-007 — Wake-word implementation must not block the first useful voice loop
+## SAI-007 ΓÇö Wake-word implementation must not block the first useful voice loop
 
 **Status:** Adopted.
 
 Use push-to-talk/touch first if needed.
 
-## SAI-008 — GPL and model licences are evaluated before distribution
+## SAI-008 ΓÇö GPL and model licences are evaluated before distribution
 
 **Status:** Adopted.
 
-## SAI-009 — Piper is the first isolated local TTS benchmark baseline
+## SAI-009 ΓÇö Piper is the first isolated local TTS benchmark baseline
 
 **Status:** Adopted for benchmarking.
 
 Sherpa-family TTS remains a high-priority replaceable alternative. Piper
 code and each selected voice model must pass the applicable release audit.
 
-## SAI-010 — Internal NUC AI services prefer the private Ethernet interface
+## SAI-010 ΓÇö Internal Pi 5 AI services are reached over the trusted Wi-Fi LAN
 
 **Status:** Adopted for prototyping.
 
-Speech and LLM endpoints should use interface-restricted private Ethernet
-by default, with health-aware policy-approved fallback.
+Speech and LLM endpoints should be reached over the trusted Wi-Fi LAN service
+path by default, with health-aware policy-approved fallback.
 
 ---
 
 # 26. Immediate Next Actions
 
 - [ ] Identify microphone hardware.
+- [ ] Set up ESP32-P4 ESP-IDF / FreeRTOS audio pipeline (I2S capture/playback).
+- [ ] Establish trusted Wi-Fi LAN service path between ESP32-P4 and Pi 5.
 - [ ] Establish common STT adapter interface.
 - [ ] Establish common TTS adapter interface.
 - [ ] Establish common AI provider interface.
 - [ ] Build fixed STT test-audio corpus.
 - [ ] Build fixed TTS test-script corpus.
-- [ ] Install whisper.cpp on Pi 5 after runtime baseline is ready.
-- [ ] Install whisper.cpp/faster-whisper on NUC.
-- [ ] Test sherpa-onnx on Pi/NUC.
-- [ ] Install Ollama on NUC.
-- [ ] Install/verify llama.cpp on NUC.
+- [ ] Install whisper.cpp/faster-whisper on Pi 5 after runtime baseline is ready.
+- [ ] Test sherpa-onnx on Pi 5.
+- [ ] Install Ollama on Pi 5.
+- [ ] Install/verify llama.cpp on Pi 5.
 - [ ] Use LM Studio on Acer for model comparison.
 - [ ] Configure one real cloud STT provider.
 - [ ] Configure two cloud TTS candidates.
@@ -1093,5 +1091,6 @@ must be rechecked before production release.
 
 | Version | Date | Notes |
 |---|---|---|
+| 0.3 | 2026-08-18 | ESP32-P4 is the primary companion, Raspberry Pi 5 is the local-compute partner, ESP32-P4ΓåöPi 5 link is trusted Wi-Fi |
 | 0.2 | 2026-08-09 | Reconciled exact NUC hardware and CPU-first assumptions, local-first LLM routing, Piper baseline wording, private-network deployment and staged licensing language |
 | 0.1 | 2026-08-09 | Initial STT/TTS/local-LLM runtime comparison, compatibility matrices, licensing cautions, benchmark methodology, fallback strategy and recommended first-build stack |

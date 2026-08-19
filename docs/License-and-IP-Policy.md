@@ -1,8 +1,8 @@
 # Project TARS --- License & Intellectual Property Policy
 
-**Status:** Version 0.4 — Living Work in Progress\
+**Status:** Version 0.4 ΓÇö Living Work in Progress\
 **Date:** 2026-08-09\
-**License model:** Staged / component-specific — private development now; Apache-2.0 default for original software selected for open-source release\
+**License model:** Staged / component-specific ΓÇö private development now; Apache-2.0 default for original software selected for open-source release\
 **Applies to:** Project TARS source code, documentation, specifications,
 original visual assets, original sound assets, configuration,
 interaction designs, prompts, workflows, hardware designs and other
@@ -16,7 +16,7 @@ original project materials, except where expressly stated otherwise.
 
 ------------------------------------------------------------------------
 
-# Document Status — Living Work in Progress
+# Document Status ΓÇö Living Work in Progress
 
 This policy is a **living project document** and will evolve as Project TARS moves from private research and prototyping toward any future collaboration, distribution or commercial release.
 
@@ -42,7 +42,7 @@ The licensing policy should protect the project **without preventing legitimate 
 
 # 1. Copyright Notice
 
-**Copyright © 2026 Project TARS rights holder. All Rights Reserved.**
+**Copyright ┬⌐ 2026 Project TARS rights holder. All Rights Reserved.**
 
 Unless a specific file, component or release states otherwise, unreleased
 original Project TARS materials remain proprietary and protected by
@@ -58,7 +58,7 @@ the Project TARS rights holder.
 
 ------------------------------------------------------------------------
 
-# 2. Unreleased / Proprietary Material — No Permission to Copy or Redistribute
+# 2. Unreleased / Proprietary Material ΓÇö No Permission to Copy or Redistribute
 
 For Project TARS material that has **not** been explicitly released under Apache-2.0 or another stated licence, without prior written permission from the rights holder you may not:
 
@@ -88,7 +88,7 @@ This includes suitable project-owned software such as:
 
 - orchestrator/framework code;
 - provider and hardware abstraction interfaces;
-- Pi/NUC service protocols and implementations;
+- ESP32-P4/Pi 5 service protocols and implementations;
 - deployment/build tooling;
 - diagnostics and tests;
 - example plugins and clients;
@@ -280,11 +280,11 @@ The project should preserve the following distinction:
 
 ``` text
 INSPIRATION
-    ↓
+    Γåô
 abstract design principle
-    ↓
+    Γåô
 Project TARS implementation
-    ↓
+    Γåô
 original behaviour / language / visuals / sounds
 ```
 
@@ -292,9 +292,9 @@ It should avoid:
 
 ``` text
 existing character
-    ↓
+    Γåô
 direct imitation
-    ↓
+    Γåô
 copied dialogue / voice / appearance / branding
 ```
 

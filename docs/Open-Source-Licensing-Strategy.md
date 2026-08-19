@@ -14,7 +14,7 @@ Obtain qualified IP/legal review before public or commercial release.
 For original Project TARS **software source code explicitly selected for
 open-source release**, the adopted default licence is:
 
-> **Apache License 2.0 — adopted default for original software explicitly released as open source.**
+> **Apache License 2.0 ΓÇö adopted default for original software explicitly released as open source.**
 
 This is preferred over MIT for Project TARS because the project is
 intended to be modular, extensible, AI-assisted, potentially
@@ -35,8 +35,8 @@ Project TARS is designed around replaceable modules and provider
 adapters:
 
 ``` text
-Pi runtime
-NUC services
+ESP32-P4 runtime
+Pi 5 compute services
 STT adapters
 TTS adapters
 LLM providers
@@ -455,7 +455,7 @@ A sensible candidate public structure is:
 **Candidate software for Apache-2.0 release:**
 
 - provider interfaces;
-- Pi/NUC service protocols;
+- ESP32-P4/Pi 5 service protocols;
 - hardware abstraction;
 - deployment tooling;
 - example plugins;

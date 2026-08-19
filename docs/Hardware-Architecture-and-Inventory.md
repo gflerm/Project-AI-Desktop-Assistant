@@ -1,7 +1,7 @@
 # Project TARS --- Hardware Architecture & Inventory
 
-**Status:** Version 0.10 --- Living Work in Progress\
-**Date:** 2026-08-09\
+**Status:** Version 0.11 --- Living Work in Progress\
+**Date:** 2026-08-18\
 **Document role:** Hardware inventory, node roles, interfaces,
 constraints and hardware evolution plan\
 **Companion to:** `Design-Specification.md`
@@ -37,13 +37,13 @@ The design favours **distributed capability**:
 
 ``` text
 PHYSICAL COMPANION
-Raspberry Pi 5
+ESP32-P4
         |
         +------ OPTIONAL EDGE AI NODE
         |       NVIDIA Jetson Nano
         |
         +------ LOCAL COMPUTE NODE
-        |       Intel NUC / Mini PC
+        |       Raspberry Pi 5
         |
         +------ DEVELOPMENT / WORKSTATION NODE
         |       Acer i7 / NVIDIA laptop
@@ -63,8 +63,8 @@ The companion must degrade gracefully if another node is unavailable.
 
 # 3. Architectural Principle
 
-**The Pi is the companion. Other computers are resources available to
-the companion.**
+**The ESP32-P4 is the companion. Other computers are resources available
+to the companion.**
 
 The user should not need to think constantly about which machine is
 answering.
@@ -74,14 +74,14 @@ observable.
 
 ------------------------------------------------------------------------
 
-# 4. Node A --- Raspberry Pi 5
+# 4. Node A --- ESP32-P4
 
 ## 4.1 Role
 
 **Primary physical companion / edge controller**
 
-The Pi 5 is intended to remain the always-present device attached to the
-display, microphone, speaker, camera and future sensors.
+The ESP32-P4 is intended to remain the always-present device attached to
+the display, microphone, speaker, camera and future sensors.
 
 ## 4.2 Proposed responsibilities
 
@@ -108,8 +108,8 @@ display, microphone, speaker, camera and future sensors.
 
 ## 4.3 Tasks to avoid where possible
 
-The Pi should not be forced to perform sustained heavy workloads that
-damage responsiveness, including:
+The ESP32-P4 should not be forced to perform sustained heavy workloads
+that damage responsiveness, including:
 
 -   large LLM inference;
 -   heavyweight vision inference;
@@ -122,66 +122,77 @@ damage responsiveness, including:
 
   Item                 Current status
   -------------------- -------------------------------------------------
-  Board                Raspberry Pi 5 Model B, revision 1.0
-  CPU                  Four-core ARM Cortex-A76, up to 2.4 GHz
-  RAM                  8 GB
-  Primary storage      Samsung 256 GB NVMe boot drive
-  Additional storage   64 GB microSD card
-  Cooling              PWM-controlled cooling fan
-  Ethernet             Gigabit Ethernet
-  Wi-Fi                Built-in Wi-Fi
-  Bluetooth            Built-in Bluetooth
+  Board                Waveshare ESP32-P4-WIFI6 Kit A (SKU 32021);
+                       ESP32-P4NRW32 package
+  CPU                  Dual-core RISC-V, up to 360 MHz
+  Memory               32 MB in-package PSRAM (ESP32-P4NRW32)
+  Primary storage      32 MB NOR flash
+  Cooling              **To verify** (passive expected at 360 MHz)
+  Wi-Fi                ESP32-C6 ESP-Hosted coprocessor over four-bit
+                       SDIO; 2.4 GHz Wi-Fi 6
+  Bluetooth            Via ESP32-C6 coprocessor **to verify**
+  Display interface    MIPI-DSI and parallel RGB LCD; HDMI bridge as an
+                       alternative
+  Camera interface     MIPI-CSI (Kit A ships an OV5647 camera)
+  Audio                Onboard ES8311 codec; speaker and microphone
   Hostname             `titanium`
-  Power supply         **To verify**
-  OS baseline          Raspberry Pi OS Lite 64-bit
+  Power supply         USB-C (programming/power port) **to verify**
+  OS baseline          ESP-IDF / FreeRTOS (native ESP-IDF project;
+                       verified with ESP-IDF 6.0.2)
+
+**Silicon note:** this board reports ESP32-P4 silicon revision v1.3
+(pre-v3). `sdkconfig.defaults` therefore sets
+`CONFIG_ESP32P4_SELECTS_REV_LESS_V3=y` and `CONFIG_ESP32P4_REV_MIN_100=y`.
+Revisions 3+ require different settings.
 
 ------------------------------------------------------------------------
 
 
-## 4.5 Raspberry Pi Operating-System Baseline
+## 4.5 ESP32-P4 Firmware Baseline (ESP-IDF / FreeRTOS)
 
-**Current baseline:** Raspberry Pi OS Lite 64-bit.
+**Current baseline:** ESP-IDF / FreeRTOS.
 
-Project TARS should run the Pi as an appliance rather than as a conventional
-desktop computer.
+Project TARS should run the ESP32-P4 as a purpose-built embedded appliance
+rather than as a conventional Linux desktop. The ESP32-P4 is **not a Linux
+host**: it runs bare-metal/RTOS firmware built with ESP-IDF and FreeRTOS.
 
 The preferred software stack is:
 
 ```text
-Raspberry Pi OS Lite 64-bit
+ESP-IDF / FreeRTOS
         |
-minimal graphics / input / audio stack
+display / touch / audio / networking drivers
         |
-Project TARS fullscreen UI
+Project TARS embedded UI
         |
 Project TARS services
         |
-system service supervision / autostart
+firmware task supervision / watchdog
 ```
 
-A complete desktop environment is **not required** for kiosk-style operation.
+A complete desktop environment is **not required** (and is not applicable)
+on the ESP32-P4.
 
-### 4.5.1 Why Lite is preferred
+### 4.5.1 Why the RTOS baseline is preferred
 
 Potential benefits:
 
-- lower idle RAM use;
-- fewer background desktop processes;
-- smaller update and attack surface;
-- cleaner boot path;
-- less competition for CPU/GPU resources;
-- easier appliance-style deployment;
-- more deterministic runtime environment.
+- low idle memory use (MB-class, not GB-class);
+- deterministic task scheduling and timing;
+- minimal update and attack surface;
+- clean boot path;
+- tightly controlled resource allocation;
+- appliance-style deployment;
+- predictable, low-latency runtime behaviour.
 
-### 4.5.2 Graphics-stack decision remains open
+### 4.5.2 Display/rendering stack decision remains open
 
 The UI still needs a display/rendering stack.
 
 Candidate approaches include:
 
-- a lightweight Wayland compositor plus fullscreen application;
-- a minimal X/Wayland session if the selected UI framework requires it;
-- direct DRM/KMS rendering where the chosen framework supports it well.
+- MIPI-DSI or parallel RGB LCD driven directly by the ESP32-P4;
+- an HDMI bridge as an alternative display path.
 
 The exact choice should be driven by the selected UI framework and measured
 latency/stability, not ideology.
@@ -190,19 +201,20 @@ latency/stability, not ideology.
 
 Primary development should occur on the Acer development machine.
 
-The Pi should be treated as a deployment/runtime target and administered
-primarily through SSH and automated deployment.
+The ESP32-P4 should be treated as a firmware build/flash target,
+administered through flashing and provisioning rather than interactive
+shell administration.
 
-This reduces configuration drift and helps keep the runtime image
+This reduces configuration drift and helps keep the firmware image
 reproducible.
 
 ### 4.5.4 Appliance behaviour
 
-The Pi should eventually:
+The ESP32-P4 should eventually:
 
 - boot directly into Project TARS;
 - start required services automatically;
-- restart failed services;
+- restart failed tasks via watchdog/supervision;
 - expose a local diagnostics path;
 - allow safe shutdown/restart;
 - remain operable without a conventional desktop shell.
@@ -216,8 +228,9 @@ The Pi should eventually:
 A first-generation Raspberry Pi 7-inch touchscreen is currently
 available and known to operate with a Raspberry Pi 4.
 
-The display uses the Raspberry Pi display interface rather than acting
-as a generic HDMI-only monitor.
+The display uses a dedicated display interface rather than acting as a
+generic HDMI-only monitor. Driven by the ESP32-P4, it can be connected
+via MIPI-DSI or parallel RGB, with an HDMI bridge as an alternative.
 
 ## 5.2 Intended role
 
@@ -241,8 +254,8 @@ It may show:
 Before committing the enclosure/UI design:
 
 -   identify exact display revision;
--   verify Pi 5 physical/electrical compatibility;
--   verify required DSI cable/adapter;
+-   verify ESP32-P4 physical/electrical compatibility;
+-   verify required display interface (MIPI-DSI / parallel RGB / HDMI bridge) and adapter;
 -   verify touch support;
 -   verify display orientation;
 -   verify brightness control;
@@ -250,13 +263,13 @@ Before committing the enclosure/UI design:
 -   test boot-to-UI behaviour;
 -   test animation performance.
 
-**Status:** Available; Pi 5 compatibility still to be physically
-verified.
+**Status:** Available; ESP32-P4 display-interface compatibility still to
+be physically verified.
 
 ------------------------------------------------------------------------
 
 
-## 5.4 Display Options — Gen-1 DSI vs Touch Display 2 vs HDMI
+## 5.4 Display Options ΓÇö Gen-1 DSI vs Touch Display 2 vs HDMI
 
 Project TARS currently has three realistic display paths:
 
@@ -271,15 +284,15 @@ interface is inherently faster.
 | Area | Gen-1 Raspberry Pi 7-inch Touch Display | Raspberry Pi 7-inch Touch Display 2 | HDMI touchscreen/display |
 |---|---|---|---|
 | Interface | DSI | DSI + GPIO power | HDMI; touch often via USB |
-| Native resolution | 800×480 | 720×1280 portrait / 1280×720 landscape use | Varies widely |
+| Native resolution | 800├ù480 | 720├ù1280 portrait / 1280├ù720 landscape use | Varies widely |
 | Display size | 7 inch | 7 inch | Varies |
 | Colour | Older panel generation | 24-bit RGB | Varies |
 | Touch | Integrated | Integrated five-point multitouch | Usually USB touch; capability varies |
-| Pi 5 compatibility | Yes with correct 22-way to 15-way FFC | Officially supported; supplied Pi 5-compatible 22-way to 15-way FFC | Yes, subject to panel/USB support |
-| Power | Separate display power arrangement | Powered from host Pi via GPIO cable | Usually separate panel power |
+| ESP32-P4 interface | DSI via MIPI-DSI or parallel RGB | DSI + GPIO power via MIPI-DSI or parallel RGB | HDMI bridge as alternative; touch often via USB |
+| Power | Separate display power arrangement | Powered from host board via GPIO/display cable | Usually separate panel power |
 | Cabling | Compact | Compact; DSI + GPIO power | HDMI + often USB + power |
 | Enclosure integration | Excellent | Excellent; slim integrated option | More connector/cable volume |
-| UI pixel workload | Lowest | ~2.4× Gen-1 pixel count | Depends on chosen resolution |
+| UI pixel workload | Lowest | ~2.4├ù Gen-1 pixel count | Depends on chosen resolution |
 | Text/diagnostic sharpness | Limited | Significantly improved | Potentially highest |
 | Touch/UI flexibility | Good | Very good | Varies |
 | Replaceability / panel choice | Limited | Limited to official panel | Excellent |
@@ -289,7 +302,7 @@ interface is inherently faster.
 
 A concrete upgrade candidate has been identified:
 
-**Raspberry Pi 7-inch Touch Display 2 — 720×1280 native portrait resolution.**
+**Raspberry Pi 7-inch Touch Display 2 ΓÇö 720├ù1280 native portrait resolution.**
 
 Reference retailer supplied during design review:
 
@@ -298,23 +311,22 @@ Reference retailer supplied during design review:
 Official Raspberry Pi documentation confirms the 7-inch Touch Display 2
 provides:
 
-- 720×1280 native resolution;
+- 720├ù1280 native resolution;
 - 24-bit RGB;
 - five-finger multitouch;
 - integrated DSI video/touch connection;
-- power from the host Raspberry Pi via the supplied GPIO power cable;
-- Raspberry Pi 5 compatibility;
-- supplied 22-way to 15-way FFC for Raspberry Pi 5;
+- power from the host board via the supplied GPIO/display power cable;
+- interfaceable with the ESP32-P4 via MIPI-DSI or parallel RGB (HDMI bridge as an alternative);
 - approximately 15 mm depth;
-- 120 × 189.5 mm overall dimensions;
-- 87 × 154.5 mm active area.
+- 120 ├ù 189.5 mm overall dimensions;
+- 87 ├ù 154.5 mm active area.
 
 For landscape Project TARS UI design, the effective working orientation can
-be treated as **1280×720** after rotation.
+be treated as **1280├ù720** after rotation.
 
 ### 5.4.2 Why Touch Display 2 is attractive
 
-Compared with the existing 800×480 panel, Touch Display 2 provides
+Compared with the existing 800├ù480 panel, Touch Display 2 provides
 substantially more usable pixels without moving to the HDMI/USB cabling
 model.
 
@@ -325,7 +337,7 @@ Potential benefits:
 - richer animation assets;
 - better split-screen/settings layouts;
 - five-point multitouch;
-- official Pi 5 support and supplied cable;
+- MIPI-DSI or parallel RGB interface supported by the ESP32-P4;
 - cleaner enclosure integration than many HDMI touch panels;
 - no separate display PSU.
 
@@ -340,30 +352,30 @@ Approximate pixel counts:
 
 ```text
 Gen-1 display:
-800 × 480 = 384,000 pixels
+800 ├ù 480 = 384,000 pixels
 
 Touch Display 2:
-1280 × 720 = 921,600 pixels
+1280 ├ù 720 = 921,600 pixels
 ```
 
 Touch Display 2 therefore requires roughly **2.4 times as many pixels per
 full frame** as the Gen-1 display.
 
-This does not mean the Pi 5 will be slow. It means the UI benchmark should
-verify that the additional visual quality is worth the additional rendering
-load.
+This does not mean the ESP32-P4 will be slow. It means the UI benchmark
+should verify that the additional visual quality is worth the additional
+rendering load.
 
 For Project TARS, animation architecture, compositor behaviour, asset
 complexity and frame pacing may matter more than DSI versus HDMI alone.
 
 ### 5.4.4 Current recommendation
 
-**Stage 1 — Use the existing Gen-1 DSI touchscreen.**
+**Stage 1 ΓÇö Use the existing Gen-1 DSI touchscreen.**
 
 It is already owned, has the lowest rendering workload, and is sufficient
 to prove the display architecture.
 
-**Stage 2 — Benchmark the actual Project TARS UI.**
+**Stage 2 ΓÇö Benchmark the actual Project TARS UI.**
 
 Measure:
 
@@ -380,9 +392,9 @@ readability at desk distance
 available UI space
 ```
 
-**Stage 3 — Upgrade only if justified.**
+**Stage 3 ΓÇö Upgrade only if justified.**
 
-If 800×480 is demonstrably restrictive, evaluate the 7-inch Touch Display 2
+If 800├ù480 is demonstrably restrictive, evaluate the 7-inch Touch Display 2
 before moving to an HDMI panel.
 
 ### 5.4.5 When HDMI would still win
@@ -418,22 +430,22 @@ clear upgrade path.
 
 ### 5.4.7 Display decisions
 
-**H010 — Existing Gen-1 DSI touchscreen remains the baseline prototype
+**H010 ΓÇö Existing Gen-1 DSI touchscreen remains the baseline prototype
 display.**
 
-Status: Adopted pending Pi 5 physical verification.
+Status: Adopted pending ESP32-P4 physical verification.
 
-**H011 — Display upgrades remain benchmark-driven.**
+**H011 ΓÇö Display upgrades remain benchmark-driven.**
 
 Status: Architectural requirement.
 
-**H012 — Raspberry Pi 7-inch Touch Display 2 is the preferred DSI upgrade
+**H012 ΓÇö Raspberry Pi 7-inch Touch Display 2 is the preferred DSI upgrade
 candidate.**
 
 Status: Candidate / do not purchase until prototype benchmark.
 
 Reason: it approximately doubles linear UI resolution while retaining
-official Pi integration, multitouch and compact DSI cabling.
+an integrated display, multitouch and compact DSI cabling.
 
 ---
 
@@ -448,8 +460,8 @@ Requirements:
 -   clear near-field speech capture;
 -   acceptable desk-distance capture;
 -   low noise;
--   reliable Linux support;
--   preferably USB or well-supported audio interface;
+-   reliable ESP-IDF / ESP32-P4 driver support;
+-   preferably I2S or well-supported audio interface;
 -   suitable for echo-cancellation experiments.
 
 Future options may include a microphone array, but this is not required
@@ -466,40 +478,40 @@ Requirements:
 -   controllable volume;
 -   low latency;
 -   minimal microphone feedback;
--   acceptable Linux support.
+-   acceptable ESP-IDF / ESP32-P4 driver support.
 
-## 6.3 Raspberry Pi 5 Audio Capabilities
+## 6.3 ESP32-P4 Audio Capabilities
 
-The Raspberry Pi 5 provides digital audio paths but does **not** include
-an onboard microphone, speaker, conventional analogue microphone input, or
-3.5 mm analogue audio-output jack.
+The ESP32-P4 provides multiple I2S interfaces for digital audio but does
+**not** include an onboard microphone, speaker, conventional analogue
+microphone input, or a 3.5 mm analogue audio-output jack.
 
 Available audio paths relevant to Project TARS include:
 
 | Audio path | Input | Output | Project TARS relevance |
 |---|---:|---:|---|
-| USB audio | Yes | Yes | **Preferred first-prototype path** |
-| I2S / GPIO audio hardware | Yes with suitable codec/mic | Yes with DAC/amplifier | **Preferred integrated-design candidate** |
-| HDMI audio | No | Yes | Useful but not preferred for companion audio |
+| I2S / codec hardware | Yes with suitable codec/mic | Yes with DAC/amplifier | **Preferred integrated-design candidate** |
+| USB audio | Yes with supported device | Yes with supported device | **Preferred first-prototype path** |
 | Bluetooth audio | Yes, device-dependent | Yes | Optional; latency/reliability must be tested |
 | HDMI display audio | No | Yes, if display supports it | Convenient temporary output only |
 
 ### Prototype recommendation
 
-Use a well-supported **USB microphone / USB audio interface and speaker**
-for the first voice prototype where suitable hardware is available.
+Use a well-supported **I2S microphone/codec/DAC/amplifier (or supported USB
+audio device) and speaker** for the first voice prototype where suitable
+hardware is available.
 
 Reasons:
 
-- fastest path to working Linux audio;
-- avoids custom electronics during software development;
+- fastest path to working audio on the ESP32-P4;
+- avoids over-custom electronics during software development;
 - easy to replace;
 - allows STT/TTS latency work to begin before enclosure/audio-board design;
 - useful baseline against which an integrated audio solution can be measured.
 
 ### Integrated enclosure candidate
 
-After the conversational voice loop is stable, evaluate an **I2S-based
+After the conversational voice loop is stable, finalise an **I2S-based
 microphone/codec/DAC/amplifier solution** for the final enclosure.
 
 Potential advantages:
@@ -511,13 +523,9 @@ Potential advantages:
 - potential microphone-array integration.
 
 The exact I2S hardware must not be selected until microphone placement,
-speaker placement, echo behaviour and Linux driver support are tested.
+speaker placement, echo behaviour and ESP-IDF driver support are tested.
 
-### HDMI and Bluetooth
-
-HDMI audio is a valid digital output but is not the preferred Project TARS
-voice path because it does not solve microphone capture and ties audio
-output to the display chain.
+### Bluetooth
 
 Bluetooth should remain optional rather than the baseline because wireless
 audio can add latency, codec negotiation and reconnection behaviour that is
@@ -543,9 +551,11 @@ models.
 
 ## 7.1 Available hardware
 
-A Raspberry Pi camera is believed to be available.
+A camera is believed to be available.
 
-**Exact model:** To identify.
+**Exact model / interface:** To identify. The ESP32-P4 has a MIPI-CSI
+camera interface, so candidate camera hardware should be assessed against
+that interface.
 
 ## 7.2 Intended future roles
 
@@ -600,7 +610,7 @@ Candidate responsibilities:
 - camera preprocessing;
 - selected lightweight neural-network inference;
 - experimental vision services;
-- comparison against Pi CPU, AI HAT candidate, NUC and workstation vision.
+- comparison against ESP32-P4, Pi 5 and workstation vision.
 
 With only 4 GB of RAM, it should not be assumed to be a useful host for
 modern general-purpose LLM workloads.
@@ -609,7 +619,7 @@ modern general-purpose LLM workloads.
 
 The Nano is already owned, so it should be benchmarked before purchasing
 additional vision hardware. It may provide a useful dedicated vision
-service while leaving the Pi responsive.
+service while leaving the ESP32-P4 responsive.
 
 The project should avoid forcing the Jetson into the architecture merely
 because it is available. Its role must be justified by measured latency,
@@ -629,56 +639,39 @@ throughput, software compatibility, power and reliability.
 - [ ] Verify TensorRT.
 - [ ] Benchmark representative vision model.
 - [ ] Measure sustained temperature and power.
-- [ ] Compare vision latency with Pi/NUC alternatives.
+- [ ] Compare vision latency with ESP32-P4 / Pi 5 alternatives.
 
 ---
 
-# 9. Node C --- Intel NUC / Mini PC
+# 9. Node C --- Raspberry Pi 5 (local-compute partner)
 
 ## 9.1 Identified hardware
 
-The NUC has now been identified from the chassis label as:
+The local-compute node is a **Raspberry Pi 5 Model B, revision 1.0**.
 
-**Intel NUC8i5BEH**  
-**Product code:** BOXNUC8i5BEH  
-**Regulatory model:** NUC8BEH  
-**Date of manufacture:** 01/2020
-
-The installed memory has been upgraded to **16 GB total RAM**.
+The installed memory is **8 GB total RAM**.
 
 | Item | Current information |
 |---|---|
-| Device | Intel NUC8i5BEH ("Bean Canyon") |
-| Product code | BOXNUC8i5BEH |
-| CPU | Intel Core i5-8259U |
-| CPU generation | 8th Generation Intel Core |
-| CPU topology | 4 cores / 8 threads |
-| Base frequency | 2.30 GHz |
-| Maximum turbo | Up to 3.80 GHz |
-| Cache | 6 MB |
-| TDP | 28 W |
-| RAM | **16 GB installed** |
-| Platform RAM support | Up to 32 GB DDR4-2400 |
-| Integrated GPU | Intel Iris Plus Graphics 655 |
-| GPU eDRAM | 128 MB |
-| Ethernet | Intel Gigabit Ethernet |
-| Wi-Fi | Intel Wireless-AC 9560, 2×2 802.11ac |
-| Bluetooth | Bluetooth 5-class capability via installed wireless module |
-| HDMI | HDMI 2.0a |
-| USB-C / Thunderbolt | Thunderbolt 3 / USB-C |
-| USB-A | Multiple USB 3.x ports |
-| Storage capability | M.2 2242/2280 SSD plus 2.5-inch SATA bay in BEH chassis |
-| Installed storage | **To verify** |
-| Power input | 19 V DC, 4.74 A on chassis label |
-| Approx. PSU class | ~90 W |
-| OS | **To decide / verify installed state** |
-| Status | Available; platform identified, detailed runtime verification pending |
+| Device | Raspberry Pi 5 Model B, revision 1.0 |
+| CPU | Four-core ARM Cortex-A76, up to 2.4 GHz |
+| RAM | 8 GB |
+| Primary storage | Samsung 256 GB NVMe boot drive |
+| Additional storage | 64 GB microSD card |
+| Cooling | PWM-controlled cooling fan |
+| Ethernet | Gigabit Ethernet |
+| Wi-Fi | Built-in Wi-Fi |
+| Bluetooth | Built-in Bluetooth |
+| Hostname | `titanium` |
+| Power supply | **To verify** |
+| OS | Raspberry Pi OS Lite 64-bit (target baseline) |
+| Status | Available; runtime verification pending |
 
 ## 9.2 Proposed role
 
 **Primary local compute / AI service node**
 
-This NUC is well suited to work as the Pi 5's local compute partner.
+This Pi 5 is well suited to work as the ESP32-P4's local compute partner.
 
 Candidate responsibilities:
 
@@ -695,55 +688,55 @@ Candidate responsibilities:
 - optional vision inference where CPU performance is acceptable;
 - local cache for models and speech assets.
 
-The NUC should be regarded primarily as a **CPU inference node**. Its Intel
-Iris Plus Graphics 655 is useful for media/graphics acceleration but should
+The Pi 5 should be regarded primarily as a **CPU inference node**. Its
+integrated graphics is useful for media/graphics acceleration but should
 not be assumed to provide NVIDIA/CUDA-class AI acceleration.
 
-## 9.3 Why it complements the Pi 5
+## 9.3 Why it complements the ESP32-P4
 
 The architectural split is:
 
 ```text
-PI 5
+ESP32-P4
 real-time physical interaction
 display / touch / audio / wake / device state
         |
-        | dedicated Ethernet
+        | trusted Wi-Fi LAN
         v
-NUC8i5BEH
+PI 5
 heavier local compute
 LLM / STT / TTS / memory / indexing
 ```
 
-The NUC's 4-core/8-thread i5 and 16 GB RAM make it materially better suited
-than the Pi for sustained CPU-heavy workloads while allowing the Pi to
-remain responsive.
+The Pi 5's quad-core Cortex-A76 and 8 GB RAM make it materially better
+suited than the ESP32-P4 for sustained CPU-heavy workloads while allowing
+the ESP32-P4 to remain responsive.
 
-The NUC should add capability rather than become a single point of failure.
+The Pi 5 should add capability rather than become a single point of
+failure.
 
 ## 9.4 Installed-state verification checklist
 
-- [x] Identify chassis/model: Intel NUC8i5BEH.
-- [x] Identify CPU family: Intel Core i5-8259U.
-- [x] Record installed RAM: 16 GB total.
-- [ ] Verify exact RAM module arrangement and speed.
-- [ ] Identify installed M.2 SSD model/capacity.
-- [ ] Identify installed 2.5-inch SATA drive, if any.
+- [x] Record exact model: Raspberry Pi 5 Model B, revision 1.0.
+- [x] Record CPU: four-core ARM Cortex-A76, up to 2.4 GHz.
+- [x] Record installed RAM: 8 GB.
+- [x] Record primary storage: Samsung 256 GB NVMe boot drive.
+- [x] Record additional storage: 64 GB microSD card.
 - [ ] Record free storage capacity.
-- [ ] Verify BIOS version.
+- [ ] Verify cooling fan operation and thermal behaviour.
 - [ ] Verify Ethernet controller/driver.
 - [ ] Verify Wi-Fi and Bluetooth operation.
-- [ ] Decide/record operating system.
+- [ ] Install/verify Raspberry Pi OS Lite 64-bit baseline.
 - [ ] Benchmark sustained CPU temperature.
 - [ ] Benchmark power at idle and under inference load.
 - [ ] Benchmark Ollama/llama.cpp model load and token speed.
 - [ ] Benchmark faster-whisper / whisper.cpp STT.
 - [ ] Benchmark local TTS.
-- [ ] Measure Pi↔NUC network latency and throughput.
+- [ ] Measure ESP32-P4↔Pi 5 network latency and throughput.
 
 ## 9.5 Initial workload guidance
 
-The first NUC benchmarks should focus on realistic small-to-medium
+The first Pi 5 benchmarks should focus on realistic small-to-medium
 quantized models rather than attempting the largest model that can
 technically fit in memory.
 
@@ -758,7 +751,7 @@ Priorities:
 6. power consumption
 ```
 
-A model that fits in 16 GB but produces poor conversational latency is not
+A model that fits in 8 GB but produces poor conversational latency is not
 a useful default.
 
 ---
@@ -826,16 +819,16 @@ Possible providers may change during development.
 A task router may eventually choose:
 
 ``` text
-LEVEL 0 — Pi
+LEVEL 0 ΓÇö ESP32-P4
 instant physical/UI/device work
 
-LEVEL 1 — NUC
+LEVEL 1 ΓÇö Pi 5
 local private compute and medium workloads
 
-LEVEL 2 — Workstation
+LEVEL 2 ΓÇö Workstation
 heavy local tools / development / GPU work
 
-LEVEL 3 — Cloud
+LEVEL 3 ΓÇö Cloud
 highest-capability remote AI/services
 ```
 
@@ -858,22 +851,22 @@ Routing criteria may include:
 
   Task                      Preferred node      Fallback
   ------------------------- ------------------- -----------------------
-  Touch input               Pi                  None
-  UI animation              Pi                  None
-  Wake word                 Pi                  NUC where appropriate
-  Microphone capture        Pi                  None
-  Local STT                 NUC                 Pi/cloud
-  Local TTS                 NUC or Pi           Cloud
-  Small local LLM           NUC                 Cloud
-  Large reasoning task      Cloud/workstation   NUC where capable
-  GPIO/sensor control       Pi                  None
-  Camera capture            Pi                  None
-  Vision inference          NUC/workstation     Cloud
-  Embeddings                NUC                 workstation/cloud
-  Vector database           NUC                 workstation
-  Codex/development tools   Workstation         NUC where appropriate
-  Long build/test           Workstation         NUC
-  Offline status/UI         Pi                  None
+  Touch input               ESP32-P4            None
+  UI animation              ESP32-P4            None
+  Wake word                 ESP32-P4            Pi 5 where appropriate
+  Microphone capture        ESP32-P4            None
+  Local STT                 Pi 5                ESP32-P4/cloud
+  Local TTS                 Pi 5 or ESP32-P4    Cloud
+  Small local LLM           Pi 5                Cloud
+  Large reasoning task      Cloud/workstation   Pi 5 where capable
+  GPIO/sensor control       ESP32-P4            None
+  Camera capture            ESP32-P4            None
+  Vision inference          Pi 5/workstation    Cloud
+  Embeddings                Pi 5                workstation/cloud
+  Vector database           Pi 5                workstation
+  Codex/development tools   Workstation         Pi 5 where appropriate
+  Long build/test           Workstation         Pi 5
+  Offline status/UI         ESP32-P4            None
 
 This table is provisional and should be changed after benchmarking.
 
@@ -883,15 +876,16 @@ This table is provisional and should be changed after benchmarking.
 
 Initial preference:
 
-**Wired Ethernet where practical.**
+**Trusted Wi-Fi LAN between the ESP32-P4 and Pi 5, with static private
+addressing where practical.**
 
 Benefits:
 
--   low latency;
+-   low latency on a trusted LAN;
 -   reliability;
 -   predictable discovery;
 -   better model/data transfer;
--   less dependence on Wi-Fi quality.
+-   a single Wi-Fi path serving both the service link and development/cloud access.
 
 Candidate communication technologies:
 
@@ -899,7 +893,7 @@ Candidate communication technologies:
 -   WebSocket for live state;
 -   MQTT for lightweight events;
 -   gRPC where strongly typed high-performance RPC becomes useful;
--   SSH for administration/deployment.
+-   SSH for administration/deployment (on Linux hosts such as the Pi 5).
 
 Do not introduce every protocol at once.
 
@@ -909,20 +903,20 @@ The first prototype should favour simplicity.
 
 # 15. Service Discovery
 
-The Pi should eventually be able to determine which resources are
+The ESP32-P4 should eventually be able to determine which resources are
 available.
 
 Conceptual state:
 
 ``` text
-NUC: ONLINE
+PI 5: ONLINE
 WORKSTATION: ONLINE
 CLOUD: ONLINE
 
-LOCAL_LLM: AVAILABLE ON NUC
-STT: AVAILABLE ON NUC
+LOCAL_LLM: AVAILABLE ON PI 5
+STT: AVAILABLE ON PI 5
 CODEX_TOOLS: AVAILABLE ON WORKSTATION
-VISION: AVAILABLE ON NUC + CLOUD
+VISION: AVAILABLE ON PI 5 + CLOUD
 ```
 
 Discovery may initially use static configuration before automatic
@@ -934,9 +928,9 @@ discovery is implemented.
 
 Distributed hardware creates failure modes that must be intentional.
 
-## NUC offline
+## Pi 5 offline
 
--   Pi continues;
+-   ESP32-P4 continues;
 -   heavy local services marked unavailable;
 -   eligible work rerouted.
 
@@ -947,16 +941,16 @@ Distributed hardware creates failure modes that must be intentional.
 
 ## Internet offline
 
--   local Pi/NUC functions continue;
+-   local ESP32-P4 / Pi 5 functions continue;
 -   cloud-only capabilities are clearly unavailable.
 
-## Pi failure
+## ESP32-P4 failure
 
 The physical companion is offline even if other compute nodes remain
 available.
 
 This is why critical configuration and project data should not exist
-only on the Pi.
+only on the ESP32-P4.
 
 ------------------------------------------------------------------------
 
@@ -966,9 +960,10 @@ Exact storage is still to be inventoried.
 
 Possible allocation:
 
-**Pi** - OS; - UI; - local configuration; - small caches; - device logs.
+**ESP32-P4** - firmware/config; - UI assets; - local configuration; -
+small caches; - device logs.
 
-**NUC** - local models; - vector indexes; - databases; - larger
+**Pi 5** - local models; - vector indexes; - databases; - larger
 caches; - service logs.
 
 **Workstation / repository** - source code; - master documentation; -
@@ -983,10 +978,10 @@ long-term memory.
 
 To verify:
 
--   Pi 5 power supply rating;
--   Pi cooling solution;
--   NUC power consumption;
--   whether NUC should run continuously;
+-   ESP32-P4 power supply rating;
+-   ESP32-P4 cooling solution;
+-   Pi 5 power consumption;
+-   whether Pi 5 should run continuously;
 -   display power source;
 -   audio hardware power;
 -   cable management;
@@ -1009,7 +1004,7 @@ Requirements:
 -   firewall rules;
 -   secure administration;
 -   logs for consequential remote actions;
--   explicit trust relationship between Pi, NUC and workstation.
+-   explicit trust relationship between ESP32-P4, Pi 5 and workstation.
 
 Remote access from outside the local network should not be enabled
 casually.
@@ -1022,10 +1017,10 @@ This section should become the authoritative inventory.
 
 | ID | Hardware | Status | Intended role | Known model/details | Remaining verification |
 |---|---|---|---|---|---|
-| HW-001 | Raspberry Pi 5 | Available | Physical companion | Model B Rev 1.0; 8 GB RAM; 4-core Cortex-A76 up to 2.4 GHz; Samsung 256 GB NVMe; 64 GB microSD; PWM fan; Gigabit Ethernet; Wi-Fi; Bluetooth; hostname `titanium` | PSU |
-| HW-002 | Raspberry Pi 7-inch Touch Display Gen 1 | Available | Prototype UI | Exact revision to verify | Pi 5 cable, touch and UI benchmarks |
-| HW-003 | Raspberry Pi Camera | Believed available | Future vision | To identify | Locate, identify and test |
-| HW-004 | Intel NUC | Available | Primary local-compute baseline | NUC8i5BEH; Core i5-8259U; 16 GB RAM | Storage, RAM layout, BIOS, OS and benchmarks |
+| HW-001 | ESP32-P4 | Identified | Physical companion | Waveshare ESP32-P4-WIFI6 Kit A (SKU 32021); ESP32-P4NRW32; dual-core RISC-V up to 360 MHz; 32 MB PSRAM; 32 MB flash; ESP32-C6 Wi-Fi 6 coprocessor (ESP-Hosted over SDIO); MIPI-DSI / parallel RGB; MIPI-CSI (OV5647); ES8311 audio; ESP-IDF / FreeRTOS | PSU, display-interface, touch and UI benchmarks |
+| HW-002 | Raspberry Pi 7-inch Touch Display Gen 1 | Available | Prototype UI | Exact revision to verify | ESP32-P4 display-interface, touch and UI benchmarks |
+| HW-003 | Camera (OV5647) | Included with Kit A | Future vision | OV5647 MIPI-CSI camera included with Waveshare Kit A | Camera driver/stream tests |
+| HW-004 | Raspberry Pi 5 | Available | Primary local-compute baseline | Model B Rev 1.0; 8 GB RAM; 4-core Cortex-A76 up to 2.4 GHz; Samsung 256 GB NVMe; 64 GB microSD; PWM fan; Gigabit Ethernet; Wi-Fi; Bluetooth; hostname `titanium` | PSU, OS baseline and benchmarks |
 | HW-005 | Acer development system | Available | Workstation/development | i7; 32 GB RAM; NVIDIA GPU | Exact model, CPU, GPU, storage and OS |
 | HW-006 | Microphone | To define | Voice input | TBD | Inventory and benchmark existing devices |
 | HW-007 | Speaker | To define | Voice output | TBD | Inventory and benchmark existing devices |
@@ -1035,33 +1030,34 @@ This section should become the authoritative inventory.
 ------------------------------------------------------------------------
 
 
-# 20A. Pi 5 ↔ NUC Network Architecture
+# 20A. ESP32-P4 ↔ Pi 5 Network Architecture
 
 ## 20A.1 Design intent
 
-Project TARS should use two logically distinct network paths:
+The ESP32-P4 and Pi 5 communicate over the **trusted Wi-Fi LAN**. The same
+trusted Wi-Fi/LAN path also carries development, cloud and internet
+traffic.
 
 ```text
                     HOME LAN / INTERNET
                          Wi-Fi
                     /             \
-                 PI 5             NUC
-                   \               /
-                    \             /
-                     === Ethernet ===
-                    PRIVATE TARS LINK
+                 ESP32-P4        PI 5
+                    \               /
+                     \             /
+                  TRUSTED WI-FI LAN
+                     TARS SERVICE PATH
 ```
 
-The **direct wired Ethernet link** is the preferred Pi-to-NUC service
-backbone.
+The **trusted Wi-Fi LAN** is the preferred ESP32-P4↔Pi 5 service path.
 
-The **Wi-Fi interfaces** remain available independently for development,
-normal LAN access and cloud/internet services.
+Both nodes use the same trusted LAN for development, normal LAN access and
+cloud/internet services.
 
-## 20A.2 Direct Ethernet role
+## 20A.2 Wi-Fi service role
 
-The point-to-point Ethernet connection should carry latency-sensitive and
-internal TARS traffic such as:
+The Wi-Fi connection should carry latency-sensitive and internal TARS
+traffic such as:
 
 - STT audio/data streams;
 - TTS audio/data streams;
@@ -1070,35 +1066,34 @@ internal TARS traffic such as:
 - event/service messages;
 - health checks;
 - capability discovery;
-- diagnostics between Pi and NUC.
+- diagnostics between ESP32-P4 and Pi 5.
 
-A normal Ethernet patch cable should be sufficient on modern
-auto-MDI/MDIX interfaces.
+A normal trusted Wi-Fi LAN connection should be sufficient, with static
+private addressing where practical.
 
-## 20A.3 Private subnet
+## 20A.3 Static private addressing
 
-Use a dedicated static subnet for the point-to-point connection.
+Use static private addressing for the ESP32-P4 and Pi 5 where practical so
+service discovery and routing are predictable.
 
 Example only:
 
 ```text
-Pi 5 Ethernet:  10.20.0.1/24
-NUC Ethernet:   10.20.0.2/24
+ESP32-P4:  10.20.0.10/24
+Pi 5:      10.20.0.20/24
 ```
 
 The exact addresses may change during implementation.
 
-**Do not configure a default gateway on this private Ethernet interface.**
+Wi-Fi remains the development/cloud/internet path as well; there is no
+separate dedicated wired Ethernet link between the ESP32-P4 and Pi 5.
 
-This prevents normal internet traffic from accidentally preferring the
-private link.
+## 20A.4 Wi-Fi / LAN role
 
-## 20A.4 Wi-Fi role
+ESP32-P4 and Pi 5 Wi-Fi should connect to the normal trusted LAN and may be
+used for:
 
-Pi 5 and NUC Wi-Fi should connect to the normal trusted LAN and may be used
-for:
-
-- SSH/development access from the Acer;
+- SSH/development access from the Acer (Linux hosts such as the Pi 5);
 - Git and source control;
 - package/OS updates;
 - model downloads;
@@ -1107,18 +1102,15 @@ for:
 - remote administration;
 - normal internet access.
 
-Cloud inference may originate directly from either Pi or NUC according to
-the orchestrator's routing policy.
-
-The NUC is therefore **not required to act as the Pi's internet gateway**.
+Cloud inference may originate directly from either ESP32-P4 or Pi 5
+according to the orchestrator's routing policy.
 
 ## 20A.5 Service exposure
 
-Where practical, NUC-hosted internal TARS services should bind to the
-private Ethernet interface rather than being exposed broadly on the home
-LAN.
+Where practical, Pi 5-hosted internal TARS services should be restricted to
+the trusted LAN rather than being exposed broadly to the internet.
 
-Candidate private services include:
+Candidate internal services include:
 
 ```text
 /health
@@ -1134,28 +1126,29 @@ Actual service/API structure remains a firmware/software design decision.
 
 ## 20A.6 Failure behaviour
 
-Loss of one network path should degrade gracefully.
+Loss of the Wi-Fi/LAN path should degrade gracefully.
 
 ```text
-PRIVATE ETHERNET FAILS
-    -> attempt policy-approved LAN/Wi-Fi fallback
-    -> preserve Pi-local companion functions
+WI-FI / LAN FAILS
+    -> attempt reconnect / policy-approved fallback
+    -> preserve ESP32-P4-local companion functions
 
-WI-FI / INTERNET FAILS
-    -> Pi ↔ NUC private Ethernet remains operational
+INTERNET FAILS
+    -> ESP32-P4 ↔ Pi 5 trusted LAN may remain operational
     -> local STT/TTS/LLM services remain available where configured
 
-NUC FAILS
-    -> Pi remains responsive
-    -> use Pi-local functions and/or cloud via Pi Wi-Fi
+PI 5 FAILS
+    -> ESP32-P4 remains responsive
+    -> use ESP32-P4-local functions and/or cloud via Wi-Fi
 ```
 
 ## 20A.7 Network principle
 
-> **Ethernet is the internal TARS backbone; Wi-Fi is the external/development path.**
+> **The trusted Wi-Fi LAN is the ESP32-P4↔Pi 5 service path; Wi-Fi is also
+> the development/cloud/internet path.**
 
-This separation is intended to improve latency predictability,
-troubleshooting, service isolation and resilience.
+This single trusted path is intended to keep configuration simple while
+maintaining latency predictability, troubleshooting clarity and resilience.
 
 ---
 
@@ -1165,20 +1158,20 @@ Do not assign workloads based solely on specifications.
 
 Benchmark real hardware.
 
-## Pi 5
+## ESP32-P4
 
 Measure:
 
 -   boot time;
 -   UI frame rate;
--   CPU temperature;
--   idle CPU/RAM;
+-   temperature;
+-   idle CPU/memory;
 -   wake-word latency;
 -   audio latency;
 -   camera performance;
--   network latency to NUC.
+-   network latency to Pi 5.
 
-## NUC
+## Raspberry Pi 5
 
 Measure:
 
@@ -1203,7 +1196,7 @@ Measure:
 - CPU/GPU utilisation;
 - sustained temperature;
 - power consumption;
-- network latency to Pi;
+- network latency to ESP32-P4;
 - stability under continuous camera inference.
 
 ## Workstation
@@ -1214,61 +1207,70 @@ Measure only what is relevant to tasks Project TARS may delegate.
 
 # 22. Immediate Hardware Verification Checklist
 
--   [x] Record exact Pi model: Raspberry Pi 5 Model B, revision 1.0.
--   [x] Record Pi CPU: four-core ARM Cortex-A76, up to 2.4 GHz.
--   [x] Record Pi 5 RAM size: 8 GB.
--   [x] Record Pi 5 storage: Samsung 256 GB NVMe boot drive and 64 GB microSD.
--   [x] Record Pi 5 cooling: PWM-controlled cooling fan.
--   [x] Record Pi networking: Gigabit Ethernet, built-in Wi-Fi and Bluetooth.
--   [x] Record Pi hostname: `titanium`.
--   [ ] Record Pi 5 PSU.
--   [ ] Install/verify Raspberry Pi OS Lite 64-bit baseline.
--   [ ] Record kernel/OS release used for the prototype.
--   [ ] Select minimal graphics stack required by the chosen UI framework.
--   [ ] Verify fullscreen UI autostart without conventional desktop.
--   [ ] Measure idle RAM/CPU before and after TARS services start.
--   [ ] Verify service restart and recovery behaviour.
--   [ ] Identify 7-inch display revision.
--   [ ] Confirm correct Pi 5 DSI cable/connector requirements.
--   [ ] Boot display on Pi 5.
--   [ ] Verify correct Pi 5 DSI ribbon/cable arrangement.
+-   [ ] Record exact ESP32-P4 board/module model and revision.
+-   [ ] Record ESP32-P4 CPU: dual-core RISC-V, up to 400 MHz.
+-   [ ] Record ESP32-P4 memory: SRAM + PSRAM size.
+-   [ ] Record ESP32-P4 flash/storage configuration.
+-   [ ] Record ESP32-P4 cooling arrangement (if any).
+-   [ ] Record ESP32-P4 networking: Wi-Fi/BLE via external companion RF module.
+-   [ ] Record ESP32-P4 hostname: `titanium`.
+-   [ ] Record ESP32-P4 power supply.
+-   [x] Record ESP32-P4 board: Waveshare ESP32-P4-WIFI6 Kit A (SKU 32021).
+-   [x] Record ESP32-P4 CPU: dual-core RISC-V, up to 360 MHz.
+-   [x] Record ESP32-P4 memory: 32 MB in-package PSRAM.
+-   [x] Record ESP32-P4 flash: 32 MB NOR flash.
+-   [x] Record ESP32-P4 Wi-Fi: ESP32-C6 ESP-Hosted coprocessor over SDIO (Wi-Fi 6).
+-   [x] Record ESP32-P4 audio: onboard ES8311 codec, speaker and microphone.
+-   [x] Record ESP32-P4 camera: OV5647 MIPI-CSI included with Kit A.
+-   [x] Record ESP32-P4 silicon revision: v1.3 (pre-v3; see sdkconfig.defaults).
+-   [ ] Record ESP32-P4 PSU (USB-C).
+-   [ ] Install/verify ESP-IDF / FreeRTOS baseline (ESP-IDF 6.0.2 verified).
+-   [ ] Record ESP-IDF version/toolchain used for the prototype.
+-   [ ] Select display interface required by the chosen UI framework (MIPI-DSI / parallel RGB / HDMI bridge).
+-   [ ] Verify firmware autostart and boot into Project TARS UI.
+-   [ ] Measure idle memory/CPU before and after TARS tasks start.
+-   [ ] Verify task restart and watchdog recovery behaviour.
+-   [ ] Identify 7-inch display revision and interface.
+-   [ ] Confirm correct ESP32-P4 display-interface/connector requirements.
+-   [ ] Boot display on ESP32-P4.
+-   [ ] Verify correct display-interface/ribbon/cable arrangement.
 -   [ ] Verify touch.
 -   [ ] Benchmark display frame rate and frame-time consistency.
 -   [ ] Measure touch-to-visual-response latency.
--   [ ] Record CPU/GPU load during animation.
+-   [ ] Record CPU load during animation.
 -   [ ] Evaluate readability and brightness at normal desk distance.
--   [ ] If Gen-1 resolution is limiting, compare UI at 800×480 vs 1280×720.
--   [ ] Confirm Touch Display 2 enclosure dimensions before any purchase.
--   [ ] Confirm GPIO power/cooling/HAT clearance with Touch Display 2 layout.
--   [ ] Locate Raspberry Pi camera.
--   [ ] Identify camera model.
+-   [ ] If Gen-1 resolution is limiting, compare UI at 800├ù480 vs 1280├ù720.
+-   [ ] Confirm display enclosure dimensions before any purchase.
+-   [ ] Confirm display/interface power/cooling clearance with enclosure layout.
+-   [ ] Identify camera model and interface (OV5647 MIPI-CSI).
+-   [ ] Verify camera capture on the ESP32-P4.
 -   [ ] Inventory available microphones.
 -   [ ] Inventory available speakers.
--   [ ] Inventory available USB audio interfaces/headsets/microphones.
--   [ ] Verify USB audio capture/playback on Pi 5 OS Lite.
--   [ ] Measure USB microphone-to-STT latency.
+-   [ ] Inventory available audio interfaces/headsets/microphones.
+-   [ ] Verify I2S/USB audio capture/playback on the ESP32-P4.
+-   [ ] Measure microphone-to-STT latency.
 -   [ ] Measure TTS-to-speaker playback latency.
 -   [ ] Test simultaneous microphone capture and speaker playback.
 -   [ ] Evaluate echo/feedback with proposed physical spacing.
 -   [ ] Identify candidate I2S microphone/codec/DAC/amplifier hardware only after baseline testing.
--   [x] Record exact Intel NUC model: NUC8i5BEH.
--   [x] Record exact i5 CPU: Core i5-8259U.
--   [x] Record NUC RAM: 16 GB installed.
--   [ ] Record NUC RAM module arrangement/speed.
--   [ ] Record NUC storage devices/capacities.
--   [ ] Record NUC BIOS version.
--   [ ] Decide initial NUC operating system.
+-   [x] Record exact Pi 5 model: Raspberry Pi 5 Model B, revision 1.0.
+-   [x] Record Pi 5 CPU: four-core ARM Cortex-A76, up to 2.4 GHz.
+-   [x] Record Pi 5 RAM: 8 GB installed.
+-   [x] Record Pi 5 primary storage: Samsung 256 GB NVMe boot drive.
+-   [x] Record Pi 5 additional storage: 64 GB microSD card.
+-   [ ] Record Pi 5 storage devices/capacities.
+-   [ ] Record Pi 5 cooling arrangement.
+-   [ ] Install/verify Raspberry Pi OS Lite 64-bit baseline on the Pi 5.
 -   [ ] Record relevant Windows workstation specs.
--   [ ] Confirm wired-network options between nodes.
--   [ ] Connect Pi 5 and NUC directly by Ethernet.
--   [ ] Assign static private-link IP addresses.
--   [ ] Verify private Ethernet has no default gateway.
--   [ ] Measure Pi↔NUC latency and sustained throughput.
--   [ ] Test streamed STT/TTS/LLM traffic over private Ethernet.
--   [ ] Verify both nodes retain independent Wi-Fi internet/LAN access.
+-   [ ] Confirm trusted Wi-Fi/LAN connectivity between nodes.
+-   [ ] Connect ESP32-P4 and Pi 5 over the trusted Wi-Fi LAN.
+-   [ ] Assign static private IP addresses where practical.
+-   [ ] Measure ESP32-P4↔Pi 5 latency and sustained throughput.
+-   [ ] Test streamed STT/TTS/LLM traffic over the trusted Wi-Fi LAN.
+-   [ ] Verify ESP32-P4 and Pi 5 retain trusted LAN/internet access.
 -   [ ] Verify Acer SSH/development access over trusted Wi-Fi/LAN.
--   [ ] Test graceful fallback if private Ethernet is disconnected.
--   [ ] Test local Pi↔NUC operation while Wi-Fi/internet is unavailable.
+-   [ ] Test graceful fallback if the trusted LAN is disconnected.
+-   [ ] Test local ESP32-P4↔Pi 5 operation while internet is unavailable.
 -   [ ] Identify exact Jetson Nano board revision and JetPack version.
 -   [ ] Verify Jetson CUDA/OpenCV/TensorRT stack.
 -   [ ] Identify exact Acer laptop model, i7 CPU and NVIDIA GPU.
@@ -1280,26 +1282,26 @@ Measure only what is relevant to tasks Project TARS may delegate.
 
 # 23. Hardware Decision Log
 
-## H001 --- Raspberry Pi 5 remains the physical companion
+## H001 --- ESP32-P4 is the physical companion
 
 **Status:** Current direction.
 
 The addition of more powerful computers does not move the
-UI/device-control role away from the Pi.
+UI/device-control role away from the ESP32-P4.
 
-## H002 --- Intel NUC is the local-compute node
+## H002 --- Raspberry Pi 5 is the local-compute node
 
 **Status:** Adopted for prototyping.
 
-The identified NUC8i5BEH is the primary local-compute baseline for local
+The Raspberry Pi 5 is the primary local-compute baseline for local
 AI, speech, embeddings, databases and background services. Its services
-remain optional to the Pi's basic physical-companion operation.
+remain optional to the ESP32-P4's basic physical-companion operation.
 
 ## H003 --- Distributed operation must degrade gracefully
 
 **Status:** Architectural requirement.
 
-Loss of the NUC, workstation or internet should reduce capability rather
+Loss of the Pi 5, workstation or internet should reduce capability rather
 than unnecessarily kill the companion.
 
 ## H004 --- Benchmark before workload assignment
@@ -1347,7 +1349,7 @@ machine can be rebuilt without relying on undocumented local state.
 
 ## H010 --- Existing DSI touchscreen is the baseline prototype display
 
-**Status:** Adopted pending Pi 5 verification.
+**Status:** Adopted pending ESP32-P4 verification.
 
 The first-generation 7-inch Raspberry Pi DSI touchscreen should be used
 for the initial prototype before purchasing an HDMI or newer DSI panel.
@@ -1367,36 +1369,36 @@ usage and usability with the intended UI.
 
 **Status:** Candidate; do not purchase until prototype benchmarking.
 
-If the Gen-1 800×480 display proves limiting, evaluate Raspberry Pi
+If the Gen-1 800├ù480 display proves limiting, evaluate Raspberry Pi
 Touch Display 2 before moving to a generic HDMI panel. HDMI remains
 available if resolution, size or integration requirements still are not
 met.
 
-## H013 --- Raspberry Pi OS Lite 64-bit is the baseline runtime OS
+## H013 --- ESP-IDF / FreeRTOS is the baseline runtime firmware
 
 **Status:** Adopted for prototyping.
 
-The Pi should use Raspberry Pi OS Lite 64-bit with only the graphical,
-input, audio and service components required by Project TARS.
+The ESP32-P4 should run ESP-IDF / FreeRTOS with only the display, input,
+audio, networking and service components required by Project TARS.
 
-A complete desktop environment should not be installed unless a measured
-requirement later justifies it.
+A conventional Linux desktop is not applicable on the ESP32-P4.
 
-## H014 --- Pi is a runtime appliance, not the primary development desktop
+## H014 --- ESP32-P4 is a firmware runtime appliance, not the primary development desktop
 
 **Status:** Adopted.
 
 Development should primarily occur on the Acer development machine, with
-the Pi treated as a reproducible deployment target administered via SSH
-and automated tooling.
+the ESP32-P4 treated as a reproducible firmware build/flash target
+administered via provisioning and automated tooling.
 
-## H015 --- USB audio is the first-prototype baseline
+## H015 --- I2S/USB audio is the first-prototype baseline
 
 **Status:** Adopted for prototyping.
 
-Where suitable existing USB audio hardware is available, use USB
-microphone/audio devices to establish the first reliable voice loop before
-committing to custom integrated audio electronics.
+Where suitable existing audio hardware is available, use an I2S
+microphone/codec/DAC/amplifier (or a supported USB audio device) to
+establish the first reliable voice loop before committing to custom
+integrated audio electronics.
 
 ## H016 --- I2S audio is the preferred integrated-design candidate
 
@@ -1404,78 +1406,73 @@ committing to custom integrated audio electronics.
 
 Evaluate I2S microphone/codec/DAC/amplifier hardware after the voice
 software stack is stable. Final selection must account for echo
-cancellation, microphone/speaker geometry, Linux support and enclosure
-constraints.
+cancellation, microphone/speaker geometry, ESP-IDF driver support and
+enclosure constraints.
 
-## H017 --- Direct Ethernet is the preferred Pi-to-NUC transport
-
-**Status:** Adopted for prototyping.
-
-Use a dedicated point-to-point Ethernet subnet for normal internal TARS
-service traffic between Pi 5 and NUC.
-
-The private Ethernet interface should have static addressing and no default
-internet gateway.
-
-## H018 --- Wi-Fi remains the external and development path
+## H017 --- Trusted Wi-Fi is the preferred ESP32-P4-to-Pi 5 transport
 
 **Status:** Adopted for prototyping.
 
-Pi 5 and NUC Wi-Fi may independently provide trusted-LAN access,
-development/SSH access, updates, model downloads and cloud AI inference.
+Use the trusted Wi-Fi LAN for normal internal TARS service traffic
+between ESP32-P4 and Pi 5, with static private addressing where practical.
 
-Neither node must route its normal internet traffic through the other's
-private Ethernet interface.
+## H018 --- Trusted Wi-Fi LAN serves both the service and external paths
 
-## H019 --- Internal NUC services should prefer the private interface
+**Status:** Adopted for prototyping.
+
+ESP32-P4 and Pi 5 connect over the trusted Wi-Fi LAN, which serves both
+internal TARS service traffic and development/SSH access, updates, model
+downloads and cloud AI inference.
+
+## H019 --- Internal Pi 5 services should stay on the trusted LAN
 
 **Status:** Architectural requirement.
 
-Where practical, internal TARS APIs should bind to or firewall toward the
-private Pi↔NUC network rather than being unnecessarily exposed across the
-general LAN.
+Where practical, internal TARS APIs on the Pi 5 should bind to or firewall
+toward the trusted LAN rather than being unnecessarily exposed to the
+internet.
 
-## H020 --- NUC8i5BEH is the primary local compute baseline
+## H020 --- Raspberry Pi 5 is the primary local compute baseline
 
 **Status:** Adopted for prototyping.
 
-The identified Intel NUC8i5BEH with Core i5-8259U and 16 GB RAM becomes
-the baseline local compute node for Project TARS.
+The Raspberry Pi 5 with quad-core Cortex-A76 and 8 GB RAM becomes the
+baseline local compute node for Project TARS.
 
 Its initial evaluation should prioritize local LLM serving, STT, TTS,
 memory/index services and sustained CPU performance.
 
-## H021 --- Treat NUC AI workloads as CPU-first
+## H021 --- Treat Pi 5 AI workloads as CPU-first
 
 **Status:** Architectural guidance.
 
-The integrated Intel Iris Plus Graphics 655 should not be relied upon as a
-CUDA-class AI accelerator. Workload decisions should be based on measured
-CPU inference performance and supported acceleration paths.
+The integrated graphics should not be relied upon as a CUDA-class AI
+accelerator. Workload decisions should be based on measured CPU inference
+performance and supported acceleration paths.
 
 ------------------------------------------------------------------------
 
 # 24. Open Hardware Questions
 
--   Exact Pi 5 power-supply model and rating?
--   Which minimal graphics path best suits the final UI framework: lightweight Wayland, X/Wayland session, or direct DRM/KMS?
--   What is the minimum package set required for display, touch, audio and networking?
--   Which OS should the NUC run?
--   Which supported Intel CPU/iGPU acceleration paths materially improve
-    measured NUC inference without harming stability?
+-   Exact ESP32-P4 power-supply model and rating?
+-   Which display interface best suits the final UI framework: MIPI-DSI, parallel RGB, or an HDMI bridge?
+-   What is the minimum component set required for display, touch, audio and networking on the ESP32-P4?
+-   Which OS baseline should the Pi 5 run as the local-compute node?
+-   Which supported Pi 5 CPU/acceleration paths materially improve
+    measured inference without harming stability?
 -   Exact workstation specifications?
 -   Which microphone gives acceptable desk-range capture?
 -   Which speaker arrangement minimises echo?
--   Is the first-generation display satisfactory on Pi 5?
--   Does 800×480 provide enough usable UI space after real prototype testing?
+-   Is the first-generation display satisfactory on the ESP32-P4?
+-   Does 800├ù480 provide enough usable UI space after real prototype testing?
 -   Would a newer DSI panel materially improve the experience?
 -   Would an HDMI panel justify its extra cabling and enclosure complexity?
--   Does Touch Display 2 provide enough additional UI space to justify ~2.4× pixel workload?
+-   Does Touch Display 2 provide enough additional UI space to justify ~2.4├ù pixel workload?
 -   Would Touch Display 2 mounting geometry improve or complicate the final enclosure?
 -   Can Touch Display 2 coexist cleanly with planned cooling and any PCIe/AI accelerator hardware?
 -   Is a camera physically useful in the final enclosure?
--   Should the NUC remain powered continuously?
--   Is Ethernet practical for all three local nodes?
+-   Should the Pi 5 remain powered continuously?
+-   Is the trusted Wi-Fi LAN practical for the local nodes?
 -   Will a UPS or coordinated shutdown system be worthwhile?
 -   How should physical privacy controls for microphone/camera work?
 -   Exact Jetson Nano board revision, JetPack version and power mode?
@@ -1491,8 +1488,8 @@ CPU inference performance and supported acceleration paths.
 
 The architecture succeeds if:
 
-1.  the Pi interface remains responsive during heavy AI work;
-2.  the NUC meaningfully improves local capability;
+1.  the ESP32-P4 interface remains responsive during heavy AI work;
+2.  the Pi 5 meaningfully improves local capability;
 3.  the system automatically survives loss of optional compute nodes;
 4.  the user does not need to manually select a machine for ordinary
     tasks;
@@ -1517,7 +1514,7 @@ be treated as a replaceable, serviceable subsystem rather than decoration.
 Design goals:
 
 - original appearance;
-- accommodate Pi, display, audio and cooling cleanly;
+- accommodate ESP32-P4, display, audio and cooling cleanly;
 - provide access to serviceable components;
 - permit camera and sensor additions;
 - manage cables and strain relief;
@@ -1537,7 +1534,7 @@ replaceable subassemblies over a single monolithic print.
 |---|---|
 | Printer | Creality K2 Pro |
 | Material system | CFS |
-| Build volume | 300 × 300 × 300 mm |
+| Build volume | 300 ├ù 300 ├ù 300 mm |
 | Nozzles available | 0.4 mm, 0.6 mm, 0.8 mm |
 | Material capability | Broad filament capability; exact validated materials to record |
 | Status | Available / working |
@@ -1547,7 +1544,7 @@ Candidate uses:
 - enclosure prototypes;
 - final enclosure components;
 - display bezels;
-- Pi/NUC/Jetson brackets;
+- ESP32-P4 / Pi 5 / Jetson brackets;
 - camera mounts;
 - speaker and microphone mounts;
 - cable guides;
@@ -1630,7 +1627,7 @@ Candidate responsibilities:
 - documentation;
 - CAD;
 - 3D slicing;
-- Pi toolchains;
+- ESP32-P4 toolchains;
 - Jetson toolchains;
 - remote administration;
 - build/test work;
@@ -1648,7 +1645,7 @@ Git
 Python
 IDE/editor
 Docker/container runtime
-Pi tooling
+ESP32-P4 tooling
 Jetson tooling
 CUDA (where applicable)
 CAD software
@@ -1668,6 +1665,13 @@ accidental collection of installed software.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
+  0.11                    2026-08-18              Repurposed ESP32-P4 as the
+                                                  primary physical companion,
+                                                  Raspberry Pi 5 as the
+                                                  local-compute partner, and
+                                                  switched the ESP32-P4↔Pi 5
+                                                  link to trusted Wi-Fi
+
   0.10                    2026-08-09              Recorded confirmed Pi 5
                                                   Model B Rev 1.0 hardware,
                                                   8 GB RAM, Cortex-A76 CPU,

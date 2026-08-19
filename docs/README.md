@@ -1,9 +1,9 @@
 # Project AI Desktop Companion
 
 > **Living project --- work in progress.**\
-> A modular, local-first AI desktop companion combining a Raspberry Pi 5
-> interaction node, an Intel NUC local-compute node, optional cloud AI,
-> speech, touch, display, memory, tools and future vision.
+> A modular, local-first AI desktop companion combining an ESP32-P4
+> interaction node, a Raspberry Pi 5 local-compute node, optional cloud
+> AI, speech, touch, display, memory, tools and future vision.
 
 ## Project Summary
 
@@ -20,13 +20,13 @@ and **cloud capability** so each can evolve independently.
 USER
   |
   v
-RASPBERRY PI 5
+ESP32-P4
 display / touch / microphone / speaker
 wake/VAD / device state / immediate interaction
   |
-  | dedicated point-to-point Ethernet
+  | trusted Wi-Fi LAN
   v
-INTEL NUC8i5BEH — i5-8259U / 16 GB RAM
+RASPBERRY PI 5 ── 8 GB RAM
 local LLM / STT / TTS / memory / embeddings
 background services / indexing
   |
@@ -41,16 +41,17 @@ Wi-Fi / LAN        Wi-Fi / LAN
 
 -   **Modular first.** STT, TTS, LLM, vision, memory, display and
     hardware services are replaceable modules behind stable interfaces.
--   **Pi 5 = physical companion.** It owns display, touch, audio,
+-   **ESP32-P4 = physical companion.** It owns display, touch, audio,
     immediate state and hardware-facing behaviour.
--   **NUC = local compute partner.** It provides heavier CPU workloads
-    such as local models, speech processing, memory and indexing.
+-   **Raspberry Pi 5 = local compute partner.** It provides heavier CPU
+    workloads such as local models, speech processing, memory and
+    indexing.
 -   **Cloud = capability escalation.** Cloud AI is optional and used
     when policy, connectivity and task complexity justify it.
--   **Dedicated Ethernet = internal backbone.** Pi↔NUC traffic uses a
-    private wired link; Wi-Fi remains available for development, updates
-    and cloud access.
--   **Graceful degradation.** Loss of the NUC or internet should reduce
+-   **Trusted Wi-Fi = internal service path.** ESP32-P4↔Pi 5 traffic
+    uses the trusted LAN; Wi-Fi also serves development, updates and
+    cloud access.
+-   **Graceful degradation.** Loss of the Pi 5 or internet should reduce
     capability rather than make the companion disappear.
 -   **Local-first, not local-only.** Privacy, latency, quality and cost
     determine routing.
@@ -64,13 +65,12 @@ Wi-Fi / LAN        Wi-Fi / LAN
 
 ## Current Hardware Baseline
 
--   Raspberry Pi 5 --- primary physical/UI node.
--   Intel NUC8i5BEH --- Core i5-8259U, 4 cores / 8 threads, 16 GB RAM;
-    primary local compute node.
--   First-generation Raspberry Pi 7-inch DSI touchscreen --- initial
-    display baseline.
--   Raspberry Pi Touch Display 2 --- preferred official DSI upgrade
-    candidate if testing justifies it.
+-   ESP32-P4 --- primary physical/UI node (ESP-IDF / FreeRTOS).
+-   Raspberry Pi 5 --- local compute partner (Raspberry Pi OS Lite).
+-   7-inch touchscreen --- initial display baseline.
+-   Raspberry Pi Touch Display 2 --- preferred official display upgrade
+    candidate if testing justifies it (via MIPI-DSI/HDMI bridge on the
+    ESP32-P4).
 -   NVIDIA Jetson Nano 4 GB --- optional edge/vision experimentation
     node.
 -   Acer i7 / 32 GB / NVIDIA development system --- primary engineering
@@ -79,15 +79,16 @@ Wi-Fi / LAN        Wi-Fi / LAN
 
 ## Current Software Direction
 
--   Raspberry Pi OS Lite 64-bit on the Pi 5.
+-   ESP-IDF / FreeRTOS firmware baseline on the ESP32-P4.
+-   Raspberry Pi OS Lite 64-bit on the Pi 5 compute node.
 -   Minimal graphics stack; no conventional desktop required for
     production kiosk operation.
 -   Service-based boot/autostart and recovery.
--   SSH/deployment workflow from the development workstation.
--   `whisper.cpp` as the first local STT baseline.
--   Piper and sherpa-family TTS candidates, with licensing evaluated
-    separately.
--   Ollama as the first operational NUC local-LLM server candidate.
+-   Deployment workflow from the development workstation.
+-   `whisper.cpp` as the first local STT baseline on the Pi 5.
+-   Piper and sherpa-family TTS candidates on the Pi 5, with licensing
+    evaluated separately.
+-   Ollama as the first operational Pi 5 local-LLM server candidate.
 -   `llama.cpp` as the portable low-level local inference reference.
 -   Cloud STT/TTS/LLM providers remain interchangeable through adapters.
 -   Multi-agent development is permitted where modules have clear
@@ -102,8 +103,8 @@ The following documents are the current design source of truth:
     requirements.
 -   [Hardware Architecture &
     Inventory](Hardware-Architecture-and-Inventory.md) ---
-    hardware inventory, Pi/NUC roles, display, audio, networking and
-    verification plans.
+    hardware inventory, ESP32-P4/Pi 5 roles, display, audio, networking
+    and verification plans.
 -   [Firmware & Software
     Roadmap](Firmware-Software-Roadmap.md) --- development
     work packages, milestones, modular implementation plan and
@@ -156,8 +157,8 @@ See:
 Current priorities are to:
 
 1.  verify the owned hardware configuration;
-2.  establish the Pi 5 minimal runtime;
-3.  establish the private Pi↔NUC network;
+2.  establish the ESP32-P4 minimal runtime;
+3.  establish the trusted Wi-Fi ESP32-P4↔Pi 5 service path;
 4.  implement stable service/provider interfaces;
 5.  build the first display/touch/audio conversational loop;
 6.  benchmark STT, TTS and local/cloud LLM paths;

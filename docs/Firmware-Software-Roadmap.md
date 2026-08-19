@@ -71,11 +71,11 @@ not raw lines-of-code production time.
                           NVIDIA 4 GB GPU         coding/build/test
                                                   workstation
 
-  Raspberry Pi 5          Primary physical        UI, touch, audio/event
+  ESP32-P4                Primary physical        UI, touch, audio/event
                           runtime                 handling and device
                                                   services
 
-  Intel NUC8i5BEH         i5-8259U / 16 GB        Primary CPU-first local
+  Raspberry Pi 5          Pi 5 / 16 GB RAM        Primary CPU-first local
                                                   AI/services baseline
 
   Jetson Nano             First-generation / 4 GB Optional CUDA/vision
@@ -119,26 +119,61 @@ These are engineering estimates, not deadlines.
 ------------------------------------------------------------------------
 
 
-## 2.4 Pi runtime baseline
+## 2.4 ESP32-P4 runtime baseline
 
-The current Raspberry Pi deployment baseline is:
+The current ESP32-P4 deployment baseline is:
 
 ```text
-Raspberry Pi OS Lite 64-bit
-+ minimal graphics stack
+ESP-IDF (FreeRTOS) baseline
++ minimal graphics/display stack
 + Project TARS fullscreen UI
 + supervised Project TARS services
-+ SSH/admin tooling
++ admin/remote tooling
 ```
 
-The roadmap does not assume installation of a full Raspberry Pi desktop
-environment.
+The roadmap does not assume a general-purpose Linux desktop environment
+on the companion device.
 
-This should reduce background overhead and make the Pi behave like a
+This should reduce background overhead and make the ESP32-P4 behave like a
 dedicated appliance.
 
 Development is expected to occur primarily on the Acer workstation, with
-deployments pushed to the Pi.
+deployments pushed to the ESP32-P4.
+
+### 2.4.1 Toolchain baseline
+
+Project TARS firmware is a **native ESP-IDF project** (not PlatformIO).
+
+-   **Board:** Waveshare ESP32-P4-WIFI6 Kit A (SKU 32021)
+-   **Chip:** ESP32-P4 (dual-core RISC-V, up to 360 MHz) with onboard
+    ESP32-C6 ESP-Hosted Wi-Fi coprocessor over SDIO
+-   **Target:** `esp32p4` (pre-v3 silicon; see `sdkconfig.defaults`)
+-   **Framework:** ESP-IDF 5.4 or newer; **ESP-IDF 6.0.2 is the verified
+    version**
+-   **Build tool:** `idf.py` (activate via the ESP-IDF PowerShell/export
+    script for the installed IDF checkout)
+
+Key project files:
+
+```text
+CMakeLists.txt
+sdkconfig.defaults
+partitions.csv
+main/CMakeLists.txt
+main/idf_component.yml
+main/app_main.c
+```
+
+Reference firmware: `gflerm/ESP32-P4-WIFI6-Test` — ESP-IDF hardware and
+multimedia diagnostics for the same board (private).
+
+Common build/flash/monitor flow:
+
+```powershell
+$env:ESP_PORT = 'COMx'
+idf.py build
+idf.py -p $env:ESP_PORT flash monitor
+```
 
 # 3. Project Dashboard
 
@@ -162,8 +197,8 @@ foundation\
   Core event/state runtime     Not started                        Yes Interfaces to
                                                                       define
 
-  Display/animation            Not started                        Yes Pi/display
-                                                                      verification
+Display/animation            Not started                        Yes ESP32-P4/display
+                                                                       verification
 
   Touch input                  Not started                         No Display/touch
                                                                       verification
@@ -192,8 +227,8 @@ foundation\
   Workstation bridge           Designed                            No Local
                                conceptually                           RPC/security
 
-  Local NUC AI                 Baseline selected                   No Benchmark
-                                                                      hardware/models
+Local Pi 5 AI                 Baseline selected                   No Benchmark
+                                                                       hardware/models
 
   Vision                       Deferred                            No Camera/compute
                                                                       benchmark
@@ -263,7 +298,7 @@ mechanisms: components can be developed and tested independently.
   **M5**      **First usable desk companion**              **20--32 FDD**
   M6          Memory + personality/policy                      25--39 FDD
   M7          Tools + workstation partnership                  31--48 FDD
-  M8          Local NUC/offline intelligence                   35--54 FDD
+  M8          Local Pi 5/offline intelligence                   35--54 FDD
   M9          Optional vision                                  39--60 FDD
   M10         Codex development-agent integration              43--62 FDD
   M11         v1 hardening / appliance behaviour           **50--75 FDD**
@@ -290,10 +325,11 @@ Parallel work means module estimates do not simply add together.
 -   logging conventions;
 -   basic unit-test framework;
 -   lint/format/type-check tooling;
--   Pi deployment method;
--   Raspberry Pi OS Lite 64-bit image/baseline definition;
+-   ESP32-P4 deployment method;
+-   ESP-IDF / FreeRTOS baseline definition;
+-   Raspberry Pi OS Lite 64-bit image/baseline for the Pi 5 compute node;
 -   minimal graphics/input/audio package manifest;
--   SSH-based deployment workflow;
+-   deployment workflow;
 -   development-machine setup notes;
 -   initial CI where useful.
 
@@ -431,7 +467,7 @@ health_check()
 
 Initial implementation may wrap the already-tested Gemini/Gemma-family
 cloud endpoint, but cloud is an adapter and capability-escalation tier,
-not the architectural owner of intelligence. NUC-local and mock providers
+not the architectural owner of intelligence. Pi 5-local and mock providers
 must fit the same contract.
 
 Other providers remain adapters rather than architectural changes.
@@ -692,26 +728,25 @@ layer.
 -   structured result return;
 -   audit log.
 
-## Pi↔NUC network requirements
+## ESP32-P4 ↔ Pi 5 network requirements
 
--   use dedicated point-to-point Ethernet as the preferred internal
-    service path;
--   use static private addressing with no default gateway;
--   bind or firewall internal NUC services toward the private interface
+-   use the trusted Wi-Fi LAN as the preferred internal service path
+    between the ESP32-P4 and the Raspberry Pi 5;
+-   use static private addressing on a dedicated subnet where practical;
+-   bind or firewall internal Pi 5 services toward the trusted interface
     where practical;
--   retain independent Wi-Fi for trusted-LAN development, updates and
-    cloud access;
--   test policy-approved Wi-Fi/LAN fallback without making it the default
-    service route.
+-   retain independent Wi-Fi for development, updates and cloud access;
+-   test policy-approved fallback without making it the default service
+    route.
 
 ## Definition of done
 
-The Pi can safely request one useful service from the workstation
+The ESP32-P4 can safely request one useful service from the workstation
 without exposing an unrestricted remote shell.
 
 ------------------------------------------------------------------------
 
-# 19. WP13 --- NUC Local Compute Services
+# 19. WP13 --- Pi 5 Local Compute Services
 
 **Priority:** Medium\
 **Prototype:** 2--4 FDD after benchmark\
@@ -730,18 +765,18 @@ Candidate services:
 -   background indexing;
 -   local tool services.
 
-The baseline hardware is the Intel NUC8i5BEH with Core i5-8259U and
-16 GB RAM. Treat it as CPU-first: do not assume CUDA-class acceleration.
-Benchmark model load, tokens/second, speech latency, storage, thermals and
-power before assigning default workloads.
+The baseline hardware is the Raspberry Pi 5. Treat it as CPU-first: do not
+assume CUDA-class acceleration. Benchmark model load, tokens/second,
+speech latency, storage, thermals and power before assigning default
+workloads.
 
-Do not build every service merely because the NUC exists.
+Do not build every service merely because the Pi exists.
 
 ## Definition of done
 
-At least one workload can route Pi -\> private Ethernet -\> NUC -\> Pi
+At least one workload can route ESP32-P4 → Wi-Fi → Pi 5 → ESP32-P4
 with health detection, interface-restricted exposure, automatic fallback,
-and independent Wi-Fi/cloud operation verified.
+and independent cloud operation verified.
 
 ------------------------------------------------------------------------
 
@@ -755,7 +790,7 @@ and independent Wi-Fi/cloud operation verified.
 Scenarios:
 
 -   cloud unavailable;
--   NUC unavailable;
+-   Pi 5 compute unavailable;
 -   workstation unavailable;
 -   STT unavailable;
 -   TTS unavailable;
@@ -795,7 +830,7 @@ Later:
 -   workbench inspection;
 -   workstation awareness.
 
-Jetson Nano, NUC and future Pi accelerator options should be benchmarked
+Jetson Nano and future Pi accelerator options should be benchmarked
 rather than assumed.
 
 ## Definition of done
@@ -908,8 +943,9 @@ need to decide whether those tests prove the correct behaviour.
 
 Includes:
 
--   Raspberry Pi OS Lite 64-bit runtime baseline;
--   no conventional desktop environment by default;
+-   ESP-IDF / FreeRTOS runtime baseline for the ESP32-P4;
+-   Raspberry Pi OS Lite 64-bit baseline for the Pi 5 compute node;
+-   no conventional desktop environment on the companion by default;
 -   minimal graphics stack required by selected UI framework;
 -   boot directly into companion UI;
 -   service supervision;
@@ -923,7 +959,7 @@ Includes:
 
 ## Definition of done
 
-Powering the Pi on results in a usable companion without opening a
+Powering the ESP32-P4 on results in a usable companion without opening a
 terminal.
 
 ------------------------------------------------------------------------
@@ -958,7 +994,7 @@ Touch can develop alongside display.
 Personality can begin as a thin policy configuration and deepen after
 M5.
 
-Memory, tools, NUC compute, vision and Codex integration should **not
+Memory, tools, Pi 5 compute, vision and Codex integration should **not
 block M5**.
 
 ------------------------------------------------------------------------
@@ -972,7 +1008,7 @@ block M5**.
 Goal:
 
 > The system boots, displays state, passes events and can talk to a mock,
-> NUC-local or cloud AI through the same typed interfaces.
+> Pi 5-local or cloud AI through the same typed interfaces.
 
 Includes WP00, WP01, early WP02, WP04 and early WP05.
 
@@ -1024,7 +1060,7 @@ Adds generic tools, permissions and LAN RPC.
 
 Goal:
 
-> Local NUC/workstation services participate automatically.
+> Local Pi 5/workstation services participate automatically.
 
 Adds routing, health and degraded-mode logic.
 
@@ -1081,7 +1117,7 @@ Good parallel pairs:
 DISPLAY       || AI PROVIDER ADAPTER
 TOUCH         || TTS
 MEMORY        || TOOL SCHEMAS
-NUC SERVICE   || WORKSTATION SERVICE
+PI 5 SERVICE  || WORKSTATION SERVICE
 VISION        || NON-VISION CORE HARDENING
 TESTS         || IMPLEMENTATION
 DOCUMENTATION || IMPLEMENTATION
@@ -1229,13 +1265,13 @@ SYSTEM / HARDWARE TEST
 REGRESSION SUITE
 ```
 
-### Level 1 — Unit tests
+### Level 1 ΓÇö Unit tests
 
 Written alongside the module.
 
 They verify internal behaviour in isolation.
 
-### Level 2 — Contract tests
+### Level 2 ΓÇö Contract tests
 
 Verify that the module obeys the agreed interface.
 
@@ -1250,7 +1286,7 @@ Contract tests are particularly important for multi-agent development
 because they let one agent implement against another module before that
 module is complete.
 
-### Level 3 — Integration tests
+### Level 3 ΓÇö Integration tests
 
 Run after independently developed modules are combined.
 
@@ -1263,7 +1299,7 @@ STREAM -> TTS -> DISPLAY
 ORCHESTRATOR -> TOOL -> RESULT
 ```
 
-### Level 4 — System tests
+### Level 4 ΓÇö System tests
 
 Run on the actual Project TARS hardware/environment.
 
@@ -1273,13 +1309,13 @@ These measure real behaviour that mocks cannot prove:
 - speaker echo;
 - touch;
 - display responsiveness;
-- Pi CPU/RAM use;
+- ESP32-P4 CPU/RAM use;
 - network latency;
-- NUC/workstation availability;
+- Pi 5/workstation availability;
 - camera behaviour;
 - restart/recovery.
 
-### Level 5 — Regression tests
+### Level 5 ΓÇö Regression tests
 
 Every fixed bug should add a regression test where practical.
 
@@ -1326,7 +1362,7 @@ It should:
 - record failures;
 - coordinate fixes back to module agents.
 
-This role prevents “everyone edits everything” development.
+This role prevents ΓÇ£everyone edits everythingΓÇ¥ development.
 
 ## 29.9 Parallel workflow example
 
@@ -1391,7 +1427,7 @@ More agents do not automatically mean more speed.
 For early Project TARS development, a practical starting point is:
 
 ```text
-2–4 implementation agents
+2ΓÇô4 implementation agents
 + 1 test/review role
 + 1 integration/lead role
 ```
@@ -1491,7 +1527,7 @@ For cross-module integration, physical audio, asynchronous bugs and
 user-experience tuning, the improvement is smaller.
 
 Therefore this roadmap does **not** apply a blanket "AI makes
-development 5× faster" assumption.
+development 5├ù faster" assumption.
 
 ------------------------------------------------------------------------
 
@@ -1608,9 +1644,10 @@ The correct schedule is the one that changes when evidence changes.
 -   [x] Establish canonical private code repository and documentation
     checkpoint.
 -   [ ] Record actual development toolchain and versions.
--   [x] Adopt Raspberry Pi OS Lite 64-bit as the Pi OS baseline.
--   [ ] Select Python version and the minimum graphics/audio/input package
-    set; capture it in reproducible provisioning.
+-   [x] Adopt ESP-IDF / FreeRTOS as the ESP32-P4 runtime baseline and
+    Raspberry Pi OS Lite 64-bit as the Pi 5 compute-node OS baseline.
+-   [ ] Select firmware/display framework and the minimum graphics/audio/input
+    package set; capture it in reproducible provisioning.
 -   [ ] Define repository/module layout.
 -   [ ] Define event schema.
 -   [ ] Define service interfaces.
@@ -1696,41 +1733,43 @@ Parallel agents must not independently redefine shared contracts during the
 same integration cycle.
 
 
-## R011 --- Pi runtime uses Raspberry Pi OS Lite 64-bit by default
+## R011 --- ESP32-P4 is the primary runtime; Pi 5 runs a minimal OS
 
 **Status:** Adopted.
 
-The Pi should run only the packages/services required for Project TARS,
-rather than carrying the overhead of a complete desktop environment.
+The ESP32-P4 should run ESP-IDF / FreeRTOS with only the packages/services
+required for Project TARS, while the Raspberry Pi 5 provides the
+CPU-first local-compute baseline without a full desktop environment.
 
 ## R012 --- Development and runtime environments are intentionally separated
 
 **Status:** Adopted.
 
 The Acer development machine is the primary engineering environment; the
-Pi is a reproducible deployment target and appliance runtime.
+ESP32-P4 is a reproducible deployment target and appliance runtime.
 
-## R013 --- Private Ethernet is the default Pi-to-NUC service path
+## R013 --- Trusted Wi-Fi is the default ESP32-P4-to-Pi service path
 
 **Status:** Adopted for prototyping.
 
-The software deployment and acceptance tests must assume a dedicated
-static Pi↔NUC subnet with no default gateway, interface-restricted internal
-services and independently functioning Wi-Fi.
+The software deployment and acceptance tests must assume a trusted Wi-Fi
+LAN link between the ESP32-P4 and Raspberry Pi 5 with static private
+addressing where practical, interface-restricted internal services and
+independently functioning internet/cloud access.
 
-## R014 --- NUC8i5BEH is the CPU-first local-compute baseline
+## R014 --- Raspberry Pi 5 is the CPU-first local-compute baseline
 
 **Status:** Adopted for benchmarking.
 
 Ollama, `llama.cpp`, STT, TTS, memory and background services should be
-benchmarked on the identified i5-8259U / 16 GB node before default routing
-is selected.
+benchmarked on the Raspberry Pi 5 node before default routing is
+selected.
 
 ## R015 --- Cloud is capability escalation, not the architectural brain
 
 **Status:** Adopted.
 
-Cloud providers, NUC-local providers and mocks share the same interfaces;
+Cloud providers, Pi 5-local providers and mocks share the same interfaces;
 the orchestrator chooses among them by policy, availability and measured
 fitness.
 
@@ -1741,15 +1780,18 @@ fitness.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
-  0.4                     2026-08-09              Reconciled NUC8i5BEH
-                                                  baseline, private Pi↔NUC
-                                                  networking, provider naming,
+  0.4                     2026-08-09              Reconciled Raspberry Pi 5
+                                                  baseline, trusted Wi-Fi
+                                                  ESP32-P4↔Pi networking,
+                                                  provider naming,
                                                   repository state and v1
                                                   estimate
 
-  0.3                     2026-08-09              Adopted Raspberry Pi OS Lite
-                                                  64-bit and separated Acer
-                                                  development from Pi runtime
+  0.3                     2026-08-09              Adopted ESP32-P4 primary
+                                                  runtime and Raspberry Pi
+                                                  OS Lite 64-bit compute
+                                                  node; separated Acer
+                                                  development from runtime
 
   0.2                     2026-08-09              Added multi-agent ownership,
                                                   testing, review and

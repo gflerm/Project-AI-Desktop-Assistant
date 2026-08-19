@@ -1,6 +1,6 @@
 # Project TARS --- Design Specification
 
-**Status:** Version 0.6 — Living Work in Progress --- Concept, Comparative Analysis & Initial
+**Status:** Version 0.6 ΓÇö Living Work in Progress --- Concept, Comparative Analysis & Initial
 Architecture\
 **Date:** 2026-08-09\
 **Working concept:** A desk-resident, hybrid AI workstation companion
@@ -12,7 +12,7 @@ rather than reproduce any of these characters.
 
 ------------------------------------------------------------------------
 
-## Document Status — Living Work in Progress
+## Document Status ΓÇö Living Work in Progress
 
 This specification is a **living work in progress**, not a frozen product contract. It records the project's current goals, assumptions, decisions and proposed implementation direction so that design changes remain deliberate and traceable.
 
@@ -30,10 +30,10 @@ The goal of Project TARS is to develop an **original, desk-resident AI companion
 
 The system should:
 
-- live primarily on a Raspberry Pi 5-based desk device;
+- live primarily on an ESP32-P4-based desk device;
 - remain useful even when cloud services are degraded or unavailable;
 - use replaceable AI providers rather than depend on one model vendor;
-- use the Intel NUC as the primary local-compute partner and the adjacent
+- use a Raspberry Pi 5 as the primary local-compute partner and the adjacent
   Acer system as the development workstation;
 - feel responsive through local event handling and pre-built expressive states;
 - provide a consistent original personality independent of the underlying model;
@@ -50,11 +50,11 @@ primary PC and provide a persistent, expressive interface to AI
 services, local tools, sensors, voice interaction, automation, and
 eventually computer vision.
 
-The initial hardware target is a **Raspberry Pi 5** with the original
-official **7-inch Raspberry Pi touchscreen**, microphone, speaker, and
-optional Raspberry Pi camera. The Pi should be the primary runtime. Any
-smaller microcontroller/display device should be treated as an optional
-peripheral rather than the main intelligence layer.
+The initial hardware target is an **ESP32-P4** with a
+7-inch touchscreen, microphone, speaker, and
+optional camera. The ESP32-P4 should be the primary runtime. A
+Raspberry Pi 5 provides the heavier local compute as a secondary
+computing partner rather than the main intelligence layer.
 
 The project should favour:
 
@@ -593,10 +593,10 @@ KITT contributes the idea that the assistant is not merely an application the op
 - preserve conversational/task continuity;
 - surface diagnostics when relevant;
 - assist while the operator is doing something else;
-- treat the adjacent PC and Pi as cooperating parts of one environment;
+- treat the adjacent PC and the compute-partner Pi as cooperating parts of one environment;
 - avoid demanding attention merely to prove the assistant is active.
 
-This reinforces the goal of making Project TARS a **workstation companion**, not simply a chatbot displayed on a Raspberry Pi.
+This reinforces the goal of making Project TARS a **workstation companion**, not simply a chatbot displayed on an embedded screen.
 
 ---
 
@@ -692,7 +692,7 @@ physical front-end to the user's personal AI environment**.
 
 ### 20.1 Design principles
 
-1.  **Pi-first:** Raspberry Pi 5 is the primary device.
+1.  **ESP32-P4-first:** ESP32-P4 is the primary device.
 2.  **Cloud-optional, not cloud-shaped:** cloud models may supply
     intelligence, but the local architecture owns the experience.
 3.  **Provider independence:** Gemini, OpenAI or future local/cloud
@@ -720,57 +720,56 @@ physical front-end to the user's personal AI environment**.
 
 ### Required / already considered
 
--   Raspberry Pi 5
--   Intel NUC8i5BEH with Core i5-8259U and 16 GB RAM
--   Official first-generation 7-inch Raspberry Pi touchscreen (800×480)
--   Correct Pi 5-compatible DSI cable/adapter arrangement
--   suitable Pi 5 power supply
+-   ESP32-P4
+-   Raspberry Pi 5 (local-compute partner)
+-   7-inch touchscreen (800×480 or equivalent)
+-   suitable display interface/connector arrangement
+-   suitable power supply
 -   active cooling
--   microSD initially, with SSD/NVMe preferred for a permanent
-    installation
 -   microphone
 -   speaker/audio output
 
 ### Optional / future
 
--   Raspberry Pi camera
--   USB or HAT microphone array
+-   camera
+-   USB or I2S microphone array
 -   hardware mute switch
 -   rotary encoder or physical buttons
 -   status LED
 -   proximity/ambient-light sensor
 -   touch sensor
--   ESP32/M5 device as a peripheral controller
+-   M5/other ESP32 device as a peripheral controller
 -   external accelerator if a later workload justifies it
 
 ## 22. Hardware Responsibility Split
 
-### Raspberry Pi 5
+### ESP32-P4
 
-The Pi should own the companion identity, real-time interaction and
+The ESP32-P4 should own the companion identity, real-time interaction and
 hardware-facing control path:
 
--   operating system;
+-   real-time firmware/runtime;
 -   touchscreen UI;
 -   animation engine;
 -   audio capture/playback;
 -   wake-word/VAD;
 -   assistant orchestrator;
 -   provider/service routing and policy enforcement;
--   basic Pi-local speech and fallback functions;
+-   basic local speech and fallback functions;
 -   immediate device and conversation state;
 -   camera acquisition and privacy indication;
 -   networking;
 -   logging;
 -   updates.
 
-The Pi must remain visibly responsive and retain basic local functions if
-the NUC or internet is unavailable.
+The ESP32-P4 must remain visibly responsive and retain basic local
+functions if the compute-partner Pi or internet is unavailable.
 
-### Intel NUC8i5BEH
+### Raspberry Pi 5 (local-compute partner)
 
-The NUC is the primary local-compute partner. It should provide heavier or
-more persistent services behind explicit, replaceable interfaces:
+The Raspberry Pi 5 is the primary local-compute partner. It should
+provide heavier or more persistent services behind explicit, replaceable
+interfaces:
 
 -   Ollama as the first operational local-LLM server candidate;
 -   `llama.cpp` as the low-level local-inference reference;
@@ -779,22 +778,22 @@ more persistent services behind explicit, replaceable interfaces:
 -   embeddings, memory, indexing and databases;
 -   background jobs and optional local vision processing.
 
-The NUC is a CPU-first node; its integrated graphics must not be treated as
-a CUDA-class accelerator. The NUC adds capability but does not own the
-companion's identity or physical presence.
+The Raspberry Pi 5 is a CPU-first node; its integrated graphics must not
+be treated as a CUDA-class accelerator. The Pi adds capability but does
+not own the companion's identity or physical presence.
 
 ### Network responsibility split
 
-The preferred Pi-to-NUC transport is a dedicated point-to-point Ethernet
-link on a private static subnet with no default gateway. Internal NUC
-services should bind to or be firewalled toward that interface where
-practical. Both machines retain independent Wi-Fi for trusted-LAN access,
-development, updates and cloud services. Loss of either path must degrade
-gracefully.
+The preferred ESP32-P4-to-Pi transport is the trusted Wi-Fi LAN, with
+static private addressing where practical. Internal Pi compute services
+should bind to or be firewalled toward the trusted interface where
+possible. Both machines retain independent internet access for
+development, updates and cloud services. Loss of either path must
+degrade gracefully.
 
 ### Optional microcontroller
 
-An ESP32/M5-class device should only be introduced when it solves a
+An M5/ESP32-class device should only be introduced when it solves a
 concrete hardware problem, such as:
 
 -   physical sensors;
@@ -823,7 +822,7 @@ Microphone / Touch / Camera
    Assistant Orchestrator
     /       |        \
    /        |         \
-Pi-local  NUC AI    Cloud / Tools
+ESP32-P4    Pi 5 AI    Cloud / Tools
 fallback  services   escalation
   \        |         /
    \       |        /
@@ -839,7 +838,7 @@ fallback  services   escalation
 
 Responsibilities:
 
--   fullscreen 800×480 interface;
+-   fullscreen 800├ù480 interface;
 -   animation playback;
 -   state transitions;
 -   touch controls;
@@ -926,17 +925,17 @@ health_check()
 
 Initial candidates:
 
--   Ollama on the NUC as the first operational local-LLM server candidate;
--   `llama.cpp` on the NUC as the portable low-level reference;
+-   Ollama on the Raspberry Pi 5 as the first operational local-LLM server candidate;
+-   `llama.cpp` on the Raspberry Pi 5 as the portable low-level reference;
 -   Gemini/Gemma-family and OpenAI cloud endpoints as interchangeable
     escalation or comparison providers;
--   small Pi-local models or deterministic handlers for offline/simple
+-   small ESP32-P4-local models or deterministic handlers for offline/simple
     commands.
 
 ### 24.6 Local Intelligence
 
-The Pi should not be forced to run a large conversational model merely
-to claim that the project is "local."
+The ESP32-P4 should not be forced to run a large conversational model
+merely to claim that the project is "local."
 
 Useful local workloads include:
 
@@ -952,9 +951,10 @@ Useful local workloads include:
 -   fallback responses.
 
 A larger local model should first be evaluated on the identified
-NUC8i5BEH and exposed to the Pi over the private Ethernet link. The Acer
-development system may provide additional model testing or workstation
-services, but is not the companion's primary local-compute baseline.
+Raspberry Pi 5 and exposed to the ESP32-P4 over the trusted Wi-Fi LAN
+link. The Acer development system may provide additional model testing
+or workstation services, but is not the companion's primary local-compute
+baseline.
 
 ### 24.7 Tool Layer
 
@@ -1018,7 +1018,7 @@ A lightweight state manager may influence idle animation and conversational init
 
 ### 24.14 Workstation Partnership Layer
 
-The Pi may subscribe to selected telemetry and events from the adjacent PC, subject to explicit permissions. This creates persistent machine partnership without requiring the Pi to perform all compute locally.
+The ESP32-P4 may subscribe to selected telemetry and events from the adjacent PC and compute-partner Pi, subject to explicit permissions. This creates persistent machine partnership without requiring the ESP32-P4 to perform all compute locally.
 
 ### 24.15 Memory
 
@@ -1138,7 +1138,7 @@ Project TARS orchestrator
         |
 Development intent
         |
-Codex/CLI agent on Pi or desktop PC
+Codex/CLI agent on Pi 5 or desktop PC
         |
 Repository changes / tests / result
         |
@@ -1146,12 +1146,12 @@ TARS summarizes outcome
 ```
 
 Because the companion will sit beside the main PC, a particularly
-attractive architecture is to let the Pi remain the physical interface
-while compute-heavy development agents operate on the PC over a
-controlled local interface.
+attractive architecture is to let the ESP32-P4 remain the physical
+interface while compute-heavy development agents operate on the PC or
+compute-partner Pi over a controlled local interface.
 
-This avoids making the Pi perform work for which the desktop already has
-substantially greater resources.
+This avoids making the ESP32-P4 perform work for which the desktop
+already has substantially greater resources.
 
 ------------------------------------------------------------------------
 
@@ -1159,22 +1159,22 @@ substantially greater resources.
 
 ## 29. Phase 0 --- Hardware Verification
 
--   [ ] Verify exact Pi 5 model/RAM.
--   [x] Record NUC8i5BEH, Core i5-8259U and 16 GB RAM baseline.
--   [ ] Verify NUC storage, BIOS, thermals and operating system.
--   [ ] Verify first-generation 7-inch touchscreen with Pi 5.
--   [ ] Obtain correct DSI cable.
+-   [ ] Verify exact ESP32-P4 module/board model and RAM.
+-   [x] Record Raspberry Pi 5 local-compute-partner baseline.
+-   [ ] Verify Raspberry Pi 5 storage, thermals and operating system.
+-   [ ] Verify 7-inch touchscreen interface with ESP32-P4.
+-   [ ] Obtain correct display connector/cable.
 -   [ ] Confirm touchscreen input.
 -   [ ] Configure cooling.
 -   [ ] Choose storage.
 -   [ ] Select microphone.
 -   [ ] Select speaker/audio interface.
--   [ ] Locate and identify Raspberry Pi camera.
--   [ ] Configure and test the private Pi↔NUC Ethernet link with no
-    default gateway.
+-   [ ] Locate and identify camera hardware.
+-   [ ] Configure and test the trusted Wi-Fi ESP32-P4↔Pi service path with
+    static addressing.
 
-**Exit criterion:** Pi boots reliably into a touchscreen interface with
-working audio I/O.
+**Exit criterion:** ESP32-P4 boots reliably into a touchscreen interface
+with working audio I/O.
 
 ## 30. Phase 1 --- The Face on the Desk
 
@@ -1195,14 +1195,14 @@ LLM.
 -   [ ] Microphone capture.
 -   [ ] VAD.
 -   [ ] Wake word or push-to-talk.
--   [ ] Replaceable STT adapter with Pi and NUC benchmark paths.
--   [ ] Ollama NUC provider adapter and `llama.cpp` comparison path.
+-   [ ] Replaceable STT adapter with ESP32-P4 and Pi 5 benchmark paths.
+-   [ ] Ollama Pi 5 provider adapter and `llama.cpp` comparison path.
 -   [ ] At least one cloud provider adapter for escalation/comparison.
 -   [ ] Streaming response.
 -   [ ] Replaceable local/cloud TTS adapter.
 -   [ ] Barge-in/interruption.
 -   [ ] Personality configuration.
--   [ ] NUC health/capability discovery and graceful fallback.
+-   [ ] Pi 5 health/capability discovery and graceful fallback.
 
 **Exit criterion:** natural end-to-end conversation with useful
 perceived latency.
@@ -1211,7 +1211,7 @@ perceived latency.
 
 -   [ ] Tool framework.
 -   [ ] Local system tools.
--   [ ] Authenticated NUC/workstation communication over the appropriate
+-   [ ] Authenticated Pi 5/workstation communication over the appropriate
     private or trusted network path.
 -   [ ] Project/file context.
 -   [ ] Development/Codex integration.
@@ -1247,24 +1247,25 @@ not merely chat.
 
 ## 35. Decisions Made So Far
 
-### D001 --- Raspberry Pi 5 is the primary runtime
+### D001 --- ESP32-P4 is the primary runtime
 
-**Reason:** simplifies architecture and removes a low-power
-microcontroller from the critical conversational path.
+**Reason:** the ESP32-P4 provides a dedicated, always-on physical
+presence for the companion while removing the need for a general-purpose
+computer in the critical conversational path.
 
-### D002 --- 7-inch Raspberry Pi display remains viable for the prototype
+### D002 --- 7-inch touchscreen remains viable for the prototype
 
 **Reason:** the owned 800×480 display is the correct baseline for real UI
 verification. If measured readability, layout or rendering results show a
-limitation, Raspberry Pi Touch Display 2 is the preferred official upgrade
+limitation, a higher-resolution display is the preferred upgrade
 candidate; HDMI remains an option for requirements it cannot meet.
 
-### D003 --- Heavy LLM inference may use the NUC or cloud
+### D003 --- Heavy LLM inference may use the Pi 5 or cloud
 
-**Reason:** forcing a Pi-sized local model to provide the main
-conversational quality would unnecessarily constrain the project. The NUC
-is the first local-compute path; cloud providers remain capability
-escalation and comparison paths.
+**Reason:** forcing a small local model to provide the main
+conversational quality would unnecessarily constrain the project. The
+Raspberry Pi 5 is the first local-compute path; cloud providers remain
+capability escalation and comparison paths.
 
 ### D004 --- AI backends must be swappable
 
@@ -1280,17 +1281,17 @@ complexity.
 **Reason:** voice, display, personality and useful actions provide a
 complete first product without camera complexity.
 
-### D007 --- NUC is the primary local-compute peer
+### D007 --- Raspberry Pi 5 is the primary local-compute peer
 
-**Reason:** the NUC8i5BEH provides a stable CPU-first service node for local
-LLM, speech, memory and background work while the Acer remains the primary
-development workstation.
+**Reason:** the Raspberry Pi 5 provides a stable CPU-first service node
+for local LLM, speech, memory and background work while the Acer remains
+the primary development workstation.
 
-### D008 --- Private Ethernet is the preferred Pi-to-NUC transport
+### D008 --- Trusted Wi-Fi is the preferred ESP32-P4-to-Pi transport
 
-**Reason:** a dedicated static subnet with no default gateway gives
-internal TARS traffic predictable latency and a clearer trust boundary;
-independent Wi-Fi remains available for development and cloud access.
+**Reason:** a trusted Wi-Fi LAN with static private addressing where
+practical gives internal TARS traffic a clearer trust boundary while
+keeping the ESP32-P4 physically independent of wired infrastructure.
 
 ------------------------------------------------------------------------
 
@@ -1301,11 +1302,11 @@ independent Wi-Fi remains available for development and cloud access.
 -   Python/Qt versus web/kiosk UI?
 -   Which microphone gives acceptable far-field pickup?
 -   USB speaker, HDMI/display audio, HAT, or external DAC?
--   Which measured Pi/NUC/cloud STT route should be preferred for each
+-   Which measured ESP32-P4/Pi 5/cloud STT route should be preferred for each
     operating mode?
 -   Which measured local/cloud TTS route and voice should be preferred?
 -   Preferred wake-word engine?
--   What routing policy should choose NUC-local versus cloud providers?
+-   What routing policy should choose Pi 5-local versus cloud providers?
 -   Which workstation services, if any, should the Acer expose?
 -   How much initiative should the assistant have by default?
 -   Should the final personality retain the "TARS" working name or
@@ -1329,7 +1330,7 @@ This section should be updated throughout development.
     the main assistant when a Pi 5 is available.
 -   Perceived responsiveness is largely an architecture/UI problem:
     immediate local animation can hide unavoidable network latency.
--   The project does not need a large local LLM on the Pi to be
+-   The project does not need a large local LLM on the Pi 5 to be
     meaningfully local.
 -   EMO's strongest lesson is ambient presence and expressive state.
 -   TARS's strongest lesson is competent personality with adjustable
@@ -1343,17 +1344,18 @@ This section should be updated throughout development.
 
 ## 38. Next Build Session
 
-1.  Identify the exact Raspberry Pi 5 RAM configuration.
-2.  Confirm the touchscreen part/version and obtain the correct Pi 5 DSI
-    cable.
+1.  Identify the exact ESP32-P4 module/board configuration.
+2.  Confirm the touchscreen part/version and obtain the correct display
+    connector/cable.
 3.  Decide microphone and speaker hardware.
-4.  Install Raspberry Pi OS Lite 64-bit and the minimum graphics, input
-    and audio packages required by the chosen UI.
+4.  Set up the ESP32-P4 firmware/toolchain and the minimum graphics,
+    input and audio drivers required by the chosen UI.
 5.  Build a tiny fullscreen 800×480 animation/state-machine prototype.
 6.  Measure idle CPU/RAM usage and animation responsiveness.
-7.  Configure the private Pi↔NUC Ethernet link and health endpoint.
+7.  Configure the trusted Wi-Fi ESP32-P4↔Pi service path and health
+    endpoint.
 8.  Add microphone capture and a visible listening state.
-9.  Benchmark the initial NUC-local and cloud provider paths through the
+9.  Benchmark the initial Pi 5-local and cloud provider paths through the
     same interface.
 
 The first milestone is deliberately simple:
@@ -1387,14 +1389,13 @@ architecture, not claims about EMO's internal implementation.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
-  0.6                     2026-08-09              Reconciled the top-level
-                                                  design with the Pi/NUC/
-                                                  cloud compute hierarchy,
-                                                  private Ethernet,
-                                                  Raspberry Pi OS Lite,
-                                                  benchmark-driven display
-                                                  choice and current build
-                                                  sequence
+0.6                     2026-08-09              Reconciled the top-level
+                                                   design with the ESP32-P4/
+                                                   Pi 5 compute hierarchy,
+                                                   trusted Wi-Fi LAN,
+                                                   benchmark-driven display
+                                                   choice and current build
+                                                   sequence
 
   0.5                     2026-08-09              Consolidated the expanded
                                                   inspiration study, product

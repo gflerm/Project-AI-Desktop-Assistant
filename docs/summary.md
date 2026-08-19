@@ -19,7 +19,7 @@ Project TARS is an AI desktop assistant project with a modular, extensible archi
 
 ### 3. Design Specification
 - **Core Identity**: A calm, capable machine that enjoys solving difficult things with you, has a dry sense of humor, admits what it does not know, and never forgets that usefulness comes before performance
-- **Architecture**: Modular system with replaceable components including Pi runtime, NUC services, STT adapters, TTS adapters, LLM providers, vision providers, memory services, UI/display, hardware interfaces, cloud adapters
+- **Architecture**: Modular system with replaceable components including ESP32-P4 runtime, Pi 5 compute services, STT adapters, TTS adapters, LLM providers, vision providers, memory services, UI/display, hardware interfaces, cloud adapters
 - **Personality Pillars**: Competence first, curiosity second, appropriate humor, quiet presence, intellectual honesty, and unwavering operator control
 ## Key Requirements and Technical Approaches
 
@@ -62,12 +62,12 @@ This consolidated summary provides a comprehensive overview that connects all ke
    - Intellectual honesty about certainty levels
    - Operator control maintained throughout interactions
 
-4. **Hardware Support**: Designed for multiple platforms including Raspberry Pi 5, Intel NUC, NVIDIA Jetson Nano, and cloud environments.
+4. **Hardware Support**: Designed for multiple platforms including ESP32-P4 (primary companion), Raspberry Pi 5 (local compute), NVIDIA Jetson Nano, and cloud environments.
 
 5. **Privacy and Security**: Strong emphasis on privacy considerations and maintaining operator control over the assistant's behavior.
 ### 4. Speech & AI Runtime Evaluation
 - **Service Boundaries**: Clear separation of speech and AI components behind stable Project TARS interfaces
-- **Hardware Compatibility**: Designed for Raspberry Pi 5, Intel NUC8i5BEH, NVIDIA Jetson Nano, Acer i7 development workstation, and cloud platforms
+- **Hardware Compatibility**: Designed for ESP32-P4, Raspberry Pi 5, NVIDIA Jetson Nano, Acer i7 development workstation, and cloud platforms
 - **Runtime Components**: Evaluation of STT (whisper.cpp, faster-whisper), TTS (Piper, sherpa-onnx), local LLM (Ollama, llama.cpp) with focus on replaceable service interfaces
 
 ### 5. Personality Distillation

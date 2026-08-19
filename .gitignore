@@ -83,3 +83,10 @@ benchmarks/results/
 archive/
 PROJECT-WORKFLOW.md
 PROJECT-ORIGIN-PROMPTS.md
+
+# ESP-IDF build artifacts and generated config
+build/
+managed_components/
+sdkconfig
+sdkconfig.old
+dependencies.lock
