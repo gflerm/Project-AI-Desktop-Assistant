@@ -124,7 +124,9 @@ The following documents are the current design source of truth:
     events, tuning corpus and staged test plan.
 -   [Project TODO and Verification](Project-TODO-and-Verification.md) --- the
     single authoritative progress tracker for PC recording, P4 hardware,
-    firmware, Pi 5 services, gestures, testing and release evidence.
+    firmware, Pi 5 services, gestures, testing and release evidence. A polished
+    [PDF edition](../output/pdf/Project-TODO-and-Verification.pdf) is generated
+    from the same Markdown source.
 -   [P4-to-Pi Audio Protocol](P4-Pi-Audio-Protocol.md) --- versioned control,
     PCM framing, acknowledgements, backpressure, cancellation and reconnect
     contract for speech and response exchange.

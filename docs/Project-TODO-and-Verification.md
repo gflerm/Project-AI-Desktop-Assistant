@@ -452,8 +452,8 @@ Apply this gate to every implementation work package before merge or release:
 
 # 17. Definition of Done
 
-The VAD/voice implementation is complete for the first production milestone
-only when all of the following are true:
+The first Project TARS production milestone is complete only when all of the
+following are true:
 
 - [ ] G0 through G9 exit conditions are met or formally waived with evidence.
 - [ ] PC and P4 results are reported separately.

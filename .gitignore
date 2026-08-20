@@ -76,6 +76,7 @@ benchmarks/results/
 *.tar.gz
 *.7z
 *.pdf
+!output/pdf/Project-TODO-and-Verification.pdf
 .tox/
 .nox/
 

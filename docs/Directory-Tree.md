@@ -19,6 +19,7 @@ Project-AI-Desktop-Assistant/
 ├── docs/                  Architecture, plans, policies, and living references
 ├── images/                Hardware references and whole-face mockups
 ├── main/                  ESP32-P4 application firmware
+├── output/                Generated, review-ready project artifacts
 ├── tools/                 Reproducible developer/build helpers
 ├── CMakeLists.txt         ESP-IDF project entry point
 ├── partitions.csv         P4 flash-partition layout
@@ -112,6 +113,10 @@ Project-AI-Desktop-Assistant/
 │   ├── ESP32 LCD Wiring Reference Schematic.png
 │   └── Three-LCD-Face-Mockup.png
 │
+├── output/
+│   └── pdf/
+│       └── Project-TODO-and-Verification.pdf
+│
 ├── main/
     ├── CMakeLists.txt
     ├── Kconfig.projbuild
@@ -125,7 +130,8 @@ Project-AI-Desktop-Assistant/
     ├── tars_endpoint.c
     └── tars_endpoint.h
 └── tools/
-    └── build-firmware.ps1
+    ├── build-firmware.ps1
+    └── render-project-todo-pdf.py
 ```
 
 ---
@@ -139,6 +145,7 @@ Project-AI-Desktop-Assistant/
 | `docs/` | System design, architecture decisions, roadmaps, policies, and TODOs | Keep aligned with implemented behavior |
 | `images/` | Hardware reference images and complete-device mockups | Commit project-relevant references |
 | `main/` | ESP32-P4 firmware component and application configuration | Build and hardware-test before marking goals complete |
+| `output/` | Reviewed project artifacts generated from tracked sources | Commit stable deliverables; exclude temporary renders |
 | `tools/` | Reproducible project-level build and developer helpers | Commit scripts; keep generated output elsewhere |
 | `build/` | Generated ESP-IDF build products | Never commit |
 | `managed_components/` | Downloaded ESP-IDF component dependencies | Never commit; versions come from dependency configuration |
