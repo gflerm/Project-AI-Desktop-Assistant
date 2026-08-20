@@ -1033,6 +1033,12 @@ Goal:
 
 Adds microphone, VAD/STT, interruption and audio debugging.
 
+VAD here means speaker-independent speech detection and endpointing on the P4.
+Operator voice recognition is a separate Pi 5 enrollment workstream. Execute
+this iteration using `VAD-Implementation-TODO.md` and the private recording
+workflow under `../VED Training/`; retain push-to-talk until automatic VAD has
+passed the recorded-corpus and live-P4 acceptance tests.
+
 ## Iteration D --- It Becomes TARS
 
 **Estimate:** additional 4--7 FDD

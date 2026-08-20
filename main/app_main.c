@@ -6,6 +6,8 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
+#include "tars_audio_capture.h"
+
 static const char *TAG = "tars";
 
 void app_main(void)
@@ -19,6 +21,15 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Project TARS firmware starting on ESP32-P4 (ESP-IDF)");
     ESP_LOGI(TAG, "Wi-Fi and service initialization is not yet implemented.");
+
+#if CONFIG_TARS_AUDIO_CAPTURE_DIAGNOSTIC
+    ret = tars_audio_capture_start();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Audio capture diagnostic did not start: %s", esp_err_to_name(ret));
+    }
+#else
+    ESP_LOGI(TAG, "Audio capture diagnostic is disabled in project configuration");
+#endif
 
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(1000));

@@ -1,0 +1,21 @@
+menu "Project TARS"
+
+    config TARS_AUDIO_CAPTURE_DIAGNOSTIC
+        bool "Enable P4 microphone capture diagnostic"
+        default y
+        help
+            Initialize the Waveshare ES8311 microphone path at 16 kHz mono,
+            run a 20 ms capture task on Core 1, and log one-second signal and
+            health summaries. This is a diagnostic baseline; it does not save
+            or transmit audio and does not perform VAD.
+
+    config TARS_AUDIO_MIC_GAIN_DB
+        int "ES8311 microphone input gain (dB)"
+        depends on TARS_AUDIO_CAPTURE_DIAGNOSTIC
+        range 0 42
+        default 24
+        help
+            Initial diagnostic microphone gain. Tune from measured peak,
+            clipping, and noise-floor results rather than perceived loudness.
+
+endmenu

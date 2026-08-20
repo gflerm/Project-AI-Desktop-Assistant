@@ -1,0 +1,2 @@
+file,detected,predicted_start_ms,predicted_end_ms,backend,profile
+VED Training/recordings/voice-corpus/session-001/example.wav,true,500,1420,esp_sr_standalone,normal_desk

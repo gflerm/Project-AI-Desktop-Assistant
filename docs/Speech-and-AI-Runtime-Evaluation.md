@@ -443,6 +443,13 @@ STT
 This prevents expensive STT from running unnecessarily and permits the ESP32-P4
 to react immediately before any network call.
 
+VAD must also remain separate from speaker verification. The P4 VAD is
+speaker-independent and uses recorded audio for calibration/evaluation, not
+personal voice training. The Pi 5 performs optional operator enrollment and
+speaker-embedding comparison after VAD has bounded the utterance. The private
+PC/P4 corpus workflow is maintained under `../VED Training/`, and the ordered
+implementation checklist is `VAD-Implementation-TODO.md`.
+
 Candidates for evaluation:
 
 - openWakeWord;
@@ -454,6 +461,11 @@ Candidates for evaluation:
 **Initial recommendation:** Do not let wake-word work block M5. Begin with
 touch/push-to-talk, then add wake detection after the conversational loop is
 stable.
+
+**VAD implementation order:** push-to-talk transport, recorded-file standalone
+VAD, P4 endpoint/pre-roll state machine, live P4 VAD, AFE/VADNet comparison,
+then echo cancellation/barge-in. Apply the same held-out corpus to each backend
+so changes are measurable.
 
 ---
 

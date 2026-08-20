@@ -1,0 +1,27 @@
+phrase_id,split,intended_text,tone,distance_m,noise,repeat_count,notes
+silence_quiet,noise,,silent,1.0,quiet_room,3,Record ten seconds per repeat
+silence_fan,noise,,silent,1.0,computer_fan,3,Record ten seconds per repeat
+silence_keyboard,noise,,silent,1.0,keyboard_mouse,3,Normal desk activity without speech
+enroll_01,enrollment,Project TARS I am ready to begin,normal,0.8,quiet_room,2,Use different sessions
+enroll_02,enrollment,Please show me the current system status,quiet,0.8,quiet_room,2,Natural quiet voice
+enroll_03,enrollment,Run the audio diagnostic and report the result,energetic,0.8,quiet_room,2,Do not shout
+enroll_04,enrollment,The Raspberry Pi handles speech and inference,tired,0.8,quiet_room,2,Natural low energy
+enroll_05,enrollment,Confirm microphone display and network health,slow,0.8,quiet_room,2,Deliberate pacing
+enroll_06,enrollment,What should we test next,questioning,0.8,quiet_room,2,Question intonation
+valid_01,validation,Yes,normal,0.8,quiet_room,2,Short utterance
+valid_02,validation,No thank you,quiet,0.8,computer_fan,2,Short quiet utterance
+valid_03,validation,Stop the current task,loud,1.5,quiet_room,2,Firm but not shouting
+valid_04,validation,Set the volume to forty two percent,normal,0.8,keyboard_mouse,2,Number accuracy
+valid_05,validation,The SPI clock is running at twenty megahertz,technical,0.8,computer_fan,2,Technical vocabulary
+valid_06,validation,Can you check GPIO forty two and GPIO forty three,fast,0.8,quiet_room,2,Identifiers and speed
+valid_07,validation,I need a moment before we continue,tired,1.5,quiet_room,2,Low energy at distance
+valid_08,validation,Why did the audio buffer underrun,questioning,0.4,quiet_room,2,Near-field question
+test_01,test,Start listening now,normal,0.8,quiet_room,2,Held-out phrase
+test_02,test,Pause,quiet,0.8,quiet_room,2,Very short held-out phrase
+test_03,test,Cancel that operation,loud,1.5,computer_fan,2,Firm distant request
+test_04,test,Read back the last diagnostic result,slow,0.8,keyboard_mouse,2,Deliberate with transient noise
+test_05,test,The temperature is thirty seven point five degrees,technical,0.8,quiet_room,2,Numbers and technical content
+test_06,test,Are the two processor cores still responsive,questioning,2.0,quiet_room,2,Far-field question
+test_07,test,Everything looks good let us continue,energetic,0.4,quiet_room,2,Near-field energetic
+test_08,test,I am speaking more softly because it is late,quiet,1.5,computer_fan,2,Quiet distant speech
+playback_01,validation,Please stop speaking when you hear me,normal,0.8,tars_speaker_playback,3,Reserved for later AEC and barge-in test

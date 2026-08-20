@@ -1,0 +1,114 @@
+schema_version: 1
+asset_status: source_concepts
+generated_with: OpenAI built-in image generation
+
+display_targets:
+  rev1:
+    controller: NV3030B
+    eye_portrait: [240, 280]
+    mouth_landscape: [280, 240]
+  rev2:
+    controller: ST7789P
+    eye_portrait: [240, 284]
+    mouth_landscape: [284, 240]
+
+palette:
+  background: "#000000"
+  primary: "#19D9FF"
+  warning_accent: "#FFC400"
+  error_accent: "#FF4A1A"
+
+aliases:
+  booting: boot
+  working: acting
+  confused: uncertain
+  sleeping: sleep
+
+core_states:
+  - id: boot
+    source: source/core-states/boot.png
+    pose: ordered startup arcs and progress bar
+    behavior: loop_until_ready
+  - id: idle
+    source: source/core-states/idle.png
+    pose: calm centered eyes and relaxed smile
+    behavior: rare_blink_and_gaze_drift
+  - id: attentive
+    source: source/core-states/attentive.png
+    pose: widened forward-facing acknowledgement
+    behavior: short_transition_then_hold
+  - id: listening
+    source: source/core-states/listening.png
+    pose: focused eyes and quiet listening line
+    behavior: immediate_slow_pulse
+  - id: heard
+    source: source/core-states/heard.png
+    pose: pleased micro-squint and affirmative mouth tick
+    behavior: brief_one_shot
+  - id: thinking
+    source: source/core-states/thinking.png
+    pose: upward gaze, sparse orbit motif and three-dot mouth
+    behavior: subtle_loop
+  - id: acting
+    source: source/core-states/acting.png
+    pose: concentrated eyes, motion ticks and firm mouth
+    behavior: restrained_activity_loop
+  - id: speaking
+    source: source/core-states/speaking.png
+    pose: engaged eyes and strong-amplitude mouth waveform
+    behavior: amplitude_reactive
+  - id: success
+    source: source/core-states/success.png
+    pose: happy eye arcs and modest smile
+    behavior: brief_one_shot_then_idle
+  - id: uncertain
+    source: source/core-states/uncertain.png
+    pose: asymmetric gaze and hesitant mouth wave
+    behavior: hold_then_clarify
+  - id: warning
+    source: source/core-states/warning.png
+    pose: sharp alert eyes and amber caution bar
+    behavior: sharp_transition_then_hold
+  - id: error
+    source: source/core-states/error.png
+    pose: broken eye arcs and interrupted red-orange mouth line
+    behavior: clear_failure_hold
+  - id: offline
+    source: source/core-states/offline.png
+    pose: dim half-open eyes and disconnected dotted mouth
+    behavior: dim_static
+  - id: sleep
+    source: source/core-states/sleep.png
+    pose: closed eye arcs and tiny relaxed mouth
+    behavior: dim_static
+
+presentation_modifiers:
+  - id: quiet
+    source: source/presentation-modifiers/quiet.png
+    effect: reduce_brightness_and_motion
+  - id: normal
+    source: source/presentation-modifiers/normal.png
+    effect: default_intensity
+  - id: curious
+    source: source/presentation-modifiers/curious.png
+    effect: investigative_gaze_variants
+  - id: focused
+    source: source/presentation-modifiers/focused.png
+    effect: minimize_idle_motion
+  - id: playful
+    source: source/presentation-modifiers/playful.png
+    effect: allow_rare_wink_or_smirk
+  - id: cautious
+    source: source/presentation-modifiers/cautious.png
+    effect: restrained_alert_pose
+  - id: busy
+    source: source/presentation-modifiers/busy.png
+    effect: subtle_activity_ticks
+
+export_requirements:
+  physical_revision_verified: false
+  split_into_per_panel_assets: false
+  safe_margin_reviewed: false
+  palette_normalized: false
+  animation_frames_authored: false
+  firmware_format_selected: false

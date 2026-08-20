@@ -1,7 +1,7 @@
 # Project TARS --- Hardware Architecture & Inventory
 
-**Status:** Version 0.13 --- Living Work in Progress\
-**Date:** 2026-08-19\
+**Status:** Version 0.14 --- Living Work in Progress\
+**Date:** 2026-08-20\
 **Document role:** Hardware inventory, node roles, interfaces,
 constraints and hardware evolution plan\
 **Companion to:** `Design-Specification.md`
@@ -92,7 +92,7 @@ the display, microphone, speaker, camera and future sensors.
 -   microphone capture;
 -   speaker output;
 -   wake-word detection;
--   basic voice activity detection;
+-   speaker-independent voice activity detection and endpointing;
 -   local event bus;
 -   device state;
 -   lightweight orchestration;
@@ -105,6 +105,12 @@ the display, microphone, speaker, camera and future sensors.
 -   network discovery;
 -   fallback/offline UI;
 -   selected lightweight AI tasks.
+
+VAD on the P4 detects speech boundaries; it is calibrated and evaluated rather
+than trained to recognize the operator. STT and speaker verification remain Pi
+5 responsibilities. The implementation sequence is tracked in
+`VAD-Implementation-TODO.md`, while private recordings and enrollment test
+assets live under `../VED Training/`.
 
 ## 4.3 Tasks to avoid where possible
 
@@ -134,7 +140,8 @@ that damage responsiveness, including:
   Display interface    MIPI-DSI and parallel RGB LCD; HDMI bridge as an
                        alternative
   Camera interface     MIPI-CSI (Kit A ships an OV5647 camera)
-  Audio                Onboard ES8311 codec; speaker and microphone
+  Audio                Onboard SMD microphone, ES8311 codec and NS4150B
+                       amplifier; external 8-ohm 2-W speaker required
   Hostname             `titanium`
   Power supply         USB-C (programming/power port) **to verify**
   OS baseline          ESP-IDF / FreeRTOS (native ESP-IDF project;
@@ -521,7 +528,10 @@ an integrated display, multitouch and compact DSI cabling.
 
 ## 6.1 Microphone
 
-**Hardware:** To be selected / existing hardware to inventory.
+**Hardware:** Onboard SMD microphone connected through the ES8311 codec.
+
+**Status:** Available on the Waveshare ESP32-P4-WIFI6 board; capture quality,
+gain, noise, placement and echo behaviour remain to be benchmarked.
 
 Requirements:
 
@@ -537,7 +547,9 @@ for the first prototype.
 
 ## 6.2 Speaker
 
-**Hardware:** To be selected / existing hardware to inventory.
+**Hardware:** Onboard NS4150B power amplifier and MX1.25 two-pin speaker
+connector. The board documentation specifies an external **8 ohm, 2 W
+speaker**; confirm the attached speaker rating before use.
 
 Requirements:
 
@@ -550,37 +562,40 @@ Requirements:
 
 ## 6.3 ESP32-P4 Audio Capabilities
 
-The ESP32-P4 provides multiple I2S interfaces for digital audio but does
-**not** include an onboard microphone, speaker, conventional analogue
-microphone input, or a 3.5 mm analogue audio-output jack.
+The ESP32-P4-WIFI6 board provides an onboard SMD microphone, ES8311 audio
+codec, NS4150B power amplifier and speaker connector. The codec supports both
+recording and playback over I2S and is configured over I2C. The board does not
+include the external speaker itself or a 3.5 mm analogue audio-output jack.
 
 Available audio paths relevant to Project TARS include:
 
 | Audio path | Input | Output | Project TARS relevance |
 |---|---:|---:|---|
-| I2S / codec hardware | Yes with suitable codec/mic | Yes with DAC/amplifier | **Preferred integrated-design candidate** |
-| USB audio | Yes with supported device | Yes with supported device | **Preferred first-prototype path** |
+| Onboard ES8311 / I2S | Yes, onboard microphone | Yes, through NS4150B and speaker connector | **Preferred first-prototype baseline** |
+| USB audio | Yes with supported device | Yes with supported device | Alternative/debug path |
 | Bluetooth audio | Yes, device-dependent | Yes | Optional; latency/reliability must be tested |
 | HDMI display audio | No | Yes, if display supports it | Convenient temporary output only |
 
 ### Prototype recommendation
 
-Use a well-supported **I2S microphone/codec/DAC/amplifier (or supported USB
-audio device) and speaker** for the first voice prototype where suitable
-hardware is available.
+Use the onboard **ES8311 microphone/codec and NS4150B amplifier path** with a
+verified 8 ohm, 2 W speaker for the first voice prototype. Retain supported USB
+audio as an alternative diagnostic/reference path.
 
 Reasons:
 
-- fastest path to working audio on the ESP32-P4;
+- matches the hardware already present on the ESP32-P4-WIFI6 board;
 - avoids over-custom electronics during software development;
-- easy to replace;
 - allows STT/TTS latency work to begin before enclosure/audio-board design;
-- useful baseline against which an integrated audio solution can be measured.
+- provides an ESP-IDF/ES8311 echo-example path for initial verification;
+- supplies the baseline against which later microphone-array or audio-board
+  changes can be measured.
 
 ### Integrated enclosure candidate
 
-After the conversational voice loop is stable, finalise an **I2S-based
-microphone/codec/DAC/amplifier solution** for the final enclosure.
+After the conversational voice loop is stable, determine whether the onboard
+**ES8311/NS4150B solution** is sufficient for the final enclosure or whether a
+microphone array, different amplifier or acoustic redesign is justified.
 
 Potential advantages:
 
@@ -590,8 +605,8 @@ Potential advantages:
 - no external USB audio dongle;
 - potential microphone-array integration.
 
-The exact I2S hardware must not be selected until microphone placement,
-speaker placement, echo behaviour and ESP-IDF driver support are tested.
+Do not replace the onboard audio path until microphone placement, speaker
+placement, echo behaviour, gain and ESP-IDF driver behavior are tested.
 
 ### Bluetooth
 
@@ -1090,8 +1105,8 @@ This section should become the authoritative inventory.
 | HW-003 | Camera (OV5647) | Included with Kit A | Future vision | OV5647 MIPI-CSI camera included with Waveshare Kit A | Camera driver/stream tests |
 | HW-004 | Raspberry Pi 5 | Available | Primary local-compute baseline | Model B Rev 1.0; 8 GB RAM; 4-core Cortex-A76 up to 2.4 GHz; Samsung 256 GB NVMe; 64 GB microSD; PWM fan; Gigabit Ethernet; Wi-Fi; Bluetooth; hostname `titanium` | PSU, OS baseline and benchmarks |
 | HW-005 | Acer development system | Available | Workstation/development | i7; 32 GB RAM; NVIDIA GPU | Exact model, CPU, GPU, storage and OS |
-| HW-006 | Microphone | To define | Voice input | TBD | Inventory and benchmark existing devices |
-| HW-007 | Speaker | To define | Voice output | TBD | Inventory and benchmark existing devices |
+| HW-006 | Microphone | Available onboard | Voice input | SMD microphone through onboard ES8311 codec | Capture, gain, noise and echo benchmark |
+| HW-007 | Speaker path | Interface available; speaker to verify | Voice output | NS4150B amplifier; MX1.25 2-pin connector for external 8-ohm 2-W speaker | Confirm attached speaker rating; playback and acoustic benchmark |
 | HW-008 | NVIDIA Jetson Nano | Available | Vision/edge evaluation | First-generation 4 GB class | Exact board revision and JetPack |
 | HW-009 | Creality K2 Pro + CFS | Available | Enclosure fabrication | K2 Pro with CFS | Firmware and slicer workflow |
 
@@ -1288,7 +1303,8 @@ Measure only what is relevant to tasks Project TARS may delegate.
 -   [x] Record ESP32-P4 memory: 32 MB in-package PSRAM.
 -   [x] Record ESP32-P4 flash: 32 MB NOR flash.
 -   [x] Record ESP32-P4 Wi-Fi: ESP32-C6 ESP-Hosted coprocessor over SDIO (Wi-Fi 6).
--   [x] Record ESP32-P4 audio: onboard ES8311 codec, speaker and microphone.
+-   [x] Record ESP32-P4 audio: onboard SMD microphone, ES8311 codec,
+    NS4150B amplifier and external-speaker connector.
 -   [x] Record ESP32-P4 camera: OV5647 MIPI-CSI included with Kit A.
 -   [x] Record ESP32-P4 silicon revision: v1.3 (pre-v3; see sdkconfig.defaults).
 -   [ ] Record ESP32-P4 PSU (USB-C).
@@ -1312,8 +1328,8 @@ Measure only what is relevant to tasks Project TARS may delegate.
 -   [ ] Confirm display/interface power/cooling clearance with enclosure layout.
 -   [ ] Identify camera model and interface (OV5647 MIPI-CSI).
 -   [ ] Verify camera capture on the ESP32-P4.
--   [ ] Inventory available microphones.
--   [ ] Inventory available speakers.
+-   [x] Inventory baseline microphone: onboard SMD microphone through ES8311.
+-   [ ] Confirm the attached speaker is 8 ohm and no more than 2 W.
 -   [ ] Inventory available audio interfaces/headsets/microphones.
 -   [ ] Verify I2S/USB audio capture/playback on the ESP32-P4.
 -   [ ] Measure microphone-to-STT latency.
@@ -1459,23 +1475,22 @@ Development should primarily occur on the Acer development machine, with
 the ESP32-P4 treated as a reproducible firmware build/flash target
 administered via provisioning and automated tooling.
 
-## H015 --- I2S/USB audio is the first-prototype baseline
+## H015 --- Onboard ES8311/I2S audio is the first-prototype baseline
 
 **Status:** Adopted for prototyping.
 
-Where suitable existing audio hardware is available, use an I2S
-microphone/codec/DAC/amplifier (or a supported USB audio device) to
-establish the first reliable voice loop before committing to custom
-integrated audio electronics.
+Use the onboard SMD microphone, ES8311 codec and NS4150B amplifier with a
+verified 8-ohm 2-W speaker to establish the first reliable voice loop. USB
+audio remains an optional diagnostic/reference path.
 
-## H016 --- I2S audio is the preferred integrated-design candidate
+## H016 --- Retain onboard audio unless testing justifies replacement
 
-**Status:** Candidate pending acoustic and driver testing.
+**Status:** Adopted baseline pending acoustic and driver testing.
 
-Evaluate I2S microphone/codec/DAC/amplifier hardware after the voice
-software stack is stable. Final selection must account for echo
-cancellation, microphone/speaker geometry, ESP-IDF driver support and
-enclosure constraints.
+Evaluate the onboard ES8311/NS4150B path after the voice software stack is
+stable. Replace or augment it only when measured capture quality, echo,
+speaker output, microphone/speaker geometry or enclosure constraints justify
+the added hardware.
 
 ## H017 --- Trusted Wi-Fi is the preferred ESP32-P4-to-Pi 5 transport
 
@@ -1529,7 +1544,7 @@ performance and supported acceleration paths.
 -   Which supported Pi 5 CPU/acceleration paths materially improve
     measured inference without harming stability?
 -   Exact workstation specifications?
--   Which microphone gives acceptable desk-range capture?
+-   Does the onboard microphone give acceptable desk-range capture?
 -   Which speaker arrangement minimises echo?
 -   Is the first-generation display satisfactory on the ESP32-P4?
 -   Does 800├ù480 provide enough usable UI space after real prototype testing?
@@ -1733,6 +1748,13 @@ accidental collection of installed software.
   -----------------------------------------------------------------------
   Version                 Date                    Notes
   ----------------------- ----------------------- -----------------------
+  0.14                    2026-08-20              Verified the onboard SMD
+                                                  microphone, ES8311 codec,
+                                                  NS4150B amplifier and 8-ohm
+                                                  2-W speaker connector;
+                                                  corrected the prototype
+                                                  audio baseline
+
   0.13                    2026-08-19              Added the three-LCD face
                                                   concept with portrait eye
                                                   displays, a landscape mouth

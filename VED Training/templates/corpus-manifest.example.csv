@@ -1,0 +1,2 @@
+file,split,speaker_id,session_id,phrase_id,transcript,tone,distance_m,noise,device,consent,speech_start_ms,speech_end_ms
+VED Training/recordings/voice-corpus/session-001/example.wav,validation,operator,session-001,valid_01,Yes,normal,0.8,quiet_room,pc_microphone,true,420,780

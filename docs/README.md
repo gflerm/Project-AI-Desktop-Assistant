@@ -109,6 +109,23 @@ The following documents are the current design source of truth:
     Roadmap](Firmware-Software-Roadmap.md) --- development
     work packages, milestones, modular implementation plan and
     multi-agent workflow.
+-   [P4 FreeRTOS Execution Plan](P4-FreeRTOS-Execution-Plan.md) ---
+    dual-core task allocation, Wi-Fi/Pi 5 communication, onboard audio,
+    PSRAM use, failure handling and staged integration benchmarks.
+-   [P4 Voice Activity Detection
+    Plan](P4-Voice-Activity-Detection-Plan.md) --- P4-local VAD,
+    endpointing, ESP-SR/VADNet integration, audio buffering, Pi 5 stream
+    events, tuning corpus and staged test plan.
+-   [VAD Implementation TODO and Goals](VAD-Implementation-TODO.md) ---
+    ordered PC recording, P4 capture, push-to-talk, ESP-SR, endpointing,
+    Pi 5 enrollment, gesture integration and acceptance-test checklist.
+-   [VED Training — Start Here](../VED%20Training/README.md) --- beginner PC
+    setup, Audacity recording workflow, private folder layout and first WAV
+    validation commands.
+-   [Voice Corpus, VAD and Speaker Enrollment Test
+    Plan](../VED%20Training/docs/Voice-Corpus-and-Speaker-Enrollment-Test-Plan.md) --- private
+    recording protocol, multi-tone VAD/STT tests, speaker enrollment,
+    threshold selection, privacy and replay-risk controls.
 -   [Speech & AI Runtime
     Evaluation](Speech-and-AI-Runtime-Evaluation.md) ---
     STT, TTS, wake/VAD, Ollama, llama.cpp and cloud/local AI evaluation
