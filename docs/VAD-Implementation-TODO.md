@@ -1,14 +1,16 @@
 # Project TARS — VAD Implementation TODO and Goals
 
-**Status:** Version 0.1 — Active implementation checklist
+**Status:** Version 0.2 — Primary implementation, test, and verification checklist
 
 **Date:** 2026-08-20
 
 **Owner:** Project TARS firmware/audio workstream
 
-**Companion documents:** `P4-Voice-Activity-Detection-Plan.md`,
-`P4-FreeRTOS-Execution-Plan.md`, and
-`../VED Training/README.md`
+**Companion documents:** [VAD architecture](P4-Voice-Activity-Detection-Plan.md),
+[FreeRTOS execution plan](P4-FreeRTOS-Execution-Plan.md),
+[firmware build guide](Firmware-Build-Guide.md),
+[P4-to-Pi audio protocol](P4-Pi-Audio-Protocol.md), and
+[VED Training start page](../VED%20Training/README.md)
 
 ---
 
@@ -17,6 +19,11 @@
 This is the executable checklist for taking Project TARS from PC microphone
 recordings to reliable automatic speech detection on the P4 and enrolled-voice
 verification on the Raspberry Pi 5.
+
+This file is the primary day-to-day project document for deciding what to do
+next, running tests, recording evidence, and deciding whether a goal is truly
+complete. Companion documents explain design details; completion status belongs
+here.
 
 It deliberately separates three functions:
 
@@ -32,7 +39,50 @@ uses enrollment and held-out testing, not a newly trained neural model.
 
 ---
 
-# 2. Current Baseline
+# 2. How to Use This Checklist
+
+For every development or test session:
+
+1. Start with the first incomplete item on the critical path unless a blocker is
+   recorded beside it.
+2. Run the relevant build or validation command before hardware testing.
+3. Preserve the evidence named under that goal: logs, reports, WAV metadata,
+   counters, screenshots, or protocol traces.
+4. Tick an item only after its stated behavior has been observed. A successful
+   compile proves the code builds; it does not prove the microphone, LCD, Wi-Fi,
+   PSRAM, or timing on physical hardware.
+5. Record measured values and the test date in this document or a linked report.
+6. Update the goal summary whenever a goal changes state.
+
+Standard clean firmware verification from the repository root:
+
+```powershell
+.\tools\build-firmware.ps1 -Clean
+Test-Path .\build\project_tars.bin
+Test-Path .\build\bootloader\bootloader.bin
+```
+
+Both `Test-Path` commands must return `True`, and the build must end with
+`Project build complete`. See the [firmware build guide](Firmware-Build-Guide.md)
+for the sandbox/toolchain explanation and configurable installation paths.
+
+## Current next test
+
+The next critical-path activity is **G1 physical P4 microphone validation**:
+
+- [ ] Connect the P4 board and record its serial port and board revision.
+- [ ] Run the clean firmware verification command above.
+- [ ] Flash the generated firmware and retain the complete boot/serial log.
+- [ ] Confirm the endpoint self-test reports `passed` during startup.
+- [ ] Confirm ES8311 initialization succeeds and `audio_rx_task` remains alive.
+- [ ] Speak normally, quietly, and loudly while recording peak, RMS, clipping,
+  queue depth, dropped-frame, sequence-gap, read-error, and stack-watermark
+  values.
+- [ ] Add the measurements under G1 before marking hardware items complete.
+
+---
+
+# 3. Current Baseline
 
 ## Prepared
 
@@ -50,6 +100,14 @@ uses enrollment and held-out testing, not a newly trained neural model.
   self-test implemented.
 - [x] Version 1 P4-to-Pi audio/control protocol documented.
 
+## Verified development evidence
+
+| Date | Verification | Result |
+|---|---|---|
+| 2026-08-20 | `build-firmware.ps1 -Clean` | Passed: application 2131/2131 and bootloader 174/174 |
+| 2026-08-20 | Incremental `build-firmware.ps1` | Passed: firmware image regenerated successfully |
+| 2026-08-20 | Endpoint synthetic startup test | Compiled into firmware; physical startup log still required |
+
 ## Not yet proven
 
 - [ ] Real PC corpus has been recorded and validated.
@@ -64,15 +122,15 @@ the corresponding runtime feature works on hardware.
 
 ---
 
-# 3. Goal Summary and Critical Path
+# 4. Goal Summary and Critical Path
 
 | Goal | Outcome | Depends on | Status |
 |---|---|---|---|
 | G0 | PC recording workflow proven | None | Ready to start |
-| G1 | P4 microphone capture proven | Board audio driver | Not started |
+| G1 | P4 microphone capture proven | Board audio driver | In progress — hardware test next |
 | G2 | Push-to-talk path proven | G1 | Not started |
 | G3 | Standalone VAD works offline | G0, ESP-SR dependency | Not started |
-| G4 | P4 endpointing preserves full utterances | G1, G3 | Not started |
+| G4 | P4 endpointing preserves full utterances | G1, G3 | In progress — state machine implemented |
 | G5 | VAD-bounded audio reaches Pi 5 | G2, G4, Wi-Fi session | Not started |
 | G6 | AFE/VADNet production path evaluated | G4 | Not started |
 | G7 | STT and speaker enrollment proven | G0, Pi 5 runtime | Not started |
@@ -96,7 +154,7 @@ G1 P4 capture -> G2 push-to-talk --------------------> G4 endpointing
 
 ---
 
-# 4. G0 — Prove the PC Recording Workflow
+# 5. G0 — Prove the PC Recording Workflow
 
 **Goal:** Produce correctly formatted, private recordings that exercise
 natural changes in the operator's voice.
@@ -121,7 +179,7 @@ unclipped, correctly named, and assigned to only one data split.
 
 ---
 
-# 5. G1 — Prove P4 Onboard Microphone Capture
+# 6. G1 — Prove P4 Onboard Microphone Capture
 
 **Goal:** Capture the actual signal that the deployed system will hear.
 
@@ -145,7 +203,7 @@ or clipped normal speech during the soak test.
 
 ---
 
-# 6. G2 — Prove Push-to-Talk Before Automatic VAD
+# 7. G2 — Prove Push-to-Talk Before Automatic VAD
 
 **Goal:** Isolate microphone, buffering, networking, and STT from VAD tuning.
 
@@ -165,7 +223,7 @@ produce stable transcripts before automatic detection is introduced.
 
 ---
 
-# 7. G3 — Integrate and Test Standalone ESP-SR VAD Offline
+# 8. G3 — Integrate and Test Standalone ESP-SR VAD Offline
 
 **Goal:** Establish a minimal P4-compatible VAD baseline using repeatable audio.
 
@@ -188,7 +246,7 @@ documented with a specific mitigation experiment.
 
 ---
 
-# 8. G4 — Implement P4 Endpointing and Pre-Roll
+# 9. G4 — Implement P4 Endpointing and Pre-Roll
 
 **Goal:** Turn frame-level speech/silence states into complete utterances.
 
@@ -214,7 +272,7 @@ validation clips.
 
 ---
 
-# 9. G5 — Stream VAD-Bounded Audio to the Pi 5
+# 10. G5 — Stream VAD-Bounded Audio to the Pi 5
 
 **Goal:** Make P4 endpoint events the primary turn boundaries for conversation.
 
@@ -235,7 +293,7 @@ normal operation and controlled reconnect tests.
 
 ---
 
-# 10. G6 — Evaluate AFE/VADNet and Echo Handling
+# 11. G6 — Evaluate AFE/VADNet and Echo Handling
 
 **Goal:** Decide whether ESP-SR AFE/VADNet is the production audio front end.
 
@@ -256,7 +314,7 @@ recall, false triggers, endpoint latency, CPU, memory, and echo behavior.
 
 ---
 
-# 11. G7 — Prove STT and Operator Voice Enrollment on Pi 5
+# 12. G7 — Prove STT and Operator Voice Enrollment on Pi 5
 
 **Goal:** Recognize the words and optionally identify the enrolled operator.
 
@@ -281,7 +339,7 @@ identity is not the sole authorization for risky actions.
 
 ---
 
-# 12. G8 — Connect Voice Events to Facial Gestures
+# 13. G8 — Connect Voice Events to Facial Gestures
 
 **Goal:** Make the device respond visibly without waiting for the Pi 5.
 
@@ -301,7 +359,7 @@ causing audio overruns, excessive latency, or stale animation playback.
 
 ---
 
-# 13. G9 — Concurrent Acceptance and Soak Test
+# 14. G9 — Concurrent Acceptance and Soak Test
 
 **Goal:** Prove the complete voice path while the rest of the assistant runs.
 
@@ -321,7 +379,7 @@ audio gaps; failures recover without rebooting the complete assistant.
 
 ---
 
-# 14. Deferred Backlog
+# 15. Deferred Backlog
 
 These are explicitly outside the first implementation path:
 
@@ -336,7 +394,7 @@ These are explicitly outside the first implementation path:
 
 ---
 
-# 15. Definition of Done
+# 16. Definition of Done
 
 The VAD/voice implementation is complete for the first production milestone
 only when all of the following are true:
