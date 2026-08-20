@@ -18,4 +18,15 @@ menu "Project TARS"
             Initial diagnostic microphone gain. Tune from measured peak,
             clipping, and noise-floor results rather than perceived loudness.
 
+    config TARS_AUDIO_RING_FRAMES
+        int "Bounded audio queue capacity (20 ms frames)"
+        depends on TARS_AUDIO_CAPTURE_DIAGNOSTIC
+        range 10 100
+        default 25
+        help
+            Number of fixed PCM frames retained between capture and consumers.
+            The default is 500 ms and uses approximately 16 KiB. If consumers
+            stall, the oldest frame is discarded so microphone capture never
+            waits for networking, storage, or diagnostics.
+
 endmenu

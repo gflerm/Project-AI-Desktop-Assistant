@@ -7,6 +7,7 @@
 #include "nvs_flash.h"
 
 #include "tars_audio_capture.h"
+#include "tars_endpoint.h"
 
 static const char *TAG = "tars";
 
@@ -21,6 +22,12 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Project TARS firmware starting on ESP32-P4 (ESP-IDF)");
     ESP_LOGI(TAG, "Wi-Fi and service initialization is not yet implemented.");
+
+    if (!tars_endpoint_self_test()) {
+        ESP_LOGE(TAG, "Endpoint state-machine self-test failed");
+    } else {
+        ESP_LOGI(TAG, "Endpoint state-machine self-test passed");
+    }
 
 #if CONFIG_TARS_AUDIO_CAPTURE_DIAGNOSTIC
     ret = tars_audio_capture_start();

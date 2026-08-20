@@ -44,9 +44,11 @@ uses enrollment and held-out testing, not a newly trained neural model.
 - [x] Corpus, VAD-boundary, and speaker-score evaluation tools created.
 - [x] Raw recordings excluded from Git.
 - [x] Initial 16 kHz P4 microphone diagnostic source implemented.
-- [ ] Complete firmware build verification; currently blocked before source
-  compilation by the installed RISC-V compiler wrapper failing CMake's compiler
-  test with Windows error code 5.
+- [x] Clean ESP-IDF 6.0.2 firmware build verified on 2026-08-20.
+- [x] Bounded 500 ms producer/consumer audio queue implemented.
+- [x] Backend-independent endpoint state machine and on-device transition
+  self-test implemented.
+- [x] Version 1 P4-to-Pi audio/control protocol documented.
 
 ## Not yet proven
 
@@ -129,7 +131,7 @@ unclipped, correctly named, and assigned to only one data split.
 - [x] Drain fixed 20 ms reads from a dedicated `audio_rx_task` on Core 1.
 - [x] Add read-error, peak, RMS, clipping, and stack-watermark counters.
 - [ ] Confirm the diagnostic configuration and readings on physical hardware.
-- [ ] Add a bounded producer/consumer ring before networking or file output.
+- [x] Add a bounded producer/consumer ring before networking or file output.
 - [ ] Save a bounded diagnostic WAV without blocking the DMA task.
 - [ ] Record P4 silence, normal speech, quiet speech, and loud speech.
 - [ ] Validate the P4 WAV files with the same PC checker.
@@ -191,12 +193,13 @@ documented with a specific mitigation experiment.
 **Goal:** Turn frame-level speech/silence states into complete utterances.
 
 - [ ] Implement a backend-independent `tars_vad` interface.
-- [ ] Implement the `tars_endpoint` state machine separately from the backend.
+- [x] Implement the `tars_endpoint` state machine separately from the backend.
 - [ ] Add at least 500 ms of bounded pre-roll.
-- [ ] Add start confirmation and end-of-speech hangover/hysteresis.
-- [ ] Add maximum utterance and no-speech timeouts.
+- [x] Add start confirmation and end-of-speech hangover/hysteresis.
+- [x] Add maximum utterance and no-speech timeouts.
 - [ ] Preserve pre-trigger frames through the VAD cache where supported.
-- [ ] Unit-test synthetic VAD state sequences.
+- [x] Add deterministic synthetic VAD sequences to the on-device startup
+  self-test.
 - [ ] Verify short acknowledgements such as “yes”, “no”, and “pause”.
 - [ ] Verify that the first phoneme is not clipped.
 - [ ] Recover cleanly after ring overrun or backend failure.

@@ -112,6 +112,12 @@ The following documents are the current design source of truth:
 -   [P4 FreeRTOS Execution Plan](P4-FreeRTOS-Execution-Plan.md) ---
     dual-core task allocation, Wi-Fi/Pi 5 communication, onboard audio,
     PSRAM use, failure handling and staged integration benchmarks.
+-   [Directory Tree](Directory-Tree.md) --- living repository map,
+    directory ownership, tracked layout, private/generated paths and update
+    rules.
+-   [Firmware Build Guide](Firmware-Build-Guide.md) --- repeatable ESP-IDF
+    build commands, clean-build safety and the sandbox-compatible no-ccache
+    wrapper.
 -   [P4 Voice Activity Detection
     Plan](P4-Voice-Activity-Detection-Plan.md) --- P4-local VAD,
     endpointing, ESP-SR/VADNet integration, audio buffering, Pi 5 stream
@@ -119,6 +125,9 @@ The following documents are the current design source of truth:
 -   [VAD Implementation TODO and Goals](VAD-Implementation-TODO.md) ---
     ordered PC recording, P4 capture, push-to-talk, ESP-SR, endpointing,
     Pi 5 enrollment, gesture integration and acceptance-test checklist.
+-   [P4-to-Pi Audio Protocol](P4-Pi-Audio-Protocol.md) --- versioned control,
+    PCM framing, acknowledgements, backpressure, cancellation and reconnect
+    contract for speech and response exchange.
 -   [VED Training — Start Here](../VED%20Training/README.md) --- beginner PC
     setup, Audacity recording workflow, private folder layout and first WAV
     validation commands.
