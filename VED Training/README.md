@@ -5,7 +5,7 @@ activity detection (VAD), speech-to-text (STT), and recognition of the enrolled
 operator's voice.
 
 Implementation progress, dependencies, and goal completion criteria are tracked
-in `../docs/VAD-Implementation-TODO.md`.
+in `../docs/Project-TODO-and-Verification.md`.
 
 > Folder-name note: this project folder is named **VED Training** as requested.
 > The standard technical term for speech detection is **VAD** (Voice Activity

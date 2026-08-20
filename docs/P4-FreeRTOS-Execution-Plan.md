@@ -483,6 +483,6 @@ prevents FreeRTOS SMP from using available CPU capacity.
 
 Detailed VAD/endpoint implementation, buffering and tuning are specified in
 `P4-Voice-Activity-Detection-Plan.md`. The ordered implementation goals and
-completion evidence are tracked in `VAD-Implementation-TODO.md`; private PC and
+completion evidence are tracked in `Project-TODO-and-Verification.md`; private PC and
 P4 recordings belong under `../VED Training/recordings/` and must not be
 committed.

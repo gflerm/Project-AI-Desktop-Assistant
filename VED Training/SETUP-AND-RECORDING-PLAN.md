@@ -7,7 +7,7 @@ every file has the expected format, and preserve separate enrollment,
 validation, and test data for later processing on the Raspberry Pi 5.
 
 This recording work is Goal G0 in
-`../docs/VAD-Implementation-TODO.md`. Do not mark later P4 or Pi 5 goals complete
+`../docs/Project-TODO-and-Verification.md`. Do not mark later P4 or Pi 5 goals complete
 merely because the PC files pass validation.
 
 ## Phase 0 — Important Expectations

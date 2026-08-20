@@ -105,7 +105,8 @@ Project-AI-Desktop-Assistant/
 │   ├── P4-Voice-Activity-Detection-Plan.md
 │   ├── Personality-Distillation.md
 │   ├── Speech-and-AI-Runtime-Evaluation.md
-│   └── VAD-Implementation-TODO.md
+│   ├── Project-TODO-and-Verification.md
+│   └── VAD-Implementation-TODO.md       Compatibility pointer to master TODO
 │
 ├── images/
 │   ├── ESP32 LCD Wiring Reference Schematic.png

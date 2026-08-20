@@ -109,7 +109,7 @@ the display, microphone, speaker, camera and future sensors.
 VAD on the P4 detects speech boundaries; it is calibrated and evaluated rather
 than trained to recognize the operator. STT and speaker verification remain Pi
 5 responsibilities. The implementation sequence is tracked in
-`VAD-Implementation-TODO.md`, while private recordings and enrollment test
+`Project-TODO-and-Verification.md`, while private recordings and enrollment test
 assets live under `../VED Training/`.
 
 ## 4.3 Tasks to avoid where possible
@@ -711,7 +711,7 @@ throughput, software compatibility, power and reliability.
 ## 8.4 Verification checklist
 
 Jetson evaluation remains optional. Its authoritative task status is maintained
-under [Optional Jetson Nano evaluation](VAD-Implementation-TODO.md#optional-jetson-nano-evaluation)
+under [Optional Jetson Nano evaluation](Project-TODO-and-Verification.md#optional-jetson-nano-evaluation)
 in the primary TODO. This section retains the architectural rationale; record
 the board/software inventory and benchmark results here if that deferred work
 is activated.
@@ -793,7 +793,7 @@ failure.
 ## 9.4 Installed-state verification checklist
 
 The recorded installed facts are in Section 9.1. Remaining setup and benchmark
-status is maintained under [G7 in the primary TODO](VAD-Implementation-TODO.md#12-g7--prove-stt-and-operator-voice-enrollment-on-pi-5),
+status is maintained under [G7 in the primary TODO](Project-TODO-and-Verification.md),
 with P4-to-Pi transport measurements under G5. Put measured hardware values in
 this inventory, but update completion checkboxes only in the primary TODO.
 

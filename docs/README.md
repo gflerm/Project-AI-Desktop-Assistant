@@ -122,9 +122,9 @@ The following documents are the current design source of truth:
     Plan](P4-Voice-Activity-Detection-Plan.md) --- P4-local VAD,
     endpointing, ESP-SR/VADNet integration, audio buffering, Pi 5 stream
     events, tuning corpus and staged test plan.
--   [VAD Implementation TODO and Goals](VAD-Implementation-TODO.md) ---
-    ordered PC recording, P4 capture, push-to-talk, ESP-SR, endpointing,
-    Pi 5 enrollment, gesture integration and acceptance-test checklist.
+-   [Project TODO and Verification](Project-TODO-and-Verification.md) --- the
+    single authoritative progress tracker for PC recording, P4 hardware,
+    firmware, Pi 5 services, gestures, testing and release evidence.
 -   [P4-to-Pi Audio Protocol](P4-Pi-Audio-Protocol.md) --- versioned control,
     PCM framing, acknowledgements, backpressure, cancellation and reconnect
     contract for speech and response exchange.

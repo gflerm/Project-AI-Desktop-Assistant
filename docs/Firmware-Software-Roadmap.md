@@ -1035,7 +1035,7 @@ Adds microphone, VAD/STT, interruption and audio debugging.
 
 VAD here means speaker-independent speech detection and endpointing on the P4.
 Operator voice recognition is a separate Pi 5 enrollment workstream. Execute
-this iteration using `VAD-Implementation-TODO.md` and the private recording
+this iteration using `Project-TODO-and-Verification.md` and the private recording
 workflow under `../VED Training/`; retain push-to-talk until automatic VAD has
 passed the recorded-corpus and live-P4 acceptance tests.
 
@@ -1450,7 +1450,7 @@ code.
 An agent task is not complete because code exists.
 
 The authoritative, checkable merge gate is maintained in
-[`VAD-Implementation-TODO.md`](VAD-Implementation-TODO.md#16-development-and-merge-gate).
+[`Project-TODO-and-Verification.md`](Project-TODO-and-Verification.md#16-development-and-merge-gate).
 It covers acceptance criteria, automated checks, secrets/privacy, interface
 documentation, review, integration testing, physical-hardware evidence, and
 architecture-document alignment. Keep this roadmap focused on work-package

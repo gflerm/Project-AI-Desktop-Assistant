@@ -898,7 +898,7 @@ VAD is a speaker-independent P4 boundary detector and must not be treated as
 operator identification. PC recordings establish the test workflow, while
 final calibration uses P4 microphone captures. Pi 5 STT and optional speaker
 enrollment operate on the bounded utterance. See `P4-Voice-Activity-Detection-Plan.md`,
-`VAD-Implementation-TODO.md`, and `../VED Training/README.md`.
+`Project-TODO-and-Verification.md`, and `../VED Training/README.md`.
 
 ### 24.4 Assistant Orchestrator
 

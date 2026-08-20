@@ -5,7 +5,7 @@
 **Document role:** ESP32-P4 voice activity detection, endpointing, audio
 buffering, FreeRTOS integration, tuning and test plan\
 **Companion to:** `P4-FreeRTOS-Execution-Plan.md`,
-`Speech-and-AI-Runtime-Evaluation.md`, `VAD-Implementation-TODO.md`,
+`Speech-and-AI-Runtime-Evaluation.md`, `Project-TODO-and-Verification.md`,
 `../VED Training/README.md` and
 `../VED Training/docs/Voice-Corpus-and-Speaker-Enrollment-Test-Plan.md`
 
@@ -43,7 +43,7 @@ speaker-independent. Its recorded corpus is used to:
 Operator recognition is a separate Pi 5 speaker-enrollment task using a
 pretrained speaker-embedding model. The beginner PC recording workflow and
 private corpus layout are in `../VED Training/README.md`. The executable
-firmware/test sequence is tracked in `VAD-Implementation-TODO.md`.
+firmware/test sequence is tracked in `Project-TODO-and-Verification.md`.
 
 ---
 
@@ -694,4 +694,4 @@ The operator recording matrix, private corpus layout, VAD/STT scoring and
 speaker-enrollment workflow are specified in `../VED Training/`. PC recordings
 first prove the workflow, but final VAD acceptance must use recordings captured
 through the deployed P4 microphone path. Progress and exit evidence must be
-recorded against `VAD-Implementation-TODO.md`.
+recorded against `Project-TODO-and-Verification.md`.

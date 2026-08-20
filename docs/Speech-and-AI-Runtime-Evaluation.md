@@ -448,7 +448,7 @@ speaker-independent and uses recorded audio for calibration/evaluation, not
 personal voice training. The Pi 5 performs optional operator enrollment and
 speaker-embedding comparison after VAD has bounded the utterance. The private
 PC/P4 corpus workflow is maintained under `../VED Training/`, and the ordered
-implementation checklist is `VAD-Implementation-TODO.md`.
+implementation checklist is `Project-TODO-and-Verification.md`.
 
 Candidates for evaluation:
 
@@ -1060,7 +1060,7 @@ path by default, with health-aware policy-approved fallback.
 # 26. Immediate Next Actions
 
 Execution status is centralized in
-[`VAD-Implementation-TODO.md`](VAD-Implementation-TODO.md). The former action
+[`Project-TODO-and-Verification.md`](Project-TODO-and-Verification.md). The former action
 list maps there as follows:
 
 - P4 microphone identification, I2S capture, and hardware proof: G1;
