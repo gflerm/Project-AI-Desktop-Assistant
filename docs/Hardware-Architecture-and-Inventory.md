@@ -710,19 +710,11 @@ throughput, software compatibility, power and reliability.
 
 ## 8.4 Verification checklist
 
-- [ ] Record exact Jetson Nano board/dev-kit revision.
-- [ ] Verify CPU and 128-CUDA-core specification.
-- [ ] Record storage / microSD configuration.
-- [ ] Record JetPack and Ubuntu versions.
-- [ ] Record power supply and power mode.
-- [ ] Record cooling arrangement.
-- [ ] Test Ethernet/Wi-Fi connectivity as fitted.
-- [ ] Verify CUDA.
-- [ ] Verify OpenCV acceleration.
-- [ ] Verify TensorRT.
-- [ ] Benchmark representative vision model.
-- [ ] Measure sustained temperature and power.
-- [ ] Compare vision latency with ESP32-P4 / Pi 5 alternatives.
+Jetson evaluation remains optional. Its authoritative task status is maintained
+under [Optional Jetson Nano evaluation](VAD-Implementation-TODO.md#optional-jetson-nano-evaluation)
+in the primary TODO. This section retains the architectural rationale; record
+the board/software inventory and benchmark results here if that deferred work
+is activated.
 
 ---
 
@@ -800,22 +792,10 @@ failure.
 
 ## 9.4 Installed-state verification checklist
 
-- [x] Record exact model: Raspberry Pi 5 Model B, revision 1.0.
-- [x] Record CPU: four-core ARM Cortex-A76, up to 2.4 GHz.
-- [x] Record installed RAM: 8 GB.
-- [x] Record primary storage: Samsung 256 GB NVMe boot drive.
-- [x] Record additional storage: 64 GB microSD card.
-- [ ] Record free storage capacity.
-- [ ] Verify cooling fan operation and thermal behaviour.
-- [ ] Verify Ethernet controller/driver.
-- [ ] Verify Wi-Fi and Bluetooth operation.
-- [ ] Install/verify Raspberry Pi OS Lite 64-bit baseline.
-- [ ] Benchmark sustained CPU temperature.
-- [ ] Benchmark power at idle and under inference load.
-- [ ] Benchmark Ollama/llama.cpp model load and token speed.
-- [ ] Benchmark faster-whisper / whisper.cpp STT.
-- [ ] Benchmark local TTS.
-- [ ] Measure ESP32-P4↔Pi 5 network latency and throughput.
+The recorded installed facts are in Section 9.1. Remaining setup and benchmark
+status is maintained under [G7 in the primary TODO](VAD-Implementation-TODO.md#12-g7--prove-stt-and-operator-voice-enrollment-on-pi-5),
+with P4-to-Pi transport measurements under G5. Put measured hardware values in
+this inventory, but update completion checkboxes only in the primary TODO.
 
 ## 9.5 Initial workload guidance
 

@@ -54,6 +54,11 @@ For every development or test session:
 5. Record measured values and the test date in this document or a linked report.
 6. Update the goal summary whenever a goal changes state.
 
+All actionable checkboxes from the firmware roadmap, hardware inventory, and
+speech-runtime evaluation are consolidated here. Those documents remain the
+source for architecture, rationale, specifications, and measured facts, but
+they are not separate progress trackers.
+
 Standard clean firmware verification from the repository root:
 
 ```powershell
@@ -277,6 +282,7 @@ validation clips.
 **Goal:** Make P4 endpoint events the primary turn boundaries for conversation.
 
 - [ ] Connect endpoint output to the existing bounded uplink path.
+- [ ] Establish the trusted Wi-Fi LAN service path between the P4 and Pi 5.
 - [ ] Send pre-roll before live chunks without duplication.
 - [ ] Include stream ID, sequence, format, timestamps, and end reason.
 - [ ] Apply explicit backpressure and maximum-buffer policies.
@@ -284,6 +290,8 @@ validation clips.
 - [ ] Verify automatic reconnect without replaying stale utterances.
 - [ ] Allow Pi-side endpointing only as a secondary diagnostic/safety check.
 - [ ] Test 100 consecutive automatic utterances.
+- [ ] Measure P4-to-Pi latency and throughput under idle and inference load.
+- [ ] Record the first complete capture-to-transcript-to-response latency.
 
 **Evidence:** Protocol trace, sequence-gap counter, latency distribution, and
 saved receiver audio.
@@ -318,9 +326,23 @@ recall, false triggers, endpoint latency, CPU, memory, and echo behavior.
 
 **Goal:** Recognize the words and optionally identify the enrolled operator.
 
+- [x] Record Pi 5 model, CPU, installed RAM, NVMe, and microSD inventory.
+- [ ] Record free storage capacity and power-supply specification.
+- [ ] Verify Raspberry Pi OS Lite 64-bit and record the exact version.
+- [ ] Verify cooling-fan operation, Ethernet, Wi-Fi, and Bluetooth.
+- [ ] Benchmark sustained CPU temperature and idle/inference power.
+- [ ] Establish common STT, TTS, and AI-provider adapter interfaces.
+- [ ] Build fixed STT audio and TTS script evaluation corpora.
 - [ ] Select and license-review a Pi 5 STT runtime/model.
+- [ ] Benchmark faster-whisper and/or whisper.cpp on the Pi 5.
 - [ ] Benchmark STT separately from P4 VAD boundaries.
 - [ ] Report WER and command accuracy by tone, distance, and noise.
+- [ ] Install and benchmark Ollama and/or llama.cpp model serving.
+- [ ] Record model-load time, first-token latency, and sustained token speed.
+- [ ] Benchmark local TTS and test sherpa-onnx as a replaceable candidate.
+- [ ] Configure one cloud STT provider and two cloud TTS candidates for
+  measured fallback comparisons.
+- [ ] Use LM Studio on the Acer workstation for controlled model comparison.
 - [ ] Select and license-review a pretrained speaker-embedding model.
 - [ ] Use 12–20 clean enrollment clips from at least two days.
 - [ ] Keep validation and test clips out of enrollment.
@@ -392,9 +414,41 @@ These are explicitly outside the first implementation path:
 - [ ] vision-assisted presence or liveness checks;
 - [ ] compressed audio transport unless PCM measurements justify it.
 
+## Optional Jetson Nano evaluation
+
+These items become active only if the Jetson is selected for the vision path:
+
+- [ ] Record the exact board/dev-kit revision, CPU/GPU specification, storage,
+  JetPack, and Ubuntu versions.
+- [ ] Record its power supply, power mode, and cooling arrangement.
+- [ ] Verify Ethernet/Wi-Fi, CUDA, OpenCV acceleration, and TensorRT.
+- [ ] Benchmark a representative vision model.
+- [ ] Measure sustained temperature and power.
+- [ ] Compare vision latency against the P4 and Pi 5 alternatives before
+  assigning it a permanent architectural role.
+
 ---
 
-# 16. Definition of Done
+# 16. Development and Merge Gate
+
+Apply this gate to every implementation work package before merge or release:
+
+- [ ] Work-package acceptance criteria are satisfied.
+- [ ] Unit and contract tests pass where present.
+- [ ] Lint, type, and static checks pass where configured.
+- [ ] No secrets, private recordings, or biometric data are staged.
+- [ ] Public interfaces and protocol changes are documented.
+- [ ] Independent review is complete.
+- [ ] Review findings are resolved or explicitly accepted.
+- [ ] Integration-branch tests pass.
+- [ ] Relevant physical-hardware testing is complete or clearly marked as
+  pending rather than inferred from a successful build.
+- [ ] This TODO and affected architecture documents reflect any changed
+  assumptions.
+
+---
+
+# 17. Definition of Done
 
 The VAD/voice implementation is complete for the first production milestone
 only when all of the following are true:

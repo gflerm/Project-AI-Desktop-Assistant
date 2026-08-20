@@ -1059,23 +1059,19 @@ path by default, with health-aware policy-approved fallback.
 
 # 26. Immediate Next Actions
 
-- [ ] Identify microphone hardware.
-- [ ] Set up ESP32-P4 ESP-IDF / FreeRTOS audio pipeline (I2S capture/playback).
-- [ ] Establish trusted Wi-Fi LAN service path between ESP32-P4 and Pi 5.
-- [ ] Establish common STT adapter interface.
-- [ ] Establish common TTS adapter interface.
-- [ ] Establish common AI provider interface.
-- [ ] Build fixed STT test-audio corpus.
-- [ ] Build fixed TTS test-script corpus.
-- [ ] Install whisper.cpp/faster-whisper on Pi 5 after runtime baseline is ready.
-- [ ] Test sherpa-onnx on Pi 5.
-- [ ] Install Ollama on Pi 5.
-- [ ] Install/verify llama.cpp on Pi 5.
-- [ ] Use LM Studio on Acer for model comparison.
-- [ ] Configure one real cloud STT provider.
-- [ ] Configure two cloud TTS candidates.
-- [ ] Record first end-to-end conversational latency.
-- [ ] Update this document using measured results.
+Execution status is centralized in
+[`VAD-Implementation-TODO.md`](VAD-Implementation-TODO.md). The former action
+list maps there as follows:
+
+- P4 microphone identification, I2S capture, and hardware proof: G1;
+- trusted P4-to-Pi transport and end-to-end latency: G5;
+- STT/TTS/AI adapters, fixed corpora, Pi runtimes, cloud comparisons, and
+  speaker enrollment: G7;
+- full concurrent conversational acceptance: G9.
+
+Use this evaluation document for candidate rationale and measured comparison
+results. Change task status only in the primary TODO so the project has one
+authoritative queue.
 
 ---
 

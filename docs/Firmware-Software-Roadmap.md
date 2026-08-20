@@ -1449,19 +1449,12 @@ code.
 
 An agent task is not complete because code exists.
 
-Before merge:
-
-- [ ] Work-package acceptance criteria satisfied.
-- [ ] Unit tests pass.
-- [ ] Contract tests pass.
-- [ ] Lint/type/static checks pass where configured.
-- [ ] No secrets committed.
-- [ ] Public interfaces documented.
-- [ ] Independent review completed.
-- [ ] Review findings resolved or explicitly accepted.
-- [ ] Integration branch tests pass.
-- [ ] Relevant hardware test completed when required.
-- [ ] Roadmap/spec updated if implementation changed an assumption.
+The authoritative, checkable merge gate is maintained in
+[`VAD-Implementation-TODO.md`](VAD-Implementation-TODO.md#16-development-and-merge-gate).
+It covers acceptance criteria, automated checks, secrets/privacy, interface
+documentation, review, integration testing, physical-hardware evidence, and
+architecture-document alignment. Keep this roadmap focused on work-package
+scope and sequencing; record completion status only in the primary TODO.
 
 ## 29.13 Human control
 
