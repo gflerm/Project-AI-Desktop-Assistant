@@ -1,7 +1,7 @@
 # Project TARS --- Hardware Architecture & Inventory
 
-**Status:** Version 0.14 --- Living Work in Progress\
-**Date:** 2026-08-20\
+**Status:** Version 0.15 --- Living Work in Progress\
+**Date:** 2026-08-21\
 **Document role:** Hardware inventory, node roles, interfaces,
 constraints and hardware evolution plan\
 **Companion to:** `Design-Specification.md`
@@ -16,6 +16,23 @@ assumptions, measurements and decisions.
 
 Nothing in this document should be treated as a fixed bill of materials
 until it has been physically verified and tested.
+
+> 🟢 **P4 AUDIO WORK RESUMED — 2026-08-21:** The earlier P4 hold is superseded
+> for the bounded microphone/speaker integration slice. The user's
+> Asus GPU workstation must remain available for the user's other work and is
+> excluded as an always-on or automatic inference dependency. The existing
+> Intel NUC8i5BEH is the current candidate dedicated LLM node, with the Pi 5
+> retaining STT, TTS, tools and telemetry. No assignment, deployment or
+> purchase is approved until the NUC is inspected and benchmarked. The P4 now
+> completes a physical BOOT-button voice round trip through the Pi gateway.
+
+> 🟢 **PI MEASUREMENTS ADDED — 2026-08-20:** The live read-only gateway tool now
+> reports Pi temperature, fan RPM/PWM/cooling state, load, RAM, disk, uptime and
+> service health. Under the 4B benchmark the Pi reached 60.6 °C, used 5.4 of
+> 7.9 GiB plus swap, and the fan reported about 2,911 RPM at 29% PWM/state 1 of
+> 4. After load cleared it returned to 0 RPM/state 0. The tool cannot modify the
+> machine. Qwen 3 4B Instruct remains installed for comparison but is not the
+> spoken default because it achieved only about four tokens/s.
 
 Hardware details should move through these states:
 
@@ -530,8 +547,10 @@ an integrated display, multitouch and compact DSI cabling.
 
 **Hardware:** Onboard SMD microphone connected through the ES8311 codec.
 
-**Status:** Available on the Waveshare ESP32-P4-WIFI6 board; capture quality,
-gain, noise, placement and echo behaviour remain to be benchmarked.
+**Status:** Physically verified on the Waveshare ESP32-P4-WIFI6 board at
+16 kHz, 16-bit mono with 24 dB microphone gain. A 2.50-second BOOT-button test
+captured the user's question without clipping and produced an exact STT
+transcript. Desk-distance, noise, placement and echo benchmarks remain.
 
 Requirements:
 
@@ -549,7 +568,14 @@ for the first prototype.
 
 **Hardware:** Onboard NS4150B power amplifier and MX1.25 two-pin speaker
 connector. The board documentation specifies an external **8 ohm, 2 W
-speaker**; confirm the attached speaker rating before use.
+speaker**. The attached speaker has completed live James TTS playback.
+
+The NS4150B is a fixed-gain mono Class-D power amplifier. GPIO53 controls only
+amplifier enable/shutdown; it has no I2C or software gain setting. Runtime
+volume is therefore set through the ES8311 codec, with optional bounded PCM/TTS
+normalization if later measurements justify it. The physical test settled on
+**95% ES8311 output volume** after 65% was too quiet and 90% was improved but
+still had useful headroom. No amplifier resistor modification is planned.
 
 Requirements:
 
@@ -607,6 +633,49 @@ Potential advantages:
 
 Do not replace the onboard audio path until microphone placement, speaker
 placement, echo behaviour, gain and ESP-IDF driver behavior are tested.
+
+## 6.4 Measured firmware and memory baseline
+
+The 2026-08-21 PTT firmware includes audio, ESP-Hosted Wi-Fi, authenticated
+WebSocket transport and periodic read-only memory reporting. The current
+application binary is approximately **0.98 MiB** in an 8 MiB application
+partition, leaving about **88%** free. The linker places roughly **0.89 MiB** of
+executable/read-only content in PSRAM using XIP, while internal DIRAM static
+code/data/BSS is about **0.11 MiB**.
+
+At steady idle after Wi-Fi and gateway connection, the board reported:
+
+| Runtime heap | Used | Free | Total available to allocator |
+|---|---:|---:|---:|
+| Internal RAM | 256,424 B (250.4 KiB) | 359,295 B (350.9 KiB) | 615,719 B (601.3 KiB) |
+| PSRAM heap | 7,864 B (7.7 KiB) | 32,610,632 B (31.10 MiB) | 32,618,496 B (31.11 MiB) |
+
+These heap figures cover the complete running firmware, not audio alone. PSRAM
+XIP code/read-only data is mapped separately and is therefore not included in
+the PSRAM heap-used value. Periodic reports make later display/VAD/camera growth
+measurable.
+
+### Audio-layer memory model
+
+The audio path streams data and does **not** retain a whole recording or whole
+TTS reply:
+
+| Allocation | Size / behavior | Memory class |
+|---|---:|---|
+| Capture frame | 656 B: 640 B PCM plus sequence/timestamp/alignment | Task stack while sampling |
+| Capture queue | 25 × 656 B = 16,400 B plus queue metadata; 500 ms | Internal heap |
+| Capture task stack | 4,096 B | Internal RAM |
+| PTT task stack | 10,240 B | Internal RAM |
+| Five-frame uplink staging | 3,280 B plus a maximum 3,224 B wire packet | PTT task stack; reused per 100 ms chunk |
+| WebSocket receive assembly | 8,192 B fixed buffer | Internal static RAM |
+| WebSocket configured transport buffer | 4,096 B plus library metadata | Runtime heap |
+| TTS playback | Received chunks are written directly to ES8311/I2S | No application-level whole-response buffer |
+| I2S/codec DMA | Driver-owned fixed DMA descriptors/buffers | DMA-capable internal RAM; included in live heap use |
+
+PSRAM is deliberately unnecessary for the current half-duplex streaming audio
+baseline. Reserve it for longer pre-roll/history, display assets, camera frames
+and other large non-DMA working sets. Keep real-time I2S DMA and short queues in
+internal RAM unless measurements justify a split design.
 
 ### Bluetooth
 
@@ -739,8 +808,8 @@ The installed memory is **8 GB total RAM**.
 | Bluetooth | Built-in Bluetooth |
 | Hostname | `titanium` |
 | Power supply | **To verify** |
-| OS | Raspberry Pi OS Lite 64-bit (target baseline) |
-| Status | Available; runtime verification pending |
+| OS | Debian GNU/Linux 12 (bookworm), AArch64 |
+| Status | Available; isolated TARS gateway/voice baseline deployed |
 
 ## 9.2 Proposed role
 
@@ -817,6 +886,68 @@ Priorities:
 A model that fits in 8 GB but produces poor conversational latency is not
 a useful default.
 
+## 9.6 Deployed TARS runtime baseline
+
+The Pi named `titanium` is reachable at `192.168.8.107`. The deployment audit
+confirmed Debian GNU/Linux 12 (bookworm) on AArch64, four Cortex-A76 cores,
+8 GB RAM, a 235 GB formatted NVMe filesystem, and approximately 156 GB free.
+The following isolated baseline is active:
+
+| Component | Current selection | Bind/port | Verification |
+|---|---|---|---|
+| TARS gateway | FastAPI/Uvicorn, protocol v1 | LAN TCP 8090 | Healthy; authenticated HTTP and WebSocket |
+| STT | Existing local Whisper service | localhost TCP 8080 | Healthy |
+| Cloud LLM | `gemini-3.5-flash-lite`, intent-aware Google Search grounding | HTTPS | General/current queries verified, HTTP 200 |
+| Local LLM fallback | Ollama `qwen3:1.7b`, thinking off | localhost TCP 11434 | Installed and response-tested |
+| TARS TTS | Piper `en_GB-northern_english_male-medium` | localhost TCP 5001 | Healthy; WAV generated |
+| Current weather | Open-Meteo with named-place geocoding | HTTPS | Cape Town live response verified |
+
+`auto` routing uses Gemini first and falls back to the local Ollama model on a
+cloud/request failure. The earlier Ember application remains isolated on port
+8088 and its Piper voice remains on port 5000. TARS owns separate code, token,
+state, male voice service, and port; only the existing localhost inference
+engines and Python environment are reused where appropriate.
+
+Initial short-prompt tests showed `qwen3:1.7b` at roughly 6.9–7.8 generated
+tokens/s for conversational prompts versus roughly 5.8 tokens/s for
+`llama3.2:3b`. This justifies Qwen as the first low-latency fallback, but does
+not replace the fixed-corpus, thermal, power, RAM, and long-context benchmark.
+The Windows PTT harness records capture, STT, LLM/tool, TTS, total
+release-to-audio, and Pi-side processing timings for each test turn.
+
+See [Pi Gateway and Windows Voice Test](Pi-Gateway-and-Windows-Voice-Test.md)
+for the deployment and live push-to-talk test procedure.
+
+---
+
+# 9A. Candidate Node C2 --- Intel NUC Always-On Inference Host
+
+## 9A.1 Known inventory
+
+| Item | Recorded value | Verification state |
+|---|---|---|
+| Model | Intel NUC8i5BEH | Identified; live inspection pending |
+| CPU | Intel Core i5-8259U | Identified; benchmark pending |
+| RAM | 16 GB | Identified; configuration and health pending |
+| Graphics | Integrated Intel Iris Plus-class graphics | Not treated as a CUDA accelerator |
+
+## 9A.2 Proposed role — paused
+
+The NUC is the preferred existing candidate for dedicated, always-on local LLM
+inference because the user's GPU workstation is not continuously available.
+The first comparison should use `qwen3.5:4b`, `phi4-mini`, and `qwen3:4b` with
+the Pi continuing to supply STT, TTS, deterministic tools, web retrieval and
+telemetry. Pi `qwen3:1.7b` remains only an emergency fallback.
+
+The NUC is **not assigned yet**. Before assignment, record its OS, storage,
+thermals, network identity and SSH access, then measure warm response start,
+tokens/second, total prompt-to-audio latency, tool selection, accuracy, RAM and
+long-session stability. The initial acceptance target is warm LLM response
+within 2–3 seconds, spoken response starting near 5 seconds, correct use of
+time/weather/search/timer tools, and no false capability refusals. If it fails,
+specify a dedicated low-power replacement from measured requirements rather
+than consuming workstation GPU resources.
+
 ---
 
 # 10. Node D --- Acer Development Workstation
@@ -848,6 +979,11 @@ the user works. Exact model, CPU, GPU and storage remain to be recorded.
 
 Project TARS should not silently take control of workstation
 applications.
+
+The workstation must not be a production dependency or an automatic inference
+fallback. Any local Ollama use is a visible, manually selected development
+mode, and loaded models should be stopped after testing so VRAM is returned to
+the user's other workloads.
 
 Permissions and visible tool activity remain mandatory.
 
@@ -1085,8 +1221,8 @@ This section should become the authoritative inventory.
 | HW-003 | Camera (OV5647) | Included with Kit A | Future vision | OV5647 MIPI-CSI camera included with Waveshare Kit A | Camera driver/stream tests |
 | HW-004 | Raspberry Pi 5 | Available | Primary local-compute baseline | Model B Rev 1.0; 8 GB RAM; 4-core Cortex-A76 up to 2.4 GHz; Samsung 256 GB NVMe; 64 GB microSD; PWM fan; Gigabit Ethernet; Wi-Fi; Bluetooth; hostname `titanium` | PSU, OS baseline and benchmarks |
 | HW-005 | Acer development system | Available | Workstation/development | i7; 32 GB RAM; NVIDIA GPU | Exact model, CPU, GPU, storage and OS |
-| HW-006 | Microphone | Available onboard | Voice input | SMD microphone through onboard ES8311 codec | Capture, gain, noise and echo benchmark |
-| HW-007 | Speaker path | Interface available; speaker to verify | Voice output | NS4150B amplifier; MX1.25 2-pin connector for external 8-ohm 2-W speaker | Confirm attached speaker rating; playback and acoustic benchmark |
+| HW-006 | Microphone | Physically verified | Voice input | SMD microphone through onboard ES8311 codec; 16 kHz/16-bit mono; 24 dB gain; exact STT on first PTT identity test | Saved-WAV, noise, distance and echo benchmark |
+| HW-007 | Speaker path | Physically verified | Voice output | ES8311 at 95%; fixed-gain NS4150B amplifier enabled by GPIO53; attached speaker completed James TTS playback | Confirm speaker label/rating; acoustic level, distortion and echo benchmark |
 | HW-008 | NVIDIA Jetson Nano | Available | Vision/edge evaluation | First-generation 4 GB class | Exact board revision and JetPack |
 | HW-009 | Creality K2 Pro + CFS | Available | Enclosure fabrication | K2 Pro with CFS | Firmware and slicer workflow |
 

@@ -2,7 +2,7 @@
 
 **Status:** Living document
 
-**Last updated:** 2026-08-20
+**Last updated:** 2026-08-21
 
 **Purpose:** A readable map of the repository and the ownership of each major
 directory. Update this document whenever a tracked top-level directory or
@@ -20,6 +20,7 @@ Project-AI-Desktop-Assistant/
 ├── images/                Hardware references and whole-face mockups
 ├── main/                  ESP32-P4 application firmware
 ├── output/                Generated, review-ready project artifacts
+├── pi_gateway/            Isolated Raspberry Pi 5 voice gateway deployment
 ├── tools/                 Reproducible developer/build helpers
 ├── CMakeLists.txt         ESP-IDF project entry point
 ├── partitions.csv         P4 flash-partition layout
@@ -102,10 +103,12 @@ Project-AI-Desktop-Assistant/
 │   ├── LICENSE-SELECTION.md
 │   ├── Open-Source-Licensing-Strategy.md
 │   ├── P4-FreeRTOS-Execution-Plan.md
+│   ├── Pi-Gateway-and-Windows-Voice-Test.md
 │   ├── P4-Pi-Audio-Protocol.md
 │   ├── P4-Voice-Activity-Detection-Plan.md
 │   ├── Personality-Distillation.md
 │   ├── Speech-and-AI-Runtime-Evaluation.md
+│   ├── TARS-Teaching-and-Response-Improvement-Plan.md
 │   ├── Project-TODO-and-Verification.md
 │   └── VAD-Implementation-TODO.md       Compatibility pointer to master TODO
 │
@@ -116,6 +119,59 @@ Project-AI-Desktop-Assistant/
 ├── output/
 │   └── pdf/
 │       └── Project-TODO-and-Verification.pdf
+│
+├── pi_gateway/
+│   ├── README.md
+│   ├── requirements.txt
+│   ├── scripts/
+│   │   ├── benchmark-ollama-model.py
+│   │   ├── benchmark-turns.py
+│   │   ├── install-pi.sh
+│   │   ├── live-turn-test.py
+│   │   ├── run-voice-acceptance.py
+│   │   ├── smoke-test-pi.sh
+│   │   ├── test-routing.py
+│   │   ├── verify-adaptive-settings.py
+│   │   └── verify-teaching-upgrade.py
+│   ├── systemd/
+│   │   ├── piper-tars.service
+│   │   └── tars-gateway.service
+│   ├── tars_gateway/
+│   │   ├── __init__.py
+│   │   ├── capabilities.py
+│   │   ├── config.py
+│   │   ├── intents.py
+│   │   ├── local_learning.py
+│   │   ├── main.py
+│   │   ├── network_status.py
+│   │   ├── personality.py
+│   │   ├── persistent_memory.py
+│   │   ├── protocol.py
+│   │   ├── search.py
+│   │   ├── services.py
+│   │   ├── speech_adaptation.py
+│   │   ├── system_status.py
+│   │   ├── telemetry.py
+│   │   └── weather.py
+│   └── tests/
+│       ├── test_answer_completion.py
+│       ├── test_intents.py
+│       ├── test_personality.py
+│       ├── test_local_learning.py
+│       ├── test_persistent_memory.py
+│       ├── test_protocol.py
+│       ├── test_routing.py
+│       ├── test_search.py
+│       ├── test_speech_adaptation.py
+│       ├── test_system_status.py
+│       ├── test_telemetry.py
+│       ├── test_weather.py
+│       └── test_websocket.py
+│
+├── tests/
+│   ├── test_tars_feedback.py
+│   ├── test_tars_regression_replay.py
+│   └── test_tars_windows_tester.py
 │
 ├── main/
     ├── CMakeLists.txt
@@ -128,9 +184,20 @@ Project-AI-Desktop-Assistant/
     ├── tars_audio_ring.c
     ├── tars_audio_ring.h
     ├── tars_endpoint.c
-    └── tars_endpoint.h
+    ├── tars_endpoint.h
+    ├── tars_ptt_client.c
+    ├── tars_ptt_client.h
+    ├── tars_wifi.c
+    └── tars_wifi.h
 └── tools/
+    ├── analyze_tars_sessions.py
+    ├── analyze_tars_telemetry.py
+    ├── build_tars_review_queue.py
     ├── build-firmware.ps1
+    ├── Launch-TARS-Tester.ps1
+    ├── replay_tars_review_queue.py
+    ├── tars_feedback.py
+    ├── tars_windows_tester.py
     └── render-project-todo-pdf.py
 ```
 
@@ -146,6 +213,7 @@ Project-AI-Desktop-Assistant/
 | `images/` | Hardware reference images and complete-device mockups | Commit project-relevant references |
 | `main/` | ESP32-P4 firmware component and application configuration | Build and hardware-test before marking goals complete |
 | `output/` | Reviewed project artifacts generated from tracked sources | Commit stable deliverables; exclude temporary renders |
+| `pi_gateway/` | Authenticated P4/Pi protocol receiver, provider adapters, TARS personality, Pi services, deployment, and tests | Commit source/configuration; never commit tokens, downloaded models, or runtime state |
 | `tools/` | Reproducible project-level build and developer helpers | Commit scripts; keep generated output elsewhere |
 | `build/` | Generated ESP-IDF build products | Never commit |
 | `managed_components/` | Downloaded ESP-IDF component dependencies | Never commit; versions come from dependency configuration |
@@ -168,6 +236,7 @@ VED Training/
 
 Project-AI-Desktop-Assistant/
 ├── build/
+├── captures/
 ├── managed_components/
 └── **/__pycache__/
 ```

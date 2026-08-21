@@ -1,16 +1,109 @@
 # Project TARS — Project TODO and Verification
 
-**Status:** Version 0.2 — Primary implementation, test, and verification checklist
+**Status:** Version 0.3 — Primary implementation, test, and verification checklist
 
-**Date:** 2026-08-20
+**Date:** 2026-08-21
 
 **Owner:** Project TARS implementation and verification workstreams
 
 **Companion documents:** [VAD architecture](P4-Voice-Activity-Detection-Plan.md),
+[Pi gateway and Windows voice test](Pi-Gateway-and-Windows-Voice-Test.md),
 [FreeRTOS execution plan](P4-FreeRTOS-Execution-Plan.md),
 [firmware build guide](Firmware-Build-Guide.md),
 [P4-to-Pi audio protocol](P4-Pi-Audio-Protocol.md), and
-[VED Training start page](../VED%20Training/README.md)
+[VED Training start page](../VED%20Training/README.md), and
+[TARS teaching and response improvement plan](TARS-Teaching-and-Response-Improvement-Plan.md)
+
+> 🟢 **P4 AUDIO WORK RESUMED — 2026-08-21:** The Windows tester is no longer the
+> active acceptance client. The immediate target is the connected ESP32-P4,
+> using only its onboard microphone and attached speaker. Camera, displays,
+> automatic VAD and vision remain out of scope for this first physical pass.
+> GPIO35 BOOT is the temporary active-low push-to-talk control: hold to record,
+> release to send, then play the Pi-generated response half-duplex.
+
+> 🟢 **GATEWAY BASELINE — 2026-08-21:** Automatic local/cloud routing and
+> `system.status.readonly` are deployed on the Pi. Forty-seven gateway tests
+> pass. The Windows tester remains compatible but is retained as a diagnostic
+> tool only. Final NUC/host assignment remains paused.
+
+- [x] Make **James** the spoken assistant name; retain Project TARS only as the
+  internal project/protocol name.
+- [x] Route identity questions deterministically without an LLM call; live Pi
+  verification returned `system:identity` / `identity-registry` in 1 ms.
+- [x] Pass all 49 gateway tests on the Pi after the James identity update.
+
+- [x] Route deterministic time, weather and Pi-status queries before any LLM.
+- [x] Route current, research, long-context and high-stakes requests to Gemini.
+- [x] Route routine requests to local Ollama with an eight-second deadline.
+- [x] Escalate local refusal, empty response, error or timeout to Gemini in the
+  same turn.
+- [x] Add bounded Wikipedia grounding when Gemini is unavailable or rate-limited.
+- [x] Record provider, routing reason, fallback, grounding and timing telemetry.
+- [x] Deploy read-only Pi temperature, fan RPM/PWM/state, load, RAM, disk,
+  uptime and component-health reporting with no command/write interface.
+- [x] Benchmark `qwen3:4b-instruct`: correct 4/4; too slow for spoken default.
+- [x] Retain 16 kHz, 16-bit mono capture and playback; 8 kHz was rejected
+  because it would reduce STT quality without addressing model latency.
+- [x] Raise Gemini output capacity from 160 to 320 tokens after a correct
+  multi-part answer was truncated during its third item; retain concise spoken
+  response prompting.
+- [x] Refine the deployed personality for complete multi-part answers,
+  voice-first prose, brief ambiguity handling, reduced encyclopedia-style
+  expansion, and restrained wit after the useful answer.
+
+### Candidate and deployed local tools
+
+- [x] Read-only network health: hostname, DNS, internet reachability and
+  latency.
+- [ ] Read-only NVMe/storage health and capacity warnings.
+- [ ] Read-only service error summary and recent TARS failures.
+- [x] Ollama model and active/waiting inference-queue status.
+- [ ] Microphone level, clipping, silence and STT-confidence diagnostics.
+- [ ] Scoped local document search and retrieval from approved directories.
+- [ ] Timers, alarms and reminders with explicit create/cancel confirmation.
+- [ ] Calendar, email or smart-device tools only after account/permission review.
+
+Read-only tools may run automatically when explicitly requested. Any tool that
+changes files, services, reminders, accounts or physical devices requires a
+separate permission policy and a confirmed result before TARS claims success.
+
+### Current TARS quality and teaching work
+
+The 2026-08-21 review covered all 60 private recorded turns, 390 gateway
+telemetry events, the CSV export and all five benchmark/smoke artifacts. The
+evidence and phased remedy are in the
+[TARS teaching and response improvement plan](TARS-Teaching-and-Response-Improvement-Plan.md).
+
+- [x] Review all recorded prompt/response JSON, JSONL and CSV evidence and
+  classify the observed failure patterns.
+- [x] Identify contaminated transcript-correction data; the reported 64.5% WER
+  is not valid until its audio references are manually verified.
+- [x] Introduce feedback schema version 2 with separate transcript, answer,
+  route/tool, preferred-answer and approval fields.
+- [x] Bind feedback to immutable turn UUIDs and migrate the existing 60 turns
+  into a review queue without auto-promoting ambiguous corrections.
+- [x] Build a replayable regression suite from the reviewed real prompts and
+  preserve all 60 private turns in a zero-auto-promotion review queue.
+- [x] Add a live capability registry, multi-intent composition and stricter
+  intent contracts before any model fine-tuning.
+- [x] Preserve all tool/model results in one conversation ledger and verify
+  numbered follow-ups such as “repeat point 3”.
+- [x] Record provider finish reason, detect incomplete answers before TTS and
+  enforce single-flight local inference with bounded cancellation.
+- [ ] Collect at least 50 audio-verified utterances and 50 reviewed answer cases
+  before evaluating any training dataset.
+- [ ] Consider LoRA/fine-tuning only after 200–500 approved examples and a
+  held-out quality suite exist; training must not run on the Pi 5.
+- [x] Deploy explicit Pi-local persistent memory with remember/list/soft-forget,
+  cloud sharing disabled by default, and bulk deletion blocked from chat.
+- [x] Deploy read-only network/DNS/internet and Ollama active/waiting queue
+  status tools.
+- [x] Pass 47 gateway tests, five Windows feedback/capture/replay tests and the live
+  teaching-upgrade verifier on 2026-08-21.
+- [x] Pass the controlled ten-question live acceptance set through chat, TTS
+  and synthesized Whisper loopback on 2026-08-21: 10/10 passed, average chat
+  2.61 s, maximum chat 11.63 s. The operator-microphone PTT pass remains a
+  separate human verification step.
 
 ---
 
@@ -73,19 +166,53 @@ Both `Test-Path` commands must return `True`, and the build must end with
 `Project build complete`. See the [firmware build guide](Firmware-Build-Guide.md)
 for the sandbox/toolchain explanation and configurable installation paths.
 
-## Current next test
+## Latest completed test — P4 BOOT-button voice round trip
 
-The next critical-path activity is **G1 physical P4 microphone validation**:
+The user resumed **G1/G2 physical P4 audio validation** on 2026-08-21. Execute
+this bounded sequence before enabling the camera, displays, VAD or wake word:
 
-- [ ] Connect the P4 board and record its serial port and board revision.
-- [ ] Run the clean firmware verification command above.
-- [ ] Flash the generated firmware and retain the complete boot/serial log.
-- [ ] Confirm the endpoint self-test reports `passed` during startup.
-- [ ] Confirm ES8311 initialization succeeds and `audio_rx_task` remains alive.
-- [ ] Speak normally, quietly, and loudly while recording peak, RMS, clipping,
-  queue depth, dropped-frame, sequence-gap, read-error, and stack-watermark
-  values.
-- [ ] Add the measurements under G1 before marking hardware items complete.
+- [x] Implement onboard ES8311 microphone capture as 16 kHz, 16-bit mono PCM.
+- [x] Implement GPIO35 BOOT hold/release PTT with debounce and a 20-second cap.
+- [x] Implement authenticated WebSocket uplink to `titanium:8090` and binary
+  100 ms `TAR1` chunks.
+- [x] Implement binary 16 kHz PCM response playback through ES8311/NS4150B.
+- [x] Keep capture and playback half-duplex; ignore the camera.
+- [x] Build the firmware successfully with ESP-IDF 6.0.2 on 2026-08-21.
+- [x] Place the approved private Wi-Fi password and gateway token in ignored
+  `main/tars_private_config.h`; never print, document or commit either value.
+- [x] Flash COM7 and verify P4 boot, 32 MB PSRAM, ES8311 microphone and speaker
+  codec startup, 16 kHz capture and unclipped live microphone levels.
+- [x] Configure the P4 for the 2.4 GHz `WETOHOST2.4` SSID.
+- [x] Observe the P4 obtain `192.168.8.131`, connect to Titanium, authenticate
+  its WebSocket session and report “Gateway ready.”
+- [x] Hold BOOT, ask “Who are you and what do you do?”, release BOOT, and hear
+  a complete response beginning “My name is James.”
+- [ ] Record capture, STT, routing, TTS and release-to-audio timing evidence.
+
+The first physical turn captured 2.50 seconds without clipping, transcribed the
+question exactly, returned the deterministic James identity answer and played
+it successfully. Speaker output was tuned to 95% ES8311 volume and accepted as
+substantially improved. Detailed stage timing remains the next measurement.
+
+The always-on inference-host evaluation remains a later decision:
+
+- [ ] Obtain the NUC IP address, username, OS and authorized SSH access.
+- [ ] Inspect the NUC8i5BEH CPU, 16 GB RAM, storage, thermals and network state.
+- [ ] Benchmark `qwen3.5:4b`, `phi4-mini`, and `qwen3:4b` without changing the
+  Pi's currently deployed fallback.
+- [ ] Test time, weather, web search, timer, general knowledge and refusal
+  recovery through real gateway tools rather than model guesses.
+- [ ] Record warm response start, tokens/second, STT, LLM/tool, TTS and total
+  release-to-audio latency in the existing telemetry.
+- [ ] Require approximately 2–3 seconds to warm LLM response and approximately
+  5 seconds to spoken-response start, plus correct tool use and stable sessions.
+- [ ] Decide whether to assign the NUC or specify a dedicated low-power
+  replacement from the measured shortfall.
+- [ ] Keep **Production NUC**, **Emergency Pi**, **Development Asus**, and
+  **Cloud** routes explicit; Asus and Cloud must remain manual opt-ins.
+
+**Host-decision hold:** none of the NUC boxes should be executed or checked
+until the user explicitly resumes that separate project-host decision.
 
 ---
 
@@ -114,14 +241,25 @@ The next critical-path activity is **G1 physical P4 microphone validation**:
 | 2026-08-20 | `build-firmware.ps1 -Clean` | Passed: application 2131/2131 and bootloader 174/174 |
 | 2026-08-20 | Incremental `build-firmware.ps1` | Passed: firmware image regenerated successfully |
 | 2026-08-20 | Endpoint synthetic startup test | Compiled into firmware; physical startup log still required |
+| 2026-08-21 | Pi gateway ten-question voice acceptance | Passed 10/10 through live routing, TTS and synthesized STT loopback; private evidence retained under `captures/` |
+| 2026-08-21 | P4 BOOT-button PTT firmware build | Passed; final documented build is 0xFA9C0 bytes (1,026,496 B) with 88% of the smallest app partition free |
+| 2026-08-21 | Pi James identity suite and live query | 49/49 tests passed; deterministic live response identified as James in 1 ms |
+| 2026-08-21 | Physical P4 flash and audio startup | COM7 flash verified; ESP32-P4 v1.3 and 32 MB PSRAM passed; ES8311 input/output opened at 16 kHz; microphone showed no clipping |
+| 2026-08-21 | Physical P4 Wi-Fi association | Blocked: only `WETOHOST5.8` at 5 GHz is visible; a 2.4 GHz SSID is required |
+| 2026-08-21 | Physical P4 gateway connection | Passed on `WETOHOST2.4`; received `192.168.8.131`, authenticated to Titanium and reached BOOT-PTT ready state |
+| 2026-08-21 | Physical P4 voice round trip | Passed: 2.50 s BOOT capture, exact STT, deterministic James identity response and completed 16 kHz TTS playback |
+| 2026-08-21 | P4 speaker-volume tuning | Passed at ES8311 95%; user reported the result much better; NS4150B remains fixed-gain/enable-only |
+| 2026-08-21 | P4 firmware/memory baseline | ~0.98 MiB app; 88% app partition free; connected runtime used 250.4 KiB internal heap and 7.7 KiB PSRAM heap, with 350.9 KiB and 31.10 MiB respectively free |
 
 ## Not yet proven
 
 - [ ] Real PC corpus has been recorded and validated.
+- [x] P4 onboard microphone live capture and signal statistics have been proven.
 - [ ] P4 onboard microphone capture has been saved as a valid WAV.
 - [ ] ESP-SR has been integrated into the firmware.
 - [ ] Automatic P4 speech start/end events have been measured.
-- [ ] P4-to-Pi audio streaming has been proven end to end.
+- [x] Manual PTT P4-to-Pi audio streaming and returned speech have been proven end to end.
+- [ ] Automatic VAD-bounded P4-to-Pi streaming has been proven end to end.
 - [ ] Pi 5 STT and speaker enrollment have been benchmarked.
 
 Checked items above mean the planning/tooling exists; they do not claim that
@@ -134,11 +272,11 @@ the corresponding runtime feature works on hardware.
 | Goal | Outcome | Depends on | Status |
 |---|---|---|---|
 | G0 | PC recording workflow proven | None | Ready to start |
-| G1 | P4 microphone capture proven | Board audio driver | In progress — hardware test next |
-| G2 | Push-to-talk path proven | G1 | Not started |
+| G1 | P4 microphone capture proven | Board audio driver | Live 16 kHz capture proven; WAV evidence pending |
+| G2 | Push-to-talk path proven | G1 | Complete — physical capture/STT/James/TTS turn passed |
 | G3 | Standalone VAD works offline | G0, ESP-SR dependency | Not started |
 | G4 | P4 endpointing preserves full utterances | G1, G3 | In progress — state machine implemented |
-| G5 | VAD-bounded audio reaches Pi 5 | G2, G4, Wi-Fi session | Not started |
+| G5 | VAD-bounded audio reaches Pi 5 | G2, G4, Wi-Fi session | Manual stream proven; automatic VAD endpointing next |
 | G6 | AFE/VADNet production path evaluated | G4 | Not started |
 | G7 | STT and speaker enrollment proven | G0, Pi 5 runtime | Not started |
 | G8 | Face states follow the voice pipeline | G4, gesture renderer | Not started |
@@ -284,7 +422,16 @@ validation clips.
 **Goal:** Make P4 endpoint events the primary turn boundaries for conversation.
 
 - [ ] Connect endpoint output to the existing bounded uplink path.
-- [ ] Establish the trusted Wi-Fi LAN service path between the P4 and Pi 5.
+- [x] Deploy the isolated authenticated Pi receiver on `titanium:8090`.
+- [x] Verify protocol framing, acknowledgements, sequence-gap rejection, and
+  complete mocked STT/LLM/TTS turns in automated tests.
+- [x] Verify gateway health, capability discovery, Gemini access, Ollama
+  fallback availability, and male TTS on the live Pi.
+- [x] Implement the authenticated trusted-LAN Wi-Fi/WebSocket client path.
+- [x] Prove the trusted Wi-Fi LAN and authenticated WebSocket path on the
+  physical P4 (`192.168.8.131` on 2026-08-21).
+- [x] Prove one complete manual PTT microphone→STT→James→TTS→speaker turn on
+  physical hardware.
 - [ ] Send pre-roll before live chunks without duplication.
 - [ ] Include stream ID, sequence, format, timestamps, and end reason.
 - [ ] Apply explicit backpressure and maximum-buffer policies.
@@ -312,7 +459,7 @@ normal operation and controlled reconnect tests.
 - [ ] Measure Core 1 load, internal RAM, PSRAM, and end-to-end latency.
 - [ ] Verify VAD cache/pre-roll handling.
 - [ ] Add noise suppression only as a measured experiment.
-- [ ] Begin half-duplex with capture muted or gated during TARS playback.
+- [x] Implement initial half-duplex capture gating during James playback.
 - [ ] Route playback reference audio before enabling AEC.
 - [ ] Evaluate AEC using real speaker-to-microphone coupling.
 - [ ] Enable barge-in only after echo-trigger rates meet the target.
@@ -329,19 +476,63 @@ recall, false triggers, endpoint latency, CPU, memory, and echo behavior.
 **Goal:** Recognize the words and optionally identify the enrolled operator.
 
 - [x] Record Pi 5 model, CPU, installed RAM, NVMe, and microSD inventory.
-- [ ] Record free storage capacity and power-supply specification.
-- [ ] Verify Raspberry Pi OS Lite 64-bit and record the exact version.
+- [x] Record free NVMe capacity: approximately 156 GB at deployment audit.
+- [ ] Record power-supply specification.
+- [x] Verify the 64-bit Pi OS baseline: Debian GNU/Linux 12 (bookworm), AArch64.
 - [ ] Verify cooling-fan operation, Ethernet, Wi-Fi, and Bluetooth.
 - [ ] Benchmark sustained CPU temperature and idle/inference power.
-- [ ] Establish common STT, TTS, and AI-provider adapter interfaces.
+- [x] Establish common STT, TTS, and Gemini/Ollama provider adapter interfaces.
 - [ ] Build fixed STT audio and TTS script evaluation corpora.
 - [ ] Select and license-review a Pi 5 STT runtime/model.
 - [ ] Benchmark faster-whisper and/or whisper.cpp on the Pi 5.
 - [ ] Benchmark STT separately from P4 VAD boundaries.
 - [ ] Report WER and command accuracy by tone, distance, and noise.
-- [ ] Install and benchmark Ollama and/or llama.cpp model serving.
+- [x] Install/verify Ollama and run the initial `llama3.2:3b` versus
+  `qwen3:1.7b` spoken-assistant comparison.
+- [x] Select `qwen3:1.7b` as the initial local fallback with thinking disabled.
 - [ ] Record model-load time, first-token latency, and sustained token speed.
-- [ ] Benchmark local TTS and test sherpa-onnx as a replaceable candidate.
+- [x] Deploy an isolated male Piper baseline using
+  `en_GB-northern_english_male-medium` on localhost port 5001.
+- [ ] Tune/test the synthesized pronunciation and STT recognition of “TARS”;
+  initial loopback preserved the sentence but misheard the opening name.
+- [ ] Complete the fixed-corpus local TTS benchmark and test sherpa-onnx as a
+  replaceable candidate.
+- [x] Verify real Gemini generation and configure `auto` cloud-first/local-
+  fallback conversation routing.
+- [x] Create and verify the Windows push-to-talk STT/LLM/TTS test application.
+- [x] Add Windows/LAN and Pi-side capture, STT, LLM/tool, TTS, and
+  release-to-audio timing telemetry.
+- [x] Persist privacy-safe rotating gateway telemetry with transcript/response
+  text disabled by default and expose aggregate p50/p95 metrics in the tester.
+- [x] Add live, persistent personality controls to the Windows tester while
+  retaining the trust/severity rules and original male-voice policy.
+- [x] Add persistent Whisper vocabulary hints and operator-taught transcript/
+  word corrections; enroll the observed `Dateway` → `Gateway` error.
+- [x] Add an eight-second grounded-cloud deadline, HTTP-429 circuit breaker,
+  Wikipedia-grounded local fallback, pinned Ollama model, and three-turn memory.
+- [x] Add explicit private session recording to the tester: input/response WAV,
+  transcript stages, answer, route, timing, issue tags, and operator notes under
+  the Git-ignored `captures/tars-sessions/` directory.
+- [x] Add local JSONL-to-CSV telemetry conversion and a local analysis report;
+  verify that the installed Whisper response does not expose confidence rather
+  than fabricating that metric.
+- [x] Default the tester to automatic routing and add persistent, explicitly
+  taught Pi-local lessons that are retrieved only for Ollama and never sent to
+  Gemini.
+- [x] Live-verify a local lesson: Ollama identified itself as TARS after the
+  lesson was stored; no OpenAI/ChatGPT API route exists in the gateway.
+- [ ] Record and flag at least 20 representative failed/weak turns, run the
+  private session analyzer, and convert recurring unsupported requests into a
+  prioritized capability/tool implementation list.
+- [x] Add single-flight gateway inference admission control and active/waiting
+  queue visibility; retain the earlier 56–66 s contention outliers as baseline
+  evidence rather than treating them as current expected performance.
+- [x] Add and live-test deterministic named-place current weather via Open-Meteo.
+- [x] Add intent-aware Gemini Google Search grounding for current public
+  information while avoiding search overhead on ordinary questions.
+- [ ] Add deterministic adapters and confirmation policies for timers,
+  reminders, device diagnostics/control, source display, prices, sports,
+  schedules, and other action-oriented query classes as they enter scope.
 - [ ] Configure one cloud STT provider and two cloud TTS candidates for
   measured fallback comparisons.
 - [ ] Use LM Studio on the Acer workstation for controlled model comparison.

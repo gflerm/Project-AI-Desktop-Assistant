@@ -1,7 +1,7 @@
 # Project TARS --- Firmware & Software Development Roadmap
 
-**Status:** Version 0.4 --- Living Work in Progress\
-**Date:** 2026-08-09\
+**Status:** Version 0.5 --- Living Work in Progress\
+**Date:** 2026-08-21\
 **Scope:** Firmware/software only; mechanical enclosure and hardware
 construction are tracked separately\
 **Companion documents:** Project TARS Design Specification, Personality
@@ -18,6 +18,16 @@ integration gates and definitions of done**.
 
 It is deliberately a living estimate rather than a promised delivery
 date.
+
+> 🟢 **BOUNDED P4 AUDIO SLICE RESUMED — 2026-08-21:** The earlier phase-one
+> hold is superseded for microphone, BOOT-button PTT, Wi-Fi and speaker work.
+> The work resumed after the
+> Windows tester, Pi gateway capability/tool loop, and evaluation of the
+> Intel NUC8i5BEH as the always-on local-LLM host. The user's Asus GPU
+> workstation is development-only. No NUC deployment or hardware purchase is
+> authorized while this decision is paused, except for the explicitly resumed
+> and completed Pi routing, status-tool and model-benchmark work recorded in the
+> master TODO. Camera and display integration remain outside this slice.
 
 The estimates assume extensive use of AI-assisted development, including
 ChatGPT for architecture, research, specification, review and debugging
@@ -166,6 +176,12 @@ main/app_main.c
 
 Reference firmware: `gflerm/ESP32-P4-WIFI6-Test` — ESP-IDF hardware and
 multimedia diagnostics for the same board (private).
+
+The 2026-08-21 physical baseline now boots on the P4, joins the 2.4 GHz LAN,
+authenticates to the Pi gateway, captures BOOT-button PTT audio, receives exact
+STT and a James response, and plays returned 16 kHz PCM. ES8311 output is 95%;
+the downstream NS4150B amplifier is fixed-gain and controlled only by GPIO53
+enable. Detailed latency, reconnect and repeated-turn testing remain.
 
 Common build/flash/monitor flow:
 

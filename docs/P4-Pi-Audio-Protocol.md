@@ -1,10 +1,15 @@
 # Project TARS — P4-to-Pi Audio Protocol
 
-**Status:** Version 0.1 — implementation contract
+**Status:** Version 0.4 — physical P4↔Pi PTT voice round trip verified
 
-**Date:** 2026-08-20
+**Date:** 2026-08-21
 
 **Scope:** Reliable utterance transport between the ESP32-P4 and Raspberry Pi 5
+
+> 🟢 **PHYSICAL INTEGRATION RESUMED — 2026-08-21:** The first P4 client uses
+> GPIO35 BOOT as active-low push-to-talk, the onboard microphone and the
+> attached speaker. Camera, displays and automatic VAD are intentionally absent
+> from this bounded test. The Windows client remains a diagnostic fallback.
 
 ---
 
@@ -139,14 +144,51 @@ changing capture or endpoint frame sizes.
 
 1. Save deterministic generated PCM through a PC receiver and verify format,
    sequence and checksum.
-2. Stream push-to-talk microphone audio without automatic VAD.
+2. Stream push-to-talk microphone audio without automatic VAD. **Implemented
+   and physically verified on 2026-08-21.**
 3. Add endpoint start/end and the 500 ms pre-roll path.
 4. Connect Pi STT and measure end-to-final-transcript latency.
 5. Add response text and TTS playback.
 6. Exercise disconnects, delayed acknowledgements, Pi restart, queue pressure,
    maximum turns and cancellation before enabling automatic conversation.
 
-The exact WebSocket endpoint, authentication secret provisioning, Pi service
-port and TTS payload choice remain deployment configuration. They can be
-implemented and measured locally while SSH access to Titanium is unavailable;
-deployment onto Titanium waits for the key.
+## 7.1 Current deployment
+
+| Setting | Deployed value |
+|---|---|
+| Host | `titanium` / `192.168.8.107` |
+| WebSocket | `ws://192.168.8.107:8090/ws/v1` |
+| HTTP diagnostics | `/health`, `/capabilities` |
+| Authentication | `X-Tars-Token` or `Authorization: Bearer`; secret in `/etc/tars/tars.env` |
+| TTS response | Binary 16 kHz mono PCM, kind `2` |
+| Conversation route | `auto`: Gemini primary, local Ollama fallback |
+| Live information | Open-Meteo current weather; intent-aware Gemini Google Search grounding |
+| Spoken assistant identity | James; Project TARS remains the internal protocol/project label |
+| Temporary PTT input | GPIO35 BOOT, active-low; hold to capture and release to send |
+| P4 audio mode | Half-duplex; capture is gated while response PCM plays |
+| P4 speaker level | ES8311 95%; NS4150B has fixed hardware gain and GPIO53 enable only |
+| Firmware secrets | Git-ignored `main/tars_private_config.h`; never Kconfig or tracked source |
+| Capture buffering | 25 × 20 ms frames = 500 ms; 16,400 B PCM/frame metadata plus queue overhead |
+| Network chunk | Five frames / 100 ms / 3,200 PCM bytes plus 24-byte header |
+| Playback buffering | 8 KiB WebSocket assembly buffer; chunks write directly to ES8311/I2S |
+
+The receiver implements strict 24-byte header parsing, contiguous sequence
+acknowledgements, stale-session rejection, bounded utterance size, cancellation,
+STT final text, assistant text/expression, and streamed TTS PCM. Unit and mocked
+integration tests pass. The P4 client builds, flashes and opens both ES8311
+audio directions successfully. Live microphone levels are present and
+unclipped. It implements Wi-Fi
+reconnect, authenticated hello, PTT capture, 100 ms binary microphone chunks,
+response PCM validation and speaker playback. The physical P4 joined
+`WETOHOST2.4`, received `192.168.8.131`, authenticated to Titanium and reached
+“Gateway ready.” A live BOOT hold/speak/release turn then sent 2.50 seconds of
+unclipped microphone PCM, produced an exact STT transcript, returned the
+deterministic James identity answer and completed 16 kHz speaker playback. The
+remaining protocol work is reconnect/failure injection, detailed latency
+measurement, repeated-turn testing and automatic VAD endpointing.
+`tts.end.timings_ms` reports Pi transcription, conversation/tool, synthesis,
+and total gateway durations. The Windows PTT harness additionally records
+capture and LAN round-trip timing for pre-P4 integration measurements.
+
+See [Pi Gateway and Windows Voice Test](Pi-Gateway-and-Windows-Voice-Test.md)
+for deployment, provider, voice, and push-to-talk test procedures.

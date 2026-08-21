@@ -1,13 +1,18 @@
 # Project TARS --- P4 Voice Activity Detection Plan
 
-**Status:** Version 0.2 --- Implementation and training-workflow alignment\
-**Date:** 2026-08-20\
+**Status:** Version 0.3 --- PTT baseline proven; automatic VAD is next\
+**Date:** 2026-08-21\
 **Document role:** ESP32-P4 voice activity detection, endpointing, audio
 buffering, FreeRTOS integration, tuning and test plan\
 **Companion to:** `P4-FreeRTOS-Execution-Plan.md`,
 `Speech-and-AI-Runtime-Evaluation.md`, `Project-TODO-and-Verification.md`,
 `../VED Training/README.md` and
 `../VED Training/docs/Voice-Corpus-and-Speaker-Enrollment-Test-Plan.md`
+
+> 🟢 **RESUMED — 2026-08-21:** The physical PTT baseline has passed using the
+> onboard ES8311 microphone, BOOT button, trusted Wi-Fi, Pi STT/orchestration/TTS
+> and attached P4 speaker. Automatic VAD endpointing is now the next functional
+> goal; BOOT PTT remains the deterministic fallback.
 
 ---
 

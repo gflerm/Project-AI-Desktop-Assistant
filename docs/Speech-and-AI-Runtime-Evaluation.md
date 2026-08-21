@@ -1,7 +1,7 @@
 # Project TARS ΓÇö Speech & AI Runtime Evaluation
 
-**Status:** Version 0.3 ΓÇö Living Work in Progress\
-**Date:** 2026-08-18  
+**Status:** Version 0.4 ΓÇö Living Work in Progress\
+**Date:** 2026-08-21
 **Scope:** Speech-to-text, text-to-speech, wake-word/VAD, local LLM runtimes, cloud speech/AI services, compatibility and benchmark strategy  
 **Companion documents:** Project TARS Design Specification, Hardware Architecture & Inventory, Firmware & Software Development Roadmap, Personality Distillation Specification
 
@@ -16,6 +16,49 @@ The objective is **not** to select one permanent vendor or model. The project sh
 The governing principle is:
 
 > **Choose interfaces first; let measurements choose implementations.**
+
+> 🔴 **INFERENCE-HOST EVALUATION PAUSED — 2026-08-20:** Do not adopt the user's
+> Asus RTX workstation as a production dependency. When the user resumes, test
+> the Intel NUC8i5BEH as the always-on local-LLM host while leaving STT, TTS,
+> tools and telemetry on the Pi 5. Pi `qwen3:1.7b` is emergency fallback only.
+> Final model-host assignment and hardware purchasing remain paused. The Pi
+> routing/status implementation and bounded 4B benchmark below were later
+> explicitly authorized and completed. The P4 audio/PTT slice was subsequently
+> resumed and physically verified; only the final inference-host assignment
+> remains paused.
+
+## Implemented automatic routing — 2026-08-20
+
+The user explicitly resumed the bounded Pi routing/status work. The live
+gateway now uses the following auditable policy. The same live gateway now
+serves the physical P4; final inference-host selection remains paused.
+
+```mermaid
+flowchart TD
+    A[User request] --> B{Deterministic tool?}
+    B -->|Time, weather, Pi status| C[Run verified tool]
+    B -->|No| D{Cloud required?}
+    D -->|Current, complex, high-stakes, web| E[Gemini with grounding]
+    D -->|Routine or private offline| F[Local Ollama model]
+    F --> G{Reply passes checks within 8 seconds?}
+    G -->|Yes| H[Speak local answer]
+    G -->|Refusal, empty, error or timeout| E
+    E --> I{Gemini available?}
+    I -->|Yes| J[Speak cloud answer]
+    I -->|Quota, timeout or network failure| K[Bounded grounded fallback]
+    K --> L[Wikipedia current fact or honest local limitation]
+```
+
+This is gateway policy, not model self-assessment. It cannot prove that a
+confident local answer is factually correct, so current, research, long-context
+and high-stakes requests bypass the local model. Each turn records provider,
+route, routing reason, timing, grounding and fallback metadata.
+
+Live verification produced: Pi status in 466 ms; a correct local arithmetic
+answer; and a correct Wikipedia-grounded current-president answer in 1,294 ms
+when Gemini returned HTTP 429. `qwen3:4b-instruct` was also correct on four
+compact cases but managed only 3.94--4.85 tokens/s and 6.81--11.78 second short
+turns, so it was not selected as the spoken default.
 
 ---
 
@@ -84,6 +127,7 @@ Gemini, OpenAI or another vendor-specific implementation.
 |---|---|---|
 | ESP32-P4 | Physical companion / edge controller | Orchestration/routing, wake/VAD, UI, audio capture/playback, lightweight local speech; ESP-IDF / FreeRTOS; MB-class memory |
 | Raspberry Pi 5 / CPU-first | Primary CPU-first local-compute node | Ollama/llama.cpp, STT/TTS, embeddings, memory and background AI; no CUDA-class assumption |
+| Intel NUC8i5BEH / 16 GB | Candidate always-on inference node | Benchmark quantized 4B models; CPU-first, dedicated and independent of the user's workstation |
 | NVIDIA Jetson Nano / 4 GB | Optional edge node | CUDA/TensorRT vision; limited modern LLM role |
 | Acer i7 / 32 GB / NVIDIA 4 GB | Development workstation | Development, local-model testing, Codex, LM Studio |
 | Cloud | High-capability tier | Frontier LLM, premium STT/TTS, multimodal AI |
@@ -316,6 +360,13 @@ Project TARS role:
 **Decision:** TTS-001 ΓÇö Benchmark, but preserve process/service isolation
 because of licensing.
 
+**2026-08-20 deployed baseline:** Project TARS now has its own Piper service on
+localhost port 5001 using `en_GB-northern_english_male-medium`; the earlier
+assistant's port-5000 voice service was not changed. A real gateway response
+produced a valid WAV. This proves integration only: long-listening comfort,
+latency distribution, pronunciation, acoustic performance on the P4 speaker,
+and the voice model/dataset release audit remain open.
+
 ---
 
 ## 8.2 sherpa-onnx TTS
@@ -498,7 +549,42 @@ Project TARS fit:
 The Pi 5 should not run an LLM simply because Ollama can run there. It should
 only do so if latency and RAM measurements justify it.
 
-**Decision:** LLM-001 ΓÇö Preferred first local server on Pi 5.
+**2026-08-20 deployed baseline:** Ollama is active on `titanium` and
+`qwen3:1.7b` is the selected local conversation fallback with a 2,048-token
+runtime context and extended thinking disabled. On short spoken-assistant
+prompts it produced roughly 6.9–7.8 generated tokens/s, compared with roughly
+5.8 tokens/s from `llama3.2:3b`, while both answered the arithmetic check
+correctly. The result favors Qwen for first-turn responsiveness but does not
+replace the full benchmark plan below.
+
+The gateway's `auto` route uses the verified `gemini-3.5-flash-lite` cloud path
+first and catches request/network/provider failures within the same turn before
+using local Ollama. Explicit `gemini` and `ollama` routes are available to the
+Windows test harness. Provider selection remains configuration/policy owned by
+Project TARS rather than by the P4 firmware or a particular model.
+
+Freshness-sensitive public queries selectively enable Gemini Google Search
+grounding; ordinary questions do not incur that overhead. Current weather is a
+deterministic Open-Meteo adapter rather than an LLM guess. Local Ollama is
+explicitly offline. The Windows harness records client/LAN and Pi-side stage
+timings so tool latency can be separated from STT, model, and TTS latency.
+
+**Revised decision hold:** The Pi remains the deployed service baseline, but
+its `qwen3:1.7b` model is emergency fallback only. Main local conversational
+inference is unassigned pending the NUC benchmark.
+
+## 12.1A Intel NUC always-on candidate
+
+The recorded NUC8i5BEH (Core i5-8259U, 16 GB RAM) should first compare
+`qwen3.5:4b`, `phi4-mini`, and `qwen3:4b`. It does not need to replace the Pi
+gateway: it can expose only the model endpoint while the Pi continues speech,
+tools, routing and telemetry. Its integrated graphics should not be assumed to
+provide NVIDIA-class acceleration.
+
+The Asus GPU workstation remains useful for model screening, but it must be a
+manual development route only. The production router must never fall back to
+it silently. The Windows UI should always show the active host, model and
+local/cloud state.
 
 ---
 
@@ -1055,6 +1141,32 @@ code and each selected voice model must pass the applicable release audit.
 Speech and LLM endpoints should be reached over the trusted Wi-Fi LAN service
 path by default, with health-aware policy-approved fallback.
 
+## SAI-011 — STT adaptation precedes acoustic fine-tuning
+
+**Status:** Adopted for the integration baseline.
+
+The Pi gateway now passes private project vocabulary hints to Whisper and
+supports operator-confirmed transcript corrections. Exact phrase corrections
+are retained, and equal-length corrections can produce reusable word mappings
+such as `Dateway` → `Gateway`. These mappings persist under `/var/lib/tars` and
+do not require retaining audio. They improve recurring vocabulary errors but do
+not constitute speaker-model training. Acoustic fine-tuning remains deferred
+until the fixed tone, distance, and noise corpus establishes a measured error
+baseline and demonstrates that deterministic adaptation is insufficient.
+
+## SAI-012 — Behaviour learning is explicit, local, and evidence constrained
+
+**Status:** Adopted for the integration baseline.
+
+Operator-confirmed response guidance is stored privately on the Pi and
+retrieved by lexical relevance for Ollama only. It is not sent to Gemini and it
+does not silently fine-tune model weights. Rich test-session recording remains
+an explicit visible tester switch. Telemetry/session analysis identifies
+refusals, latency, STT error, voice quality, and repeated responses; recurring
+unsupported tasks become implementation candidates. Retrieved guidance cannot
+substitute for a real timer, reminder, diagnostic, control, or other action
+tool, and the model may not report an action complete without tool evidence.
+
 ---
 
 # 26. Immediate Next Actions
@@ -1099,6 +1211,8 @@ must be rechecked before production release.
 
 | Version | Date | Notes |
 |---|---|---|
+| 0.5 | 2026-08-20 | Added explicit Pi-local Ollama lessons and private session/telemetry analysis policy |
+| 0.4 | 2026-08-20 | Added deployed vocabulary prompting and operator-confirmed STT correction layer before acoustic fine-tuning |
 | 0.3 | 2026-08-18 | ESP32-P4 is the primary companion, Raspberry Pi 5 is the local-compute partner, ESP32-P4ΓåöPi 5 link is trusted Wi-Fi |
 | 0.2 | 2026-08-09 | Reconciled exact NUC hardware and CPU-first assumptions, local-first LLM routing, Piper baseline wording, private-network deployment and staged licensing language |
 | 0.1 | 2026-08-09 | Initial STT/TTS/local-LLM runtime comparison, compatibility matrices, licensing cautions, benchmark methodology, fallback strategy and recommended first-build stack |

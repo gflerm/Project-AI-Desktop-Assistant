@@ -22,6 +22,15 @@ The governing development principle is:
 
 > **Define the goal clearly, test the assumptions, record what we learn, and revise the specification when evidence changes the design.**
 
+> 🔴 **PAUSED ARCHITECTURE DECISION — 2026-08-20:** P4 implementation is
+> deferred while the Windows tester and TARS service behaviour are made useful
+> and reliable. The user's Asus GPU workstation is development/test equipment,
+> not an always-on inference server and not an automatic fallback. The current
+> candidate is a split service: Pi 5 for STT, TTS, tools and telemetry; existing
+> Intel NUC8i5BEH for an approximately 4B local model. This remains a proposal
+> until the user resumes the decision and the NUC passes measured latency,
+> accuracy, stability and tool-use gates.
+
 ---
 
 ## 1. Purpose
@@ -1165,19 +1174,19 @@ already has substantially greater resources.
 
 ## 29. Phase 0 --- Hardware Verification
 
--   [ ] Verify exact ESP32-P4 module/board model and RAM.
+-   [x] Verify exact ESP32-P4 module/board model and RAM.
 -   [x] Record Raspberry Pi 5 local-compute-partner baseline.
--   [ ] Verify Raspberry Pi 5 storage, thermals and operating system.
+-   [x] Verify Raspberry Pi 5 storage, thermals and operating system.
 -   [ ] Verify 7-inch touchscreen interface with ESP32-P4.
 -   [ ] Obtain correct display connector/cable.
 -   [ ] Confirm touchscreen input.
 -   [ ] Configure cooling.
 -   [ ] Choose storage.
--   [ ] Select microphone.
--   [ ] Select speaker/audio interface.
+-   [x] Select and physically verify the onboard ES8311 microphone path.
+-   [x] Select and physically verify ES8311/NS4150B speaker playback.
 -   [ ] Locate and identify camera hardware.
--   [ ] Configure and test the trusted Wi-Fi ESP32-P4↔Pi service path with
-    static addressing.
+-   [x] Configure and test the trusted Wi-Fi ESP32-P4↔Pi service path for the
+    prototype (DHCP address observed; static assignment remains optional).
 
 **Exit criterion:** ESP32-P4 boots reliably into a touchscreen interface
 with working audio I/O.
@@ -1350,18 +1359,18 @@ This section should be updated throughout development.
 
 ## 38. Next Build Session
 
-1.  Identify the exact ESP32-P4 module/board configuration.
-2.  Confirm the touchscreen part/version and obtain the correct display
+1.  Instrument capture, STT, routing, TTS and release-to-audio timing over
+    repeated physical PTT turns.
+2.  Verify reconnect, cancellation and buffer behaviour under faults.
+3.  Integrate standalone automatic VAD with pre-roll while retaining BOOT PTT.
+4.  Confirm the touchscreen part/version and obtain the correct display
     connector/cable.
-3.  Decide microphone and speaker hardware.
-4.  Set up the ESP32-P4 firmware/toolchain and the minimum graphics,
-    input and audio drivers required by the chosen UI.
-5.  Build a tiny fullscreen 800×480 animation/state-machine prototype.
-6.  Measure idle CPU/RAM usage and animation responsiveness.
-7.  Configure the trusted Wi-Fi ESP32-P4↔Pi service path and health
-    endpoint.
-8.  Add microphone capture and a visible listening state.
-9.  Benchmark the initial Pi 5-local and cloud provider paths through the
+5.  Set up the minimum graphics and input drivers required by the chosen UI.
+6.  Build a tiny fullscreen 800×480 animation/state-machine prototype.
+7.  Measure idle CPU/RAM usage and animation responsiveness.
+8.  Add a visible listening/thinking/speaking state driven by the proven audio
+    path.
+9.  Continue benchmarking Pi 5-local and cloud provider paths through the
     same interface.
 
 The first milestone is deliberately simple:

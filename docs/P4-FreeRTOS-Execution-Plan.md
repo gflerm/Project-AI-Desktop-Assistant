@@ -1,11 +1,16 @@
 # Project TARS --- P4 FreeRTOS Execution Plan
 
-**Status:** Version 0.2 --- Planning baseline\
-**Date:** 2026-08-20\
+**Status:** Version 0.3 --- Initial PTT firmware built\
+**Date:** 2026-08-21\
 **Document role:** ESP32-P4 task architecture, core affinity, memory use,
 audio/network pipeline and staged implementation plan\
 **Companion to:** `Hardware-Architecture-and-Inventory.md`,
 `Firmware-Software-Roadmap.md` and `P4-Voice-Activity-Detection-Plan.md`
+
+> 🟢 **AUDIO PROTOTYPE ACTIVE — 2026-08-21:** The user resumed a bounded P4
+> microphone/speaker pass. GPIO35 BOOT is temporary PTT. Camera, displays,
+> motion, automatic VAD and wake word stay disabled until this round trip is
+> physically proven.
 
 ---
 
@@ -61,6 +66,7 @@ The board audio wiring documented by Waveshare is:
 | I2S bit clock / SCLK | GPIO12 |
 | I2S master clock / MCLK | GPIO13 |
 | NS4150B amplifier enable | GPIO53 |
+| Temporary BOOT PTT input | GPIO35, active-low |
 
 References:
 
@@ -143,6 +149,34 @@ ESP-IDF uses dual-core SMP. Unpinned low-criticality work can run wherever
 capacity exists. Excessive pinning can leave one core overloaded while the other
 is idle, and can increase lock contention. Start with affinity only for hardware
 ownership and deadline-sensitive tasks.
+
+## 4.4 First implemented PTT slice
+
+The initial firmware pins the continuous 20 ms microphone producer to Core 1.
+The PTT/WebSocket state machine runs on Core 0, batches five frames per network
+message and never becomes the capture producer. Speaker playback uses a
+separate output handle for the same ES8311 codec and deliberately gates
+microphone capture, so this test is half-duplex and cannot self-trigger from
+James's voice.
+
+The current audio memory path remains internal-RAM-first: a 25-frame queue
+stores 500 ms/16,400 bytes of captured PCM, capture and PTT task stacks are
+4 KiB and 10 KiB, and the PTT task reuses five-frame/100 ms staging. Returned
+TTS chunks pass from the 8 KiB WebSocket assembly buffer directly to ES8311/I2S;
+there is no whole-reply playback buffer. PSRAM remains available for future
+pre-roll/history and display/camera assets rather than time-critical DMA.
+
+Physical startup on 2026-08-21 verified separate ES8311 microphone and speaker
+handles at 16 kHz and live, unclipped microphone samples. The first LAN attempt
+could not associate because the configured/visible `WETOHOST5.8` SSID is 5 GHz;
+the ESP32-C6 requires a 2.4 GHz access point. After switching to
+`WETOHOST2.4`, the P4 received `192.168.8.131`, authenticated to Titanium and
+reached the BOOT-PTT ready state. The subsequent physical turn captured 2.50
+seconds of speech without clipping, transcribed “Who are you and what do you
+do?” exactly, received the deterministic James identity response and completed
+speaker playback. ES8311 output was then tuned from 65% through 90% to **95%**;
+the user confirmed the raised level was much better. The NS4150B gain remains
+fixed in hardware and GPIO53 remains enable-only.
 
 ---
 
@@ -374,6 +408,10 @@ stable transcription latency.
 
 **Exit:** a full listen -> STT -> LLM -> TTS -> playback cycle runs repeatedly
 without display stalls or audio faults.
+
+**Baseline evidence (2026-08-21):** one complete physical PTT cycle passed.
+Repeated-turn, timing-distribution, reconnect and soak evidence remain required
+for the phase exit.
 
 ## P5 --- Three LCDs and concurrent stress
 

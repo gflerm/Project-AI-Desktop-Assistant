@@ -5,6 +5,18 @@
 > interaction node, a Raspberry Pi 5 local-compute node, optional cloud
 > AI, speech, touch, display, memory, tools and future vision.
 
+> 🟢 **P4 AUDIO INTEGRATION ACTIVE — 2026-08-21:** The earlier P4 pause is
+> superseded for the bounded voice path. The physical P4 now captures speech
+> with BOOT push-to-talk, sends it to the Pi gateway and plays James's returned
+> voice. Camera and displays remain deferred while timing, reconnect and
+> automatic VAD work continue. The
+> The user's Asus GPU workstation must remain a development-only resource and
+> must never become an automatic production dependency. The proposed always-on
+> arrangement is Pi 5 speech/tools/telemetry with local LLM inference on the
+> existing Intel NUC8i5BEH, initially comparing `qwen3.5:4b`, `phi4-mini`, and
+> `qwen3:4b`. Final host assignment and purchasing remain paused. The user later
+> authorized the Pi routing/status implementation and bounded 4B benchmark.
+
 ## Project Summary
 
 Project AI Desktop Companion is intended to behave as a persistent
@@ -130,6 +142,10 @@ The following documents are the current design source of truth:
 -   [P4-to-Pi Audio Protocol](P4-Pi-Audio-Protocol.md) --- versioned control,
     PCM framing, acknowledgements, backpressure, cancellation and reconnect
     contract for speech and response exchange.
+-   [Pi Gateway and Windows Voice
+    Test](Pi-Gateway-and-Windows-Voice-Test.md) --- deployed Titanium services,
+    Gemini/Ollama routing, male Piper voice, model measurements, and the
+    Windows push-to-talk STT/LLM/TTS verification workflow.
 -   [VED Training — Start Here](../VED%20Training/README.md) --- beginner PC
     setup, Audacity recording workflow, private folder layout and first WAV
     validation commands.
@@ -141,6 +157,10 @@ The following documents are the current design source of truth:
     Evaluation](Speech-and-AI-Runtime-Evaluation.md) ---
     STT, TTS, wake/VAD, Ollama, llama.cpp and cloud/local AI evaluation
     and benchmark strategy.
+-   [TARS Teaching and Response Improvement
+    Plan](TARS-Teaching-and-Response-Improvement-Plan.md) --- evidence from the
+    recorded sessions and telemetry, failure taxonomy, trustworthy feedback
+    schema, regression gates, persistent learning plan and fine-tuning criteria.
 -   [Personality Distillation](Personality-Distillation.md)
     --- behavioural/personality design distilled into original reusable
     traits rather than copied character expression.
@@ -184,12 +204,12 @@ See:
 
 Current priorities are to:
 
-1.  verify the owned hardware configuration;
-2.  establish the ESP32-P4 minimal runtime;
-3.  establish the trusted Wi-Fi ESP32-P4↔Pi 5 service path;
+1.  measure the physical P4 voice round trip by stage and over repeated turns;
+2.  verify reconnect, cancellation and bounded-buffer behaviour;
+3.  integrate automatic VAD endpointing while retaining BOOT PTT fallback;
 4.  implement stable service/provider interfaces;
-5.  build the first display/touch/audio conversational loop;
-6.  benchmark STT, TTS and local/cloud LLM paths;
+5.  add the face/display state loop after the audio path is stable;
+6.  continue benchmarking STT, TTS and local/cloud LLM paths;
 7.  integrate memory, tools and optional vision incrementally;
 8.  keep tests and documentation synchronized with each architectural
     decision.
