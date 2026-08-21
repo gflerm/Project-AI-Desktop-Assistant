@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from tars_gateway.system_status import SystemSnapshot, system_status_requested
+from james_gateway.system_status import SystemSnapshot, system_status_requested
 
 
 class SystemStatusTests(unittest.TestCase):

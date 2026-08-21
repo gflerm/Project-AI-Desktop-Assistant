@@ -1,4 +1,10 @@
-# Project TARS Pi 5 Gateway
+# Project James Pi 5 Gateway
+
+> 🟠 **RENAME MIGRATION PENDING — 2026-08-21:** Repository source now uses the
+> `james_gateway` package, `/etc/james`, `/opt/james`, `/var/lib/james`, James
+> service units and the `JAM1` wire identifier. The working Pi/P4 deployment has
+> deliberately not been switched yet; deploy the Pi services and flash the P4
+> as one coordinated, rollback-safe change.
 
 > 🔴 **DEPLOYMENT HOLD — 2026-08-20:** Do not change the production inference
 > host while the user reviews the architecture. The intended direction is to
@@ -20,7 +26,7 @@ Audio remains 16 kHz, signed 16-bit mono in both
 directions. `qwen3:4b-instruct` is installed only for comparison; its Pi
 benchmark was correct but too slow for the default spoken path.
 
-This is the isolated Raspberry Pi 5 service for the Project TARS ESP32-P4. It
+This is the isolated Raspberry Pi 5 service for the Project James ESP32-P4. It
 implements version 1 of `docs/P4-Pi-Audio-Protocol.md` over an authenticated
 WebSocket while reusing the Pi's existing localhost-only Whisper, Piper and
 Ollama engines. The default `auto` route uses deterministic tools first, local
@@ -41,9 +47,9 @@ services use different directories, tokens, ports and conversation state:
 | Service | Port | API |
 |---|---:|---|
 | Ember | 8088 | Existing multipart WAV API |
-| Project TARS | 8090 | `/health`, `/capabilities`, `/ws/v1` |
+| Project James | 8090 | `/health`, `/capabilities`, `/ws/v1` |
 
-TARS also owns a separate male Piper process on localhost port 5001. Ember's
+James also owns a separate male Piper process on localhost port 5001. Ember's
 existing voice service remains on port 5000.
 
 ## Pi installation
@@ -55,13 +61,13 @@ sudo ./scripts/install-pi.sh
 sudo ./scripts/smoke-test-pi.sh
 ```
 
-The installer writes application code under `/opt/tars/gateway`, creates a
-private token in `/etc/tars/tars.env`, stores runtime data under
-`/var/lib/tars`, and installs `tars-gateway.service`. It deliberately uses the
+The installer writes application code under `/opt/james/gateway`, creates a
+private token in `/etc/james/james.env`, stores runtime data under
+`/var/lib/james`, and installs `james-gateway.service`. It deliberately uses the
 existing `/opt/ember/venv` Python environment and the existing local model
 services during the first integration phase. It reads the existing Gemini key
-from `/etc/ember/ember.env` without copying or displaying the secret. TARS keeps
-its own provider choices and private device token in `/etc/tars/tars.env`.
+from `/etc/ember/ember.env` without copying or displaying the secret. James keeps
+its own provider choices and private device token in `/etc/james/james.env`.
 
 The selected local fallback is `qwen3:1.7b` with thinking disabled. On the Pi 5
 it was materially faster than `llama3.2:3b` on short spoken-assistant prompts,
@@ -74,7 +80,7 @@ licence information during any future distribution review.
 
 ## Windows response tester
 
-Run `tools/Launch-TARS-Tester.ps1` from the repository. The native lightweight
+Run `tools/Launch-James-Tester.ps1` from the repository. The native lightweight
 tester uses Python's standard library plus the small `sounddevice` microphone
 package supplied by the launcher. Click **Load token via SSH**, then **Check
 gateway**, and select `auto`, `gemini`, or `ollama`. You can send typed text or
@@ -92,7 +98,7 @@ adaptation, not automatic acoustic-model retraining.
 
 The tester defaults to `auto`, records schema-v2 diagnostic sessions only while the
 visible **Record private test sessions** switch is enabled, and stores those
-captures locally under the repository's ignored `captures/tars-sessions/`
+captures locally under the repository's ignored `captures/james-sessions/`
 directory. Feedback is bound to its immutable turn UUID and separates verified
 speech correction from answer rating, critique, preferred answer, expected
 route/tool and explicit approvals. **Flag shortcomings** can optionally teach
@@ -110,7 +116,7 @@ configuration when the Wi-Fi session is implemented.
 
 ## Authentication
 
-HTTP diagnostics require `X-Tars-Token`. The WebSocket accepts either that
+HTTP diagnostics require `X-James-Token`. The WebSocket accepts either that
 header or `Authorization: Bearer <token>`. The service is intended for the
 trusted development LAN; TLS or an authenticated private overlay is required
 before exposure outside that LAN.

@@ -157,8 +157,8 @@ The following documents are the current design source of truth:
     Evaluation](Speech-and-AI-Runtime-Evaluation.md) ---
     STT, TTS, wake/VAD, Ollama, llama.cpp and cloud/local AI evaluation
     and benchmark strategy.
--   [TARS Teaching and Response Improvement
-    Plan](TARS-Teaching-and-Response-Improvement-Plan.md) --- evidence from the
+-   [James Teaching and Response Improvement
+    Plan](James-Teaching-and-Response-Improvement-Plan.md) --- evidence from the
     recorded sessions and telemetry, failure taxonomy, trustworthy feedback
     schema, regression gates, persistent learning plan and fine-tuning criteria.
 -   [Personality Distillation](Personality-Distillation.md)
@@ -176,7 +176,7 @@ The following documents are the current design source of truth:
 
 ## Licensing
 
-Original Project AI Desktop Companion / Project TARS software
+Original Project AI Desktop Companion / Project James software
 **explicitly released as open source** uses the **Apache License 2.0**
 as the default project software licence.
 
@@ -193,6 +193,9 @@ protected intellectual property.
 
 See:
 
+-   [Apache License 2.0](../LICENSE)
+-   [Licence Scope](../LICENSE-SCOPE.md)
+-   [NOTICE](../NOTICE)
 -   [License & IP Policy](License-and-IP-Policy.md)
 -   [Open-Source Licensing
     Strategy](Open-Source-Licensing-Strategy.md)

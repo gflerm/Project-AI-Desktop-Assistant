@@ -1,4 +1,4 @@
-# Project TARS Facial Gestures
+# Project James Facial Gestures
 
 This directory contains the original facial-state artwork for the three
 1.83-inch LCD face: two portrait eye displays and one landscape mouth

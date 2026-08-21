@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from tars_gateway.services import ConversationMemory, answer_is_complete, clarify_ambiguous_request
+from james_gateway.services import ConversationMemory, answer_is_complete, clarify_ambiguous_request
 
 
 class AnswerCompletionTests(unittest.TestCase):

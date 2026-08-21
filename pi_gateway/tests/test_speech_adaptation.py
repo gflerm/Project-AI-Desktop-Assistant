@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tars_gateway.speech_adaptation import SpeechAdaptation
+from james_gateway.speech_adaptation import SpeechAdaptation
 
 
 class SpeechAdaptationTests(unittest.TestCase):

@@ -1,4 +1,4 @@
-# Project TARS --- P4 Voice Activity Detection Plan
+# Project James --- P4 Voice Activity Detection Plan
 
 **Status:** Version 0.3 --- PTT baseline proven; automatic VAD is next\
 **Date:** 2026-08-21\
@@ -22,7 +22,7 @@ Voice activity detection (VAD) answers one narrow question:
 
 > Does the current microphone audio contain human speech?
 
-Project TARS uses that answer to:
+Project James uses that answer to:
 
 - react visually as soon as speech begins;
 - decide when to start sending useful audio to Pi 5 STT;
@@ -155,7 +155,7 @@ input format: M
 pipeline: microphone -> optional NS -> VADNet
 ```
 
-This is sufficient while Project TARS is not listening during speaker
+This is sufficient while Project James is not listening during speaker
 playback.
 
 ## 4.2 Later full-duplex build: microphone plus playback reference
@@ -171,7 +171,7 @@ pipeline: AEC -> optional NS -> VADNet -> optional WakeNet
 
 The reference must be derived from the audio actually being sent to the
 speaker path, with its timing preserved. Sending arbitrary TTS data or a
-misaligned reference will weaken AEC and can make VAD trigger on Project TARS's
+misaligned reference will weaken AEC and can make VAD trigger on Project James's
 own voice.
 
 Start half-duplex. Enable barge-in only after the `MR` path passes recorded
@@ -286,21 +286,21 @@ configuration values and tune them using recorded test audio.
 
 ```c
 typedef enum {
-    TARS_VAD_SPEECH_START,
-    TARS_VAD_SPEECH_CONTINUE,
-    TARS_VAD_SPEECH_END,
-    TARS_VAD_TIMEOUT,
-    TARS_VAD_CANCELLED,
-    TARS_VAD_OVERRUN,
-} tars_vad_event_type_t;
+    JAMES_VAD_SPEECH_START,
+    JAMES_VAD_SPEECH_CONTINUE,
+    JAMES_VAD_SPEECH_END,
+    JAMES_VAD_TIMEOUT,
+    JAMES_VAD_CANCELLED,
+    JAMES_VAD_OVERRUN,
+} james_vad_event_type_t;
 
 typedef struct {
-    tars_vad_event_type_t type;
+    james_vad_event_type_t type;
     uint32_t utterance_id;
     int64_t timestamp_us;
     uint32_t audio_sequence;
     uint32_t buffered_preroll_bytes;
-} tars_vad_event_t;
+} james_vad_event_t;
 ```
 
 Every utterance receives a monotonically increasing ID. Audio chunks sent to
@@ -312,7 +312,7 @@ missing chunks are observable.
 # 8. Coding Work Required
 
 Yes, project-specific coding is required around the Espressif detector. The
-model supplies frame-level speech/silence results; Project TARS must still
+model supplies frame-level speech/silence results; Project James must still
 implement audio capture, buffering, endpointing, state events, Pi streaming,
 metrics and failure recovery.
 
@@ -429,18 +429,18 @@ Proposed firmware layout:
 ```text
 main/
   audio/
-    tars_audio_codec.c/.h       ES8311 and amplifier control
-    tars_audio_capture.c/.h     I2S RX and frame creation
-    tars_audio_playback.c/.h    I2S TX and playback reference
-    tars_audio_ring.c/.h        bounded audio rings
+    james_audio_codec.c/.h       ES8311 and amplifier control
+    james_audio_capture.c/.h     I2S RX and frame creation
+    james_audio_playback.c/.h    I2S TX and playback reference
+    james_audio_ring.c/.h        bounded audio rings
   vad/
-    tars_vad_backend.h          replaceable backend interface
-    tars_vad_standalone.c       initial ESP-SR standalone backend
-    tars_vad_afe.c              AFE/VADNet production backend
-    tars_endpoint.c/.h          hysteresis and utterance boundaries
-    tars_vad_metrics.c/.h       counters and latency measurements
+    james_vad_backend.h          replaceable backend interface
+    james_vad_standalone.c       initial ESP-SR standalone backend
+    james_vad_afe.c              AFE/VADNet production backend
+    james_endpoint.c/.h          hysteresis and utterance boundaries
+    james_vad_metrics.c/.h       counters and latency measurements
   transport/
-    tars_audio_uplink.c/.h      Pi stream protocol
+    james_audio_uplink.c/.h      Pi stream protocol
 ```
 
 Backend contract:
@@ -451,7 +451,7 @@ typedef struct {
     esp_err_t (*process)(const int16_t *pcm, size_t samples);
     esp_err_t (*reset)(void);
     esp_err_t (*stop)(void);
-} tars_vad_backend_t;
+} james_vad_backend_t;
 ```
 
 Keep endpoint policy outside the VAD backend. This allows VADNet, standalone
@@ -556,7 +556,7 @@ Prefer one robust default over many fragile automatic modes.
 
 ## V0 --- Deterministic endpoint unit tests
 
-- feed synthetic VAD state sequences into `tars_endpoint`;
+- feed synthetic VAD state sequences into `james_endpoint`;
 - verify start debounce, hangover, timeout, cancellation and utterance IDs;
 - verify no duplicate `START`/`END` events;
 - verify queue-full and overrun behavior.
@@ -660,7 +660,7 @@ one supported Espressif framework.
 
 **Status:** Architectural requirement.
 
-Detector backends produce frame state; Project TARS owns buffering, hysteresis,
+Detector backends produce frame state; Project James owns buffering, hysteresis,
 turn boundaries and events.
 
 ## VAD005 --- Preserve speech with VAD cache and bounded pre-roll
@@ -685,7 +685,7 @@ Do not treat the companion's own speaker output as user speech.
 # 16. Immediate Next Actions
 
 1. Complete ES8311 16 kHz mono capture and save a bounded diagnostic WAV.
-2. Implement `tars_endpoint` with synthetic unit tests before adding ESP-SR.
+2. Implement `james_endpoint` with synthetic unit tests before adding ESP-SR.
 3. Add a pinned `esp-sr` dependency and compile the standalone VAD API.
 4. Feed recorded WAV frames through standalone VAD and measure boundaries.
 5. Add the 500 ms pre-roll ring and verify the first word is intact.

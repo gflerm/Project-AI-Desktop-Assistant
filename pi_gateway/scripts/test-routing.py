@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exercise live automatic TARS routing without adding STT/TTS loopback time."""
+"""Exercise live automatic James routing without adding STT/TTS loopback time."""
 
 from __future__ import annotations
 
@@ -8,12 +8,12 @@ import os
 import urllib.request
 
 
-token = os.environ.get("TARS_TOKEN", "").strip()
+token = os.environ.get("JAMES_TOKEN", "").strip()
 if len(token) < 24:
-    raise SystemExit("TARS_TOKEN is not configured")
+    raise SystemExit("JAMES_TOKEN is not configured")
 
 cases = {
-    "tool": "TARS, show the Pi temperature and memory usage.",
+    "tool": "James, show the Pi temperature and memory usage.",
     "local": "What is 17 multiplied by 23? Answer in one sentence.",
     "cloud": "Who is the current president of South Africa? Answer in one sentence.",
 }
@@ -24,7 +24,7 @@ for name, prompt in cases.items():
         data=json.dumps(
             {"text": prompt, "device_id": f"routing-test-{name}", "provider": "auto"}
         ).encode(),
-        headers={"X-Tars-Token": token, "Content-Type": "application/json"},
+        headers={"X-James-Token": token, "Content-Type": "application/json"},
     )
     with urllib.request.urlopen(request, timeout=60) as response:
         result = json.load(response)

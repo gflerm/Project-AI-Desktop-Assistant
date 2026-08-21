@@ -1,15 +1,15 @@
-# Project TARS ΓÇö Speech & AI Runtime Evaluation
+# Project James ΓÇö Speech & AI Runtime Evaluation
 
 **Status:** Version 0.4 ΓÇö Living Work in Progress\
 **Date:** 2026-08-21
 **Scope:** Speech-to-text, text-to-speech, wake-word/VAD, local LLM runtimes, cloud speech/AI services, compatibility and benchmark strategy  
-**Companion documents:** Project TARS Design Specification, Hardware Architecture & Inventory, Firmware & Software Development Roadmap, Personality Distillation Specification
+**Companion documents:** Project James Design Specification, Hardware Architecture & Inventory, Firmware & Software Development Roadmap, Personality Distillation Specification
 
 ---
 
 # 1. Purpose
 
-This document evaluates candidate speech and AI runtimes for Project TARS.
+This document evaluates candidate speech and AI runtimes for Project James.
 
 The objective is **not** to select one permanent vendor or model. The project should maintain replaceable service interfaces so STT, TTS, wake-word, local LLM and cloud AI components can be benchmarked and replaced independently.
 
@@ -90,9 +90,9 @@ A component that wins one category need not become the default for every mode.
 
 ---
 
-# 3. Project TARS Service Boundaries
+# 3. Project James Service Boundaries
 
-Speech and AI should be isolated behind stable Project TARS interfaces.
+Speech and AI should be isolated behind stable Project James interfaces.
 
 Conceptual contracts:
 
@@ -116,7 +116,7 @@ AIProvider.health_check()
 VisionProvider.describe(image)
 ```
 
-The TARS orchestrator should not depend directly on Whisper, Piper, Ollama,
+The James orchestrator should not depend directly on Whisper, Piper, Ollama,
 Gemini, OpenAI or another vendor-specific implementation.
 
 ---
@@ -152,7 +152,7 @@ Strengths:
 - low dependency overhead;
 - appropriate for Pi 5 benchmarking (audio routed from ESP32-P4).
 
-Project TARS fit:
+Project James fit:
 
 | Platform | Fit |
 |---|---|
@@ -179,7 +179,7 @@ faster-whisper uses CTranslate2 and its project reports substantial speed
 and memory improvements over the original Python Whisper implementation,
 including 8-bit inference options.
 
-Project TARS fit:
+Project James fit:
 
 | Platform | Fit |
 |---|---|
@@ -212,7 +212,7 @@ Sherpa-ONNX supports a broad speech stack including:
 - ARM/AArch64 and x86 Linux support;
 - multiple model families.
 
-Project TARS fit:
+Project James fit:
 
 | Platform | Fit |
 |---|---|
@@ -223,7 +223,7 @@ Project TARS fit:
 
 Its breadth makes it particularly interesting if a single runtime can
 provide multiple offline speech components without tightly coupling them at
-the Project TARS interface layer.
+the Project James interface layer.
 
 **Decision:** STT-003 ΓÇö Include as a streaming/offline comparison candidate.
 
@@ -253,7 +253,7 @@ Potential role:
 Current OpenAI speech-to-text APIs support recorded/file transcription and
 realtime transcription workflows.
 
-Potential TARS roles:
+Potential James roles:
 
 - high-quality cloud STT;
 - benchmark reference against local engines;
@@ -282,7 +282,7 @@ Trade-offs:
 Flux is explicitly designed for conversational voice agents and includes
 contextual turn detection / end-of-turn handling.
 
-This is particularly relevant to Project TARS because conversational
+This is particularly relevant to Project James because conversational
 latency is affected not only by transcription speed but by knowing **when
 the user has finished speaking**.
 
@@ -336,7 +336,7 @@ Important licensing note:
 
 **Current Piper code is GPL-3.0.**
 
-Because private/unreleased Project TARS material remains All Rights
+Because private/unreleased Project James material remains All Rights
 Reserved while explicitly released original software defaults to
 Apache-2.0, Piper should initially be evaluated as a **separate
 executable/service boundary**. GPL and voice-model compatibility must be
@@ -351,7 +351,7 @@ Strengths:
 - CLI/web-server/API options;
 - broad existing voice ecosystem.
 
-Project TARS role:
+Project James role:
 
 - offline speech;
 - immediate fallback;
@@ -360,7 +360,7 @@ Project TARS role:
 **Decision:** TTS-001 ΓÇö Benchmark, but preserve process/service isolation
 because of licensing.
 
-**2026-08-20 deployed baseline:** Project TARS now has its own Piper service on
+**2026-08-20 deployed baseline:** Project James now has its own Piper service on
 localhost port 5001 using `en_GB-northern_english_male-medium`; the earlier
 assistant's port-5000 voice service was not changed. A real gateway response
 produced a valid WAV. This proves integration only: long-listening comfort,
@@ -390,7 +390,7 @@ Advantages:
 Kokoro-family models are attractive because relatively small model sizes
 can provide high-quality speech.
 
-For Project TARS, evaluate through a supported runtime such as sherpa-onnx
+For Project James, evaluate through a supported runtime such as sherpa-onnx
 rather than tightly coupling to a one-off implementation.
 
 Questions:
@@ -426,7 +426,7 @@ Potential role:
 Current Gemini TTS supports controllable speech generation, including
 natural-language guidance for style, pace, accent and tone.
 
-This is particularly relevant to the Project TARS personality layer because
+This is particularly relevant to the Project James personality layer because
 the personality renderer may control delivery style without embedding those
 choices permanently into the core assistant logic.
 
@@ -537,7 +537,7 @@ Advantages:
 - ARM64 availability;
 - good fit for dedicated Pi 5 service.
 
-Project TARS fit:
+Project James fit:
 
 | Platform | Fit |
 |---|---|
@@ -561,7 +561,7 @@ The gateway's `auto` route uses the verified `gemini-3.5-flash-lite` cloud path
 first and catches request/network/provider failures within the same turn before
 using local Ollama. Explicit `gemini` and `ollama` routes are available to the
 Windows test harness. Provider selection remains configuration/policy owned by
-Project TARS rather than by the P4 firmware or a particular model.
+Project James rather than by the P4 firmware or a particular model.
 
 Freshness-sensitive public queries selectively enable Gemini Google Search
 grounding; ordinary questions do not incur that overhead. Current weather is a
@@ -606,7 +606,7 @@ Current llama.cpp provides:
 This makes it especially valuable as a stable lower-level reference even if
 Ollama is used operationally.
 
-Project TARS fit:
+Project James fit:
 
 | Platform | Fit |
 |---|---|
@@ -629,7 +629,7 @@ including x64 and ARM64 Linux, and uses llama.cpp for GGUF models.
 Its current system guidance recommends 16 GB+ RAM and approximately 4 GB+
 dedicated VRAM where applicable.
 
-Project TARS role:
+Project James role:
 
 - **development workstation tool**, not primary embedded runtime;
 - model discovery;
@@ -647,7 +647,7 @@ Anthropic-compatible endpoints.
 ## 12.4 LocalAI
 
 LocalAI remains a candidate unified self-hosted AI gateway, especially if
-Project TARS later benefits from presenting multiple local model types
+Project James later benefits from presenting multiple local model types
 behind one API.
 
 Potential roles:
@@ -669,7 +669,7 @@ a demonstrated operational problem.
 vLLM is oriented toward high-throughput model serving and is more relevant
 to substantially stronger compute infrastructure.
 
-For the currently known Project TARS hardware, this complexity is unlikely
+For the currently known Project James hardware, this complexity is unlikely
 to provide sufficient benefit during early development.
 
 **Decision:** LLM-005 ΓÇö Defer.
@@ -693,7 +693,7 @@ to provide sufficient benefit during early development.
 GGUF should be treated as an important local-model format because of
 llama.cpp/Ollama/LM Studio ecosystem compatibility.
 
-Project TARS should avoid storing model selection in application code.
+Project James should avoid storing model selection in application code.
 
 Configuration example:
 
@@ -732,7 +732,7 @@ ESP32-P4
 +-- wake-word / VAD candidate
 +-- local display/audio
 +-- lightweight local speech functions
-+-- Project TARS orchestrator
++-- Project James orchestrator
         |
         +-- Raspberry Pi 5 (trusted Wi-Fi LAN path)
         |    whisper.cpp STT
@@ -791,7 +791,7 @@ Create samples covering:
 - conversational speech;
 - technical vocabulary;
 - ESP32-P4 / Raspberry Pi 5 / Linux terminology;
-- names used frequently in Project TARS;
+- names used frequently in Project James;
 - background fan noise;
 - speaker playback occurring nearby;
 - different microphone distances;
@@ -814,7 +814,7 @@ recovery after interruption
 ```
 
 The most useful STT is not necessarily the one with the lowest academic WER.
-For Project TARS, **turn latency and technical vocabulary accuracy matter
+For Project James, **turn latency and technical vocabulary accuracy matter
 heavily**.
 
 ---
@@ -885,7 +885,7 @@ structured-output reliability
 crash/recovery behaviour
 ```
 
-Use the same small Project TARS test suite:
+Use the same small Project James test suite:
 
 - casual question;
 - technical troubleshooting;
@@ -956,7 +956,7 @@ Particular current caution:
 
 **Piper's current active codebase is GPL-3.0.**
 
-Project TARS should preserve a service/process boundary and obtain proper
+Project James should preserve a service/process boundary and obtain proper
 licensing review before distributing a proprietary product containing or
 bundling GPL components.
 
@@ -1093,7 +1093,7 @@ benchmark files.
 
 **Status:** Adopted.
 
-No single STT/TTS/LLM vendor owns the Project TARS architecture.
+No single STT/TTS/LLM vendor owns the Project James architecture.
 
 ## SAI-002 ΓÇö whisper.cpp is the first local STT baseline
 
@@ -1148,7 +1148,7 @@ path by default, with health-aware policy-approved fallback.
 The Pi gateway now passes private project vocabulary hints to Whisper and
 supports operator-confirmed transcript corrections. Exact phrase corrections
 are retained, and equal-length corrections can produce reusable word mappings
-such as `Dateway` → `Gateway`. These mappings persist under `/var/lib/tars` and
+such as `Dateway` → `Gateway`. These mappings persist under `/var/lib/james` and
 do not require retaining audio. They improve recurring vocabulary errors but do
 not constitute speaker-model training. Acoustic fine-tuning remains deferred
 until the fixed tone, distance, and noise corpus establishes a measured error

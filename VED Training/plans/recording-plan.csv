@@ -2,7 +2,7 @@ phrase_id,split,intended_text,tone,distance_m,noise,repeat_count,notes
 silence_quiet,noise,,silent,1.0,quiet_room,3,Record ten seconds per repeat
 silence_fan,noise,,silent,1.0,computer_fan,3,Record ten seconds per repeat
 silence_keyboard,noise,,silent,1.0,keyboard_mouse,3,Normal desk activity without speech
-enroll_01,enrollment,Project TARS I am ready to begin,normal,0.8,quiet_room,2,Use different sessions
+enroll_01,enrollment,Project James I am ready to begin,normal,0.8,quiet_room,2,Use different sessions
 enroll_02,enrollment,Please show me the current system status,quiet,0.8,quiet_room,2,Natural quiet voice
 enroll_03,enrollment,Run the audio diagnostic and report the result,energetic,0.8,quiet_room,2,Do not shout
 enroll_04,enrollment,The Raspberry Pi handles speech and inference,tired,0.8,quiet_room,2,Natural low energy
@@ -24,4 +24,4 @@ test_05,test,The temperature is thirty seven point five degrees,technical,0.8,qu
 test_06,test,Are the two processor cores still responsive,questioning,2.0,quiet_room,2,Far-field question
 test_07,test,Everything looks good let us continue,energetic,0.4,quiet_room,2,Near-field energetic
 test_08,test,I am speaking more softly because it is late,quiet,1.5,computer_fan,2,Quiet distant speech
-playback_01,validation,Please stop speaking when you hear me,normal,0.8,tars_speaker_playback,3,Reserved for later AEC and barge-in test
+playback_01,validation,Please stop speaking when you hear me,normal,0.8,james_speaker_playback,3,Reserved for later AEC and barge-in test

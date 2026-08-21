@@ -25,4 +25,4 @@ foreach(project_tool_setting IN ITEMS
     endif()
 endforeach()
 
-project(project_tars)
+project(project_james)

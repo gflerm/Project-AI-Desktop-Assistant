@@ -9,15 +9,15 @@ import urllib.error
 import urllib.request
 
 
-TOKEN = os.environ.get("TARS_TOKEN", "").strip()
+TOKEN = os.environ.get("JAMES_TOKEN", "").strip()
 BASE = "http://127.0.0.1:8090"
 if len(TOKEN) < 24:
-    raise SystemExit("TARS_TOKEN is not configured")
+    raise SystemExit("JAMES_TOKEN is not configured")
 
 
 def request(path: str, payload: dict | None = None) -> dict:
     data = json.dumps(payload).encode() if payload is not None else None
-    headers = {"X-Tars-Token": TOKEN}
+    headers = {"X-James-Token": TOKEN}
     if data is not None:
         headers["Content-Type"] = "application/json"
     req = urllib.request.Request(BASE + path, data=data, headers=headers)

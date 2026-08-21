@@ -1,4 +1,4 @@
-# Project TARS --- Personality Distillation Specification
+# Project James --- Personality Distillation Specification
 
 **Status:** Version 0.1 --- Original Identity Definition\
 **Date:** 2026-08-09\
@@ -25,10 +25,10 @@ The personality must support the larger product goal rather than compete with it
 # 1. Purpose
 
 This document distils the character and interaction research in the main
-Project TARS design specification into **one coherent, original
+Project James design specification into **one coherent, original
 assistant identity**.
 
-The objective is not to blend fictional characters together. TARS, EMO,
+The objective is not to blend fictional characters together. EMO,
 Rocky, JARVIS, Data, R2-D2, the EMH, K-2SO, KITT, WALL-E, Baymax, C-3PO,
 Marvin, GLaDOS and HAL 9000 are research references only.
 
@@ -252,17 +252,17 @@ These are starting points, not immutable values.
 ## 5.1 Deployed gateway profile
 
 The Pi gateway now renders these values through
-`pi_gateway/tars_gateway/personality.py` so Gemini and Ollama receive the same
-Project TARS identity and trust policy. The current implementation explicitly
+`pi_gateway/james_gateway/personality.py` so Gemini and Ollama receive the same
+Project James identity and trust policy. The current implementation explicitly
 requires concise voice-first delivery, male synthesized presentation without
 actor imitation, honest offline/degraded-state reporting, and confirmation
 before claiming any reminder, command, or device action succeeded.
 
-The assistant's user-facing and spoken name is **James**. “Project TARS” is the
-repository, gateway and wire-protocol name only. When asked who it is, its name,
-or what it does, the gateway returns a deterministic James identity response
-before model routing. Neither Gemini nor Ollama is allowed to introduce the
-assistant as TARS. This rule was deployed and verified on 2026-08-21.
+The assistant's user-facing and spoken name is **James**. “Project James” is the
+repository and gateway name. When asked who it is, its name, or what it does,
+the gateway returns a deterministic James identity response before model
+routing. Neither Gemini nor Ollama may substitute a provider or fictional
+character identity. This rule was deployed and verified on 2026-08-21.
 
 The deployed response policy also treats spoken completeness as part of the
 personality: it answers every requested subpart, reserves space to finish the
@@ -778,7 +778,7 @@ CORE VALUES
 
 The LLM is one component inside this system.
 
-**The model does not own the personality. The Project TARS runtime owns
+**The model does not own the personality. The Project James runtime owns
 the personality.**
 
 This is essential for provider independence.
@@ -860,6 +860,6 @@ Those two principles should carry most of the personality.
   0.1                     2026-08-09              Initial distillation of
                                                   inspiration research
                                                   into an original
-                                                  Project TARS identity
+                                                  Project James identity
 
   -----------------------------------------------------------------------

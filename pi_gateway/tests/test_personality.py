@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 import tempfile
 
-from tars_gateway.personality import (
+from james_gateway.personality import (
     PersonalityStore,
     personality_prompt_from_environment,
 )
@@ -16,6 +16,8 @@ class PersonalityTests(unittest.TestCase):
         self.assertIn("honesty 98", prompt)
         self.assertIn("humour 65", prompt)
         self.assertIn("adult male voice", prompt)
+        self.assertIn("identify yourself as James", prompt)
+        self.assertNotIn("Never introduce yourself as James", prompt)
         self.assertIn("Never claim an action", prompt)
         self.assertIn("no humour", prompt)
         self.assertIn("answer every requested part", prompt)

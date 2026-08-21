@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the master Project TARS TODO Markdown as a polished PDF."""
+"""Render the master Project James TODO Markdown as a polished PDF."""
 
 from __future__ import annotations
 
@@ -63,7 +63,7 @@ def inline_markup(value: str) -> str:
     value = re.sub(r"\[([^]]+)\]\(([^)]+)\)", r"\1", value)
     value = html.escape(value)
     value = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", value)
-    value = re.sub(r"`([^`]+)`", r'<font name="TarsMono">\1</font>', value)
+    value = re.sub(r"`([^`]+)`", r'<font name="JamesMono">\1</font>', value)
     return value
 
 
@@ -88,15 +88,15 @@ class CriticalPathDiagram(Flowable):
         canvas.setLineWidth(1.2)
         canvas.roundRect(x, y, w, h, 3 * mm, fill=1, stroke=1)
         canvas.setFillColor(strokes[state])
-        canvas.setFont("TarsBold", 7.5)
+        canvas.setFont("JamesBold", 7.5)
         canvas.drawCentredString(x + w / 2, y + h - 10, goal)
         canvas.setFillColor(INK)
-        canvas.setFont("TarsRegular", 6.5)
+        canvas.setFont("JamesRegular", 6.5)
         words = label.split()
         lines, current = [], ""
         for word in words:
             candidate = (current + " " + word).strip()
-            if canvas.stringWidth(candidate, "TarsRegular", 6.5) <= w - 8:
+            if canvas.stringWidth(candidate, "JamesRegular", 6.5) <= w - 8:
                 current = candidate
             else:
                 lines.append(current)
@@ -123,10 +123,10 @@ class CriticalPathDiagram(Flowable):
         canvas.setFillColor(PAPER)
         canvas.roundRect(0, 0, self.width, self.height, 4 * mm, fill=1, stroke=0)
         canvas.setFillColor(NAVY)
-        canvas.setFont("TarsBold", 12)
+        canvas.setFont("JamesBold", 12)
         canvas.drawString(8 * mm, self.height - 13 * mm, "Critical path to full-system proof")
         canvas.setFillColor(MUTED)
-        canvas.setFont("TarsRegular", 7)
+        canvas.setFont("JamesRegular", 7)
         canvas.drawRightString(self.width - 8 * mm, self.height - 13 * mm,
                                "Green: active  |  Amber: ready  |  Grey: queued")
 
@@ -167,13 +167,13 @@ class CriticalPathDiagram(Flowable):
         canvas.setLineWidth(2)
         canvas.line(margin, 7 * mm, self.width - margin, 7 * mm)
         canvas.setFillColor(NAVY)
-        canvas.setFont("TarsBold", 8)
+        canvas.setFont("JamesBold", 8)
         canvas.drawCentredString(self.width / 2, 3.5 * mm,
                                  "Then: G8 facial state integration -> G9 concurrent soak test")
         canvas.restoreState()
 
 
-class TarsDocTemplate(SimpleDocTemplate):
+class JamesDocTemplate(SimpleDocTemplate):
     def __init__(self, filename: str, **kwargs):
         super().__init__(filename, **kwargs)
         self._section = "Project TODO and Verification"
@@ -186,9 +186,9 @@ class TarsDocTemplate(SimpleDocTemplate):
 def register_fonts() -> None:
     fonts = Path("C:/Windows/Fonts")
     choices = {
-        "TarsRegular": [fonts / "segoeui.ttf", fonts / "arial.ttf"],
-        "TarsBold": [fonts / "segoeuib.ttf", fonts / "arialbd.ttf"],
-        "TarsMono": [fonts / "consola.ttf", fonts / "cour.ttf"],
+        "JamesRegular": [fonts / "segoeui.ttf", fonts / "arial.ttf"],
+        "JamesBold": [fonts / "segoeuib.ttf", fonts / "arialbd.ttf"],
+        "JamesMono": [fonts / "consola.ttf", fonts / "cour.ttf"],
     }
     for name, candidates in choices.items():
         selected = next((path for path in candidates if path.exists()), None)
@@ -200,34 +200,34 @@ def register_fonts() -> None:
 def styles():
     base = getSampleStyleSheet()
     return {
-        "title": ParagraphStyle("Title", parent=base["Title"], fontName="TarsBold",
+        "title": ParagraphStyle("Title", parent=base["Title"], fontName="JamesBold",
                                 fontSize=25, leading=29, textColor=NAVY,
                                 alignment=TA_LEFT, spaceAfter=5 * mm),
         "subtitle": ParagraphStyle("Subtitle", parent=base["BodyText"],
-                                   fontName="TarsRegular", fontSize=9.5,
+                                   fontName="JamesRegular", fontSize=9.5,
                                    leading=14, textColor=MUTED, spaceAfter=3 * mm),
-        "h1": ParagraphStyle("H1", parent=base["Heading1"], fontName="TarsBold",
+        "h1": ParagraphStyle("H1", parent=base["Heading1"], fontName="JamesBold",
                              fontSize=17, leading=21, textColor=NAVY,
                              spaceBefore=7 * mm, spaceAfter=3 * mm,
                              keepWithNext=True),
-        "h2": ParagraphStyle("H2", parent=base["Heading2"], fontName="TarsBold",
+        "h2": ParagraphStyle("H2", parent=base["Heading2"], fontName="JamesBold",
                              fontSize=12.5, leading=16, textColor=BLUE,
                              spaceBefore=4 * mm, spaceAfter=2 * mm,
                              keepWithNext=True),
-        "body": ParagraphStyle("Body", parent=base["BodyText"], fontName="TarsRegular",
+        "body": ParagraphStyle("Body", parent=base["BodyText"], fontName="JamesRegular",
                                fontSize=8.8, leading=13.2, textColor=INK,
                                spaceAfter=2.2 * mm),
-        "small": ParagraphStyle("Small", parent=base["BodyText"], fontName="TarsRegular",
+        "small": ParagraphStyle("Small", parent=base["BodyText"], fontName="JamesRegular",
                                 fontSize=7.4, leading=10, textColor=INK),
-        "bullet": ParagraphStyle("Bullet", parent=base["BodyText"], fontName="TarsRegular",
+        "bullet": ParagraphStyle("Bullet", parent=base["BodyText"], fontName="JamesRegular",
                                  fontSize=8.6, leading=12.5, textColor=INK,
                                  leftIndent=5 * mm, firstLineIndent=-3 * mm,
                                  spaceAfter=1.2 * mm),
-        "code": ParagraphStyle("Code", parent=base["Code"], fontName="TarsMono",
+        "code": ParagraphStyle("Code", parent=base["Code"], fontName="JamesMono",
                                fontSize=7.4, leading=10, textColor=INK,
                                backColor=PAPER, borderColor=LINE, borderWidth=0.5,
                                borderPadding=7, spaceBefore=2 * mm, spaceAfter=3 * mm),
-        "callout": ParagraphStyle("Callout", parent=base["BodyText"], fontName="TarsRegular",
+        "callout": ParagraphStyle("Callout", parent=base["BodyText"], fontName="JamesRegular",
                                   fontSize=8.3, leading=12, textColor=INK),
     }
 
@@ -269,7 +269,7 @@ def make_markdown_table(rows: list[list[str]], st, width: float) -> Table:
     commands = [
         ("BACKGROUND", (0, 0), (-1, 0), NAVY),
         ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
-        ("FONTNAME", (0, 0), (-1, 0), "TarsBold"),
+        ("FONTNAME", (0, 0), (-1, 0), "JamesBold"),
         ("GRID", (0, 0), (-1, -1), 0.35, LINE),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 5),
@@ -284,22 +284,22 @@ def make_markdown_table(rows: list[list[str]], st, width: float) -> Table:
     return table
 
 
-def page_decor(canvas: Canvas, doc: TarsDocTemplate) -> None:
+def page_decor(canvas: Canvas, doc: JamesDocTemplate) -> None:
     canvas.saveState()
     page_w, page_h = A4
     canvas.setFillColor(NAVY)
     canvas.rect(0, page_h - 10 * mm, page_w, 10 * mm, fill=1, stroke=0)
     canvas.setFillColor(WHITE)
-    canvas.setFont("TarsBold", 7.5)
-    canvas.drawString(18 * mm, page_h - 6.4 * mm, "PROJECT TARS")
-    canvas.setFont("TarsRegular", 7)
+    canvas.setFont("JamesBold", 7.5)
+    canvas.drawString(18 * mm, page_h - 6.4 * mm, "PROJECT James")
+    canvas.setFont("JamesRegular", 7)
     canvas.drawRightString(page_w - 18 * mm, page_h - 6.4 * mm,
                            clean_text(doc._section)[:82])
     canvas.setStrokeColor(CYAN)
     canvas.setLineWidth(1.2)
     canvas.line(18 * mm, 12 * mm, page_w - 18 * mm, 12 * mm)
     canvas.setFillColor(MUTED)
-    canvas.setFont("TarsRegular", 7)
+    canvas.setFont("JamesRegular", 7)
     canvas.drawString(18 * mm, 7.5 * mm, "Master implementation, test and verification tracker")
     canvas.drawRightString(page_w - 18 * mm, 7.5 * mm, f"Page {doc.page}")
     canvas.restoreState()
@@ -376,7 +376,7 @@ def parse_markdown(source: Path, content_width: float):
                                    style=TableStyle([
                                        ("BACKGROUND", (0, 0), (-1, -1), CYAN),
                                        ("TEXTCOLOR", (0, 0), (-1, -1), NAVY),
-                                       ("FONTNAME", (0, 0), (-1, -1), "TarsBold"),
+                                       ("FONTNAME", (0, 0), (-1, -1), "JamesBold"),
                                        ("FONTSIZE", (0, 0), (-1, -1), 8),
                                        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
                                        ("TOPPADDING", (0, 0), (-1, -1), 5),
@@ -436,12 +436,12 @@ def parse_markdown(source: Path, content_width: float):
 def build_pdf(source: Path, output: Path) -> None:
     register_fonts()
     output.parent.mkdir(parents=True, exist_ok=True)
-    doc = TarsDocTemplate(
+    doc = JamesDocTemplate(
         str(output), pagesize=A4,
         leftMargin=18 * mm, rightMargin=18 * mm,
         topMargin=18 * mm, bottomMargin=18 * mm,
-        title="Project TARS - Project TODO and Verification",
-        author="Project TARS",
+        title="Project James - Project TODO and Verification",
+        author="Project James",
         subject="Master implementation, testing and verification tracker",
     )
     story = parse_markdown(source, A4[0] - 36 * mm)

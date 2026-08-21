@@ -7,12 +7,12 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
-#include "tars_audio_capture.h"
-#include "tars_endpoint.h"
-#include "tars_ptt_client.h"
-#include "tars_wifi.h"
+#include "james_audio_capture.h"
+#include "james_endpoint.h"
+#include "james_ptt_client.h"
+#include "james_wifi.h"
 
-static const char *TAG = "tars";
+static const char *TAG = "james";
 
 static void log_runtime_memory(void)
 {
@@ -39,16 +39,16 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    ESP_LOGI(TAG, "Project TARS firmware starting on ESP32-P4 (ESP-IDF)");
+    ESP_LOGI(TAG, "Project James firmware starting on ESP32-P4 (ESP-IDF)");
 
-    if (!tars_endpoint_self_test()) {
+    if (!james_endpoint_self_test()) {
         ESP_LOGE(TAG, "Endpoint state-machine self-test failed");
     } else {
         ESP_LOGI(TAG, "Endpoint state-machine self-test passed");
     }
 
-#if CONFIG_TARS_AUDIO_CAPTURE_DIAGNOSTIC
-    ret = tars_audio_capture_start();
+#if CONFIG_JAMES_AUDIO_CAPTURE_DIAGNOSTIC
+    ret = james_audio_capture_start();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Audio capture diagnostic did not start: %s", esp_err_to_name(ret));
         return;
@@ -57,13 +57,13 @@ void app_main(void)
     ESP_LOGI(TAG, "Audio capture diagnostic is disabled in project configuration");
 #endif
 
-#if CONFIG_TARS_PTT_PROTOTYPE
-    ret = tars_wifi_start();
+#if CONFIG_JAMES_PTT_PROTOTYPE
+    ret = james_wifi_start();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Wi-Fi did not start: %s", esp_err_to_name(ret));
         return;
     }
-    ret = tars_ptt_client_start();
+    ret = james_ptt_client_start();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "BOOT-button PTT client did not start: %s", esp_err_to_name(ret));
         return;

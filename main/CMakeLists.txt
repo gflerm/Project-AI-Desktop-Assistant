@@ -1,9 +1,9 @@
 idf_component_register(SRCS "app_main.c"
-                            "tars_audio_capture.c"
-                            "tars_audio_ring.c"
-                            "tars_endpoint.c"
-                            "tars_ptt_client.c"
-                            "tars_wifi.c"
+                            "james_audio_capture.c"
+                            "james_audio_ring.c"
+                            "james_endpoint.c"
+                            "james_ptt_client.c"
+                            "james_wifi.c"
                        INCLUDE_DIRS "."
                        REQUIRES esp_psram esp_wifi esp_netif esp_event nvs_flash
                                 esp_driver_i2s esp_timer

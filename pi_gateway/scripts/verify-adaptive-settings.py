@@ -8,15 +8,15 @@ import os
 import urllib.request
 
 
-token = os.environ.get("TARS_TOKEN", "")
+token = os.environ.get("JAMES_TOKEN", "")
 if len(token) < 24:
-    raise SystemExit("TARS_TOKEN is not configured")
+    raise SystemExit("JAMES_TOKEN is not configured")
 base_url = "http://127.0.0.1:8090"
 
 
 def request(path: str, payload: dict | None = None, method: str | None = None) -> dict:
     data = json.dumps(payload).encode() if payload is not None else None
-    headers = {"X-Tars-Token": token}
+    headers = {"X-James-Token": token}
     if data is not None:
         headers["Content-Type"] = "application/json"
     req = urllib.request.Request(base_url + path, data=data, headers=headers, method=method)
@@ -43,9 +43,9 @@ speech = request(
 learning = request(
     "/v1/settings/local-learning/lessons",
     {
-        "prompt": "When I ask your name, identify yourself correctly as TARS.",
+        "prompt": "When I ask your name, identify yourself correctly as James.",
         "response": "",
-        "guidance": "Use the name TARS. Do not call yourself Dateway or imitate a film performance.",
+        "guidance": "Use the name James. Do not call yourself Dateway or imitate a film performance.",
     },
     method="POST",
 )

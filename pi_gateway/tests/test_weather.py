@@ -5,8 +5,8 @@ import unittest
 
 import httpx
 
-from tars_gateway.weather import WeatherClient, current_weather_place
-from tars_gateway.services import needs_live_grounding
+from james_gateway.weather import WeatherClient, current_weather_place
+from james_gateway.services import needs_live_grounding
 
 
 class WeatherTests(unittest.TestCase):

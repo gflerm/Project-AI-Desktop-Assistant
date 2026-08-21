@@ -1,4 +1,4 @@
-# Project TARS --- Voice Corpus, VAD and Speaker Enrollment Test Plan
+# Project James --- Voice Corpus, VAD and Speaker Enrollment Test Plan
 
 **Status:** Version 0.1 --- Test preparation baseline\
 **Date:** 2026-08-20\
@@ -141,7 +141,7 @@ keyboard and mouse
 3D printer or similar steady machinery
 chair/desk movement
 open window or distant traffic
-TARS speaker playback at low/normal volume
+James speaker playback at low/normal volume
 ```
 
 Record noise conditions rather than adding artificial noise to every clip.
@@ -303,7 +303,7 @@ Before considering model fine-tuning:
 1. verify microphone gain and clipping;
 2. verify VAD pre-roll and endpoints;
 3. test a stronger pretrained STT model;
-4. add a Project TARS vocabulary/context bias if supported;
+4. add a Project James vocabulary/context bias if supported;
 5. isolate recurring errors in a held-out corpus.
 
 Fine-tuning on one speaker too early can reduce general robustness and create a

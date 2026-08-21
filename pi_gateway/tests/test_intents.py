@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from tars_gateway.intents import plan_intents
+from james_gateway.intents import plan_intents
 
 
 class IntentPlanningTests(unittest.TestCase):

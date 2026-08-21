@@ -1,4 +1,4 @@
-# Project TARS --- P4 FreeRTOS Execution Plan
+# Project James --- P4 FreeRTOS Execution Plan
 
 **Status:** Version 0.3 --- Initial PTT firmware built\
 **Date:** 2026-08-21\
@@ -138,7 +138,7 @@ microphone overrun.
 ## 4.2 Why networking is on the service core
 
 The ESP32-C6 offloads the Wi-Fi radio and Wi-Fi protocol implementation, but the
-P4 still runs the host transport, network stack and Project TARS application
+P4 still runs the host transport, network stack and Project James application
 protocol. Core 0 owns the project-level session and packet flow. ESP-IDF system
 tasks must retain their configured affinities; the project should not attempt
 to repin private ESP-IDF or ESP-Hosted tasks without a measured reason.
@@ -475,7 +475,7 @@ The P4 runs ESP-IDF/FreeRTOS and uses both high-performance cores.
 
 **Status:** Provisional; benchmark-driven.
 
-It owns Project TARS networking, Pi session, protocol and state orchestration.
+It owns Project James networking, Pi session, protocol and state orchestration.
 
 ## P4E003 --- Core 1 is the initial peripheral/media core
 

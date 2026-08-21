@@ -1,10 +1,10 @@
-# Project TARS — Project TODO and Verification
+# Project James — Project TODO and Verification
 
 **Status:** Version 0.3 — Primary implementation, test, and verification checklist
 
 **Date:** 2026-08-21
 
-**Owner:** Project TARS implementation and verification workstreams
+**Owner:** Project James implementation and verification workstreams
 
 **Companion documents:** [VAD architecture](P4-Voice-Activity-Detection-Plan.md),
 [Pi gateway and Windows voice test](Pi-Gateway-and-Windows-Voice-Test.md),
@@ -12,7 +12,7 @@
 [firmware build guide](Firmware-Build-Guide.md),
 [P4-to-Pi audio protocol](P4-Pi-Audio-Protocol.md), and
 [VED Training start page](../VED%20Training/README.md), and
-[TARS teaching and response improvement plan](TARS-Teaching-and-Response-Improvement-Plan.md)
+[James teaching and response improvement plan](James-Teaching-and-Response-Improvement-Plan.md)
 
 > 🟢 **P4 AUDIO WORK RESUMED — 2026-08-21:** The Windows tester is no longer the
 > active acceptance client. The immediate target is the connected ESP32-P4,
@@ -26,8 +26,13 @@
 > pass. The Windows tester remains compatible but is retained as a diagnostic
 > tool only. Final NUC/host assignment remains paused.
 
-- [x] Make **James** the spoken assistant name; retain Project TARS only as the
-  internal project/protocol name.
+- [x] Make **James** the spoken assistant and project name; remove the previous
+  fictional-character name from first-party source, paths and documentation.
+- [x] Add a GitHub-detectable root Apache License 2.0, `NOTICE`, and a clear
+  `LICENSE-SCOPE.md` that excludes third-party and separately licensed assets.
+- [ ] Migrate the live Pi services and P4 firmware to the renamed `james_*`
+  packages, service units, configuration names and `JAM1` wire identifier in one
+  coordinated deployment; retain the current live build until that migration.
 - [x] Route identity questions deterministically without an LLM call; live Pi
   verification returned `system:identity` / `identity-registry` in 1 ms.
 - [x] Pass all 49 gateway tests on the Pi after the James identity update.
@@ -56,7 +61,7 @@
 - [x] Read-only network health: hostname, DNS, internet reachability and
   latency.
 - [ ] Read-only NVMe/storage health and capacity warnings.
-- [ ] Read-only service error summary and recent TARS failures.
+- [ ] Read-only service error summary and recent James failures.
 - [x] Ollama model and active/waiting inference-queue status.
 - [ ] Microphone level, clipping, silence and STT-confidence diagnostics.
 - [ ] Scoped local document search and retrieval from approved directories.
@@ -65,14 +70,14 @@
 
 Read-only tools may run automatically when explicitly requested. Any tool that
 changes files, services, reminders, accounts or physical devices requires a
-separate permission policy and a confirmed result before TARS claims success.
+separate permission policy and a confirmed result before James claims success.
 
-### Current TARS quality and teaching work
+### Current James quality and teaching work
 
 The 2026-08-21 review covered all 60 private recorded turns, 390 gateway
 telemetry events, the CSV export and all five benchmark/smoke artifacts. The
 evidence and phased remedy are in the
-[TARS teaching and response improvement plan](TARS-Teaching-and-Response-Improvement-Plan.md).
+[James teaching and response improvement plan](James-Teaching-and-Response-Improvement-Plan.md).
 
 - [x] Review all recorded prompt/response JSON, JSONL and CSV evidence and
   classify the observed failure patterns.
@@ -110,7 +115,7 @@ evidence and phased remedy are in the
 # 1. Purpose
 
 This is the master executable checklist for implementing and verifying Project
-TARS across the P4 firmware, physical hardware, Raspberry Pi 5 services,
+James across the P4 firmware, physical hardware, Raspberry Pi 5 services,
 facial gestures, speech pipeline, integration tests, and release gates. The
 current critical path begins with PC recordings and physical P4 microphone
 validation, then proceeds through VAD, Pi services, and full-system testing.
@@ -158,7 +163,7 @@ Standard clean firmware verification from the repository root:
 
 ```powershell
 .\tools\build-firmware.ps1 -Clean
-Test-Path .\build\project_tars.bin
+Test-Path .\build\project_james.bin
 Test-Path .\build\bootloader\bootloader.bin
 ```
 
@@ -174,12 +179,12 @@ this bounded sequence before enabling the camera, displays, VAD or wake word:
 - [x] Implement onboard ES8311 microphone capture as 16 kHz, 16-bit mono PCM.
 - [x] Implement GPIO35 BOOT hold/release PTT with debounce and a 20-second cap.
 - [x] Implement authenticated WebSocket uplink to `titanium:8090` and binary
-  100 ms `TAR1` chunks.
+  100 ms `JAM1` chunks.
 - [x] Implement binary 16 kHz PCM response playback through ES8311/NS4150B.
 - [x] Keep capture and playback half-duplex; ignore the camera.
 - [x] Build the firmware successfully with ESP-IDF 6.0.2 on 2026-08-21.
 - [x] Place the approved private Wi-Fi password and gateway token in ignored
-  `main/tars_private_config.h`; never print, document or commit either value.
+  `main/james_private_config.h`; never print, document or commit either value.
 - [x] Flash COM7 and verify P4 boot, 32 MB PSRAM, ES8311 microphone and speaker
   codec startup, 16 kHz capture and unclipped live microphone levels.
 - [x] Configure the P4 for the 2.4 GHz `WETOHOST2.4` SSID.
@@ -395,8 +400,8 @@ documented with a specific mitigation experiment.
 
 **Goal:** Turn frame-level speech/silence states into complete utterances.
 
-- [ ] Implement a backend-independent `tars_vad` interface.
-- [x] Implement the `tars_endpoint` state machine separately from the backend.
+- [ ] Implement a backend-independent `james_vad` interface.
+- [x] Implement the `james_endpoint` state machine separately from the backend.
 - [ ] Add at least 500 ms of bounded pre-roll.
 - [x] Add start confirmation and end-of-speech hangover/hysteresis.
 - [x] Add maximum utterance and no-speech timeouts.
@@ -493,7 +498,7 @@ recall, false triggers, endpoint latency, CPU, memory, and echo behavior.
 - [ ] Record model-load time, first-token latency, and sustained token speed.
 - [x] Deploy an isolated male Piper baseline using
   `en_GB-northern_english_male-medium` on localhost port 5001.
-- [ ] Tune/test the synthesized pronunciation and STT recognition of “TARS”;
+- [ ] Tune/test the synthesized pronunciation and STT recognition of “James”;
   initial loopback preserved the sentence but misheard the opening name.
 - [ ] Complete the fixed-corpus local TTS benchmark and test sherpa-onnx as a
   replaceable candidate.
@@ -512,14 +517,14 @@ recall, false triggers, endpoint latency, CPU, memory, and echo behavior.
   Wikipedia-grounded local fallback, pinned Ollama model, and three-turn memory.
 - [x] Add explicit private session recording to the tester: input/response WAV,
   transcript stages, answer, route, timing, issue tags, and operator notes under
-  the Git-ignored `captures/tars-sessions/` directory.
+  the Git-ignored `captures/james-sessions/` directory.
 - [x] Add local JSONL-to-CSV telemetry conversion and a local analysis report;
   verify that the installed Whisper response does not expose confidence rather
   than fabricating that metric.
 - [x] Default the tester to automatic routing and add persistent, explicitly
   taught Pi-local lessons that are retrieved only for Ollama and never sent to
   Gemini.
-- [x] Live-verify a local lesson: Ollama identified itself as TARS after the
+- [x] Live-verify a local lesson: Ollama identified itself as James after the
   lesson was stored; no OpenAI/ChatGPT API route exists in the gateway.
 - [ ] Record and flag at least 20 representative failed/weak turns, run the
   private session analyzer, and convert recurring unsupported requests into a
@@ -643,7 +648,7 @@ Apply this gate to every implementation work package before merge or release:
 
 # 17. Definition of Done
 
-The first Project TARS production milestone is complete only when all of the
+The first Project James production milestone is complete only when all of the
 following are true:
 
 - [ ] G0 through G9 exit conditions are met or formally waived with evidence.

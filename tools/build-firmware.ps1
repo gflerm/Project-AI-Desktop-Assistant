@@ -136,7 +136,7 @@ $idfArguments = @(
     'build'
 )
 
-Write-Host "Building Project TARS from $projectRoot"
+Write-Host "Building Project James from $projectRoot"
 Write-Host 'ccache: disabled (sandbox-compatible)'
 Write-Host "toolchain shim: $shimPath"
 & $python $idfPy @idfArguments

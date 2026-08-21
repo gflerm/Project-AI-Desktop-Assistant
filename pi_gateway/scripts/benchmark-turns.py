@@ -15,9 +15,9 @@ import uuid
 import wave
 
 
-token = os.environ.get("TARS_TOKEN", "").strip()
+token = os.environ.get("JAMES_TOKEN", "").strip()
 if len(token) < 24:
-    raise SystemExit("TARS_TOKEN is not configured")
+    raise SystemExit("JAMES_TOKEN is not configured")
 iterations = int(sys.argv[1]) if len(sys.argv) > 1 else 3
 base_url = "http://127.0.0.1:8090"
 scenarios = (
@@ -29,7 +29,7 @@ scenarios = (
 
 
 def request(path: str, payload: dict | bytes | None = None, headers: dict | None = None):
-    request_headers = {"X-Tars-Token": token}
+    request_headers = {"X-James-Token": token}
     request_headers.update(headers or {})
     if isinstance(payload, bytes):
         data = payload
@@ -85,7 +85,7 @@ for name, provider, prompt in scenarios:
                 "chat_wall_ms": round(chat_wall),
                 "chat_server_ms": chat.get("server_ms"),
                 "tts_wall_ms": round(tts_wall),
-                "tts_server_ms": int(tts_headers.get("x-tars-server-ms", "0")),
+                "tts_server_ms": int(tts_headers.get("x-james-server-ms", "0")),
                 "total_ms": round(total_ms),
                 "audio_duration_ms": round(duration_ms),
                 "provider": chat.get("provider", chat.get("route")),
@@ -99,14 +99,14 @@ for name, provider, prompt in scenarios:
             last_audio = audio
 
 if last_audio:
-    Path("/tmp/tars-optimized-voice.wav").write_bytes(last_audio)
+    Path("/tmp/james-optimized-voice.wav").write_bytes(last_audio)
     with wave.open(BytesIO(last_audio), "rb") as wav:
         pcm = wav.readframes(wav.getnframes())
     stt_values = []
     for _ in range(iterations):
         turn_id = str(uuid.uuid4())
         body, _, wall_ms = request(
-            "/v1/test/stt", pcm, {"X-Tars-Turn-Id": turn_id}
+            "/v1/test/stt", pcm, {"X-James-Turn-Id": turn_id}
         )
         result = json.loads(body)
         stt_values.append(

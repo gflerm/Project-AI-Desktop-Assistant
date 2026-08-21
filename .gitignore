@@ -91,4 +91,4 @@ managed_components/
 sdkconfig
 sdkconfig.old
 dependencies.lock
-main/tars_private_config.h
+main/james_private_config.h

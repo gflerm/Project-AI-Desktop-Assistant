@@ -1,6 +1,6 @@
-menu "Project TARS"
+menu "Project James"
 
-    config TARS_AUDIO_CAPTURE_DIAGNOSTIC
+    config JAMES_AUDIO_CAPTURE_DIAGNOSTIC
         bool "Enable P4 microphone capture diagnostic"
         default y
         help
@@ -9,18 +9,18 @@ menu "Project TARS"
             health summaries. This is a diagnostic baseline; it does not save
             or transmit audio and does not perform VAD.
 
-    config TARS_AUDIO_MIC_GAIN_DB
+    config JAMES_AUDIO_MIC_GAIN_DB
         int "ES8311 microphone input gain (dB)"
-        depends on TARS_AUDIO_CAPTURE_DIAGNOSTIC
+        depends on JAMES_AUDIO_CAPTURE_DIAGNOSTIC
         range 0 42
         default 24
         help
             Initial diagnostic microphone gain. Tune from measured peak,
             clipping, and noise-floor results rather than perceived loudness.
 
-    config TARS_AUDIO_SPEAKER_VOLUME
+    config JAMES_AUDIO_SPEAKER_VOLUME
         int "ES8311 speaker volume (percent)"
-        depends on TARS_AUDIO_CAPTURE_DIAGNOSTIC
+        depends on JAMES_AUDIO_CAPTURE_DIAGNOSTIC
         range 0 100
         default 95
         help
@@ -28,9 +28,9 @@ menu "Project TARS"
             and raise only after confirming the attached speaker is 8 ohm and
             no more than 2 W.
 
-    config TARS_AUDIO_RING_FRAMES
+    config JAMES_AUDIO_RING_FRAMES
         int "Bounded audio queue capacity (20 ms frames)"
-        depends on TARS_AUDIO_CAPTURE_DIAGNOSTIC
+        depends on JAMES_AUDIO_CAPTURE_DIAGNOSTIC
         range 10 100
         default 25
         help
@@ -39,18 +39,18 @@ menu "Project TARS"
             stall, the oldest frame is discarded so microphone capture never
             waits for networking, storage, or diagnostics.
 
-    config TARS_PTT_PROTOTYPE
+    config JAMES_PTT_PROTOTYPE
         bool "Enable BOOT-button PTT and Pi gateway voice loop"
-        depends on TARS_AUDIO_CAPTURE_DIAGNOSTIC
+        depends on JAMES_AUDIO_CAPTURE_DIAGNOSTIC
         default y
         help
             Use the Waveshare BOOT button as active-low push-to-talk. Hold to
             capture 16 kHz mono PCM, release to send it to Titanium, and play
             the returned 16 kHz PCM through the ES8311/NS4150B speaker path.
 
-    if TARS_PTT_PROTOTYPE
+    if JAMES_PTT_PROTOTYPE
 
-        config TARS_PTT_GPIO
+        config JAMES_PTT_GPIO
             int "Temporary PTT GPIO"
             range 0 54
             default 35
@@ -58,13 +58,13 @@ menu "Project TARS"
                 GPIO35 is the BOOT button on the Waveshare ESP32-P4-WIFI6.
                 Holding it while resetting still enters download mode.
 
-        config TARS_PTT_MAX_SECONDS
+        config JAMES_PTT_MAX_SECONDS
             int "Maximum PTT utterance length (seconds)"
             range 2 30
             default 20
 
-        config TARS_GATEWAY_URI
-            string "TARS Pi WebSocket URI"
+        config JAMES_GATEWAY_URI
+            string "James Pi WebSocket URI"
             default "ws://192.168.8.107:8090/ws/v1"
 
     endif

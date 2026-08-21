@@ -1,14 +1,14 @@
-# Project TARS --- Design Specification
+# Project James --- Design Specification
 
 **Status:** Version 0.6 ΓÇö Living Work in Progress --- Concept, Comparative Analysis & Initial
 Architecture\
 **Date:** 2026-08-09\
-**Working concept:** A desk-resident, hybrid AI workstation companion
-inspired by selected interaction strengths from TARS (*Interstellar*),
-LivingAI EMO, Rocky (*Project Hail Mary*), JARVIS, Data, R2-D2 and the
-Emergency Medical Hologram, while using HAL 9000 as a cautionary design
-reference. The finished companion must develop an original identity
-rather than reproduce any of these characters.
+**Working concept:** An original desk-resident, hybrid AI workstation
+companion built around competence, concise communication, adjustable humour,
+ambient presence and collaborative technical work. External characters and
+commercial products may inform broad design research, but James must not
+reproduce their names, performances, dialogue, visuals or other protected
+expression.
 
 ------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ The governing development principle is:
 > **Define the goal clearly, test the assumptions, record what we learn, and revise the specification when evidence changes the design.**
 
 > 🔴 **PAUSED ARCHITECTURE DECISION — 2026-08-20:** P4 implementation is
-> deferred while the Windows tester and TARS service behaviour are made useful
+> deferred while the Windows tester and James service behaviour are made useful
 > and reliable. The user's Asus GPU workstation is development/test equipment,
 > not an always-on inference server and not an automatic fallback. The current
 > candidate is a split service: Pi 5 for STT, TTS, tools and telemetry; existing
@@ -35,7 +35,7 @@ The governing development principle is:
 
 ## 1. Purpose
 
-The goal of Project TARS is to develop an **original, desk-resident AI companion and workstation partner** that combines a responsive physical interface with local control, optional cloud intelligence, voice interaction, expressive but restrained visual/audio feedback, tool use, and carefully bounded proactive assistance.
+The goal of Project James is to develop an **original, desk-resident AI companion and workstation partner** that combines a responsive physical interface with local control, optional cloud intelligence, voice interaction, expressive but restrained visual/audio feedback, tool use, and carefully bounded proactive assistance.
 
 The system should:
 
@@ -49,12 +49,12 @@ The system should:
 - favour competence, truthfulness, privacy, operator control and low interruption;
 - grow incrementally from a useful voice/display companion into vision, sensors, automation and richer workstation integration where those additions prove worthwhile.
 
-**Success is not defined by imitating TARS, EMO or any other fictional/commercial character.** Success means creating a useful original companion that earns a permanent place on the desk.
+**Success is not defined by imitating any fictional or commercial character.** Success means creating a useful original companion that earns a permanent place on the desk.
 
 ---
 
 
-Project TARS is a modular desktop AI companion intended to live beside a
+Project James is a modular desktop AI companion intended to live beside a
 primary PC and provide a persistent, expressive interface to AI
 services, local tools, sensors, voice interaction, automation, and
 eventually computer vision.
@@ -80,18 +80,18 @@ The project should favour:
 
 # Part I --- Inspiration Study
 
-## 2. TARS --- Personality Model
+## 2. Original Operator Personality Model
 
-TARS is valuable as an inspiration primarily because the character feels
-intelligent without relying on a human face. Personality is communicated
-through timing, language, competence, trust, and restraint.
+James should feel intelligent without relying on a human face. Personality is
+communicated through timing, original language, competence, trust and
+restraint.
 
 ### 2.1 Core traits
 
 -   **Dry humour:** wit is brief, situational, and generally delivered
     without disrupting the task.
 -   **Sarcasm:** present, but subordinate to mission success.
--   **High competence:** TARS behaves like a capable operator rather
+-   **High competence:** James behaves like a capable operator rather
     than a novelty chatbot.
 -   **Mission focus:** conversation does not prevent action.
 -   **Loyalty:** the assistant is fundamentally aligned with its
@@ -108,9 +108,9 @@ through timing, language, competence, trust, and restraint.
 
 ### 2.2 Adjustable personality concept
 
-The film establishes the idea that robot characteristics such as humour,
-honesty and discretion can be treated as settings. This is an excellent
-interaction metaphor for Project TARS.
+James treats characteristics such as humour, honesty and discretion as
+user-adjustable presentation settings. This is a useful original interaction
+model for Project James.
 
 Proposed controls:
 
@@ -157,9 +157,9 @@ Personality parameters must affect **presentation and interaction
 policy**, not factual truth, safety, permissions, or actual system
 capability.
 
-### 2.3 TARS-inspired capability principles
+### 2.3 Original capability principles
 
-Project TARS should borrow the following conceptual strengths:
+Project James should implement the following strengths:
 
 1.  **Voice-first interaction**
 2.  **Fast acknowledgement**
@@ -174,10 +174,9 @@ Project TARS should borrow the following conceptual strengths:
 
 ### 2.4 What not to copy
 
-The project should not attempt to reproduce copyrighted dialogue, voice
-performance, exact visual design, or the fictional robot itself. "TARS"
-is a useful working project name and design reference; the finished
-companion should develop its own identity.
+The project must not reproduce copyrighted dialogue, recognizable voice
+performances, character-specific visual designs or fictional characters.
+James must retain an original identity.
 
 ------------------------------------------------------------------------
 
@@ -307,7 +306,7 @@ partner rather than merely an assistant or desktop pet.
 
 ### 4.2 Rocky-inspired interaction mode
 
-Rocky's strongest contribution to Project TARS should be a situational
+Rocky's strongest contribution to Project James should be a situational
 **engineering-partner mode**.
 
 When the user is working on electronics, software, Raspberry Pi systems,
@@ -348,7 +347,7 @@ remain measured and explicit.
 
 ### 4.4 What not to copy
 
-Project TARS should not reproduce copyrighted dialogue, character-specific
+Project James should not reproduce copyrighted dialogue, character-specific
 speech patterns, fictional biology, or exact story elements from
 *Project Hail Mary*. Rocky is an inspiration for **collaborative technical
 temperament**, not a character to imitate.
@@ -357,7 +356,7 @@ temperament**, not a character to imitate.
 
 ## 5. Three-Way Comparative Design Matrix
 
-| Dimension | TARS inspiration | EMO inspiration | Rocky inspiration | Project direction |
+| Dimension | Operator model | EMO inspiration | Rocky inspiration | Project direction |
 |---|---|---|---|---|
 | Primary appeal | Competence and personality | Presence and charm | Collaborative ingenuity | Competent companion and engineering partner |
 | Personality | Dry, witty, mission-focused | Curious, playful, pet-like | Enthusiastic, loyal, curious | Dry intelligence with selective technical enthusiasm |
@@ -375,8 +374,8 @@ temperament**, not a character to imitate.
 
 ### 5.1 Combined lesson
 
-**TARS supplies disciplined competence. EMO supplies presence. Rocky
-supplies collaborative engineering energy.**
+**The operator model supplies disciplined competence. EMO supplies presence.
+Rocky supplies collaborative engineering energy.**
 
 The target should therefore feel alive while idle, competent while
 working, concise while speaking, and noticeably more engaged when the
@@ -407,7 +406,7 @@ not require a full conversational exchange for every useful action.
 
 ### 6.2 Project lesson
 
-Project TARS should develop an **attention policy**. Events can be
+Project James should develop an **attention policy**. Events can be
 classified as silent, ambient, informational, important or urgent. This
 prevents proactive behaviour from becoming notification spam.
 
@@ -463,7 +462,7 @@ without turning every event into spoken language.
 
 ### 8.2 Project lesson
 
-Project TARS should develop a small **non-verbal vocabulary** shared by
+Project James should develop a small **non-verbal vocabulary** shared by
 screen animation and sound.
 
 Examples:
@@ -490,7 +489,7 @@ information that actually benefits from words.
 The Emergency Medical Hologram concept contributes the idea of a
 purpose-built specialist persona operating within a larger system.
 
-Project TARS should not literally imitate the EMH. Instead, it should use
+Project James should not literally imitate the EMH. Instead, it should use
 **specialist operating modes** that alter tools, context and interaction
 policy without replacing the core personality.
 
@@ -513,7 +512,7 @@ assistant should still feel like the same companion.
 
 ## 10. K-2SO --- Deadpan Operational Commentary
 
-K-2SO overlaps substantially with TARS, so it should be a minor
+K-2SO overlaps substantially with the deadpan operator model, so it should be a minor
 inspiration rather than a major personality source.
 
 Useful contribution:
@@ -530,7 +529,7 @@ dialogs.
 
 ## 11. HAL 9000 --- Anti-Pattern and Safety Reference
 
-HAL is most useful to Project TARS as a warning.
+HAL is most useful to Project James as a warning.
 
 ### 11.1 Failure modes to avoid
 
@@ -545,7 +544,7 @@ HAL is most useful to Project TARS as a warning.
 
 ### 11.2 Project lesson
 
-Project TARS should follow these principles:
+Project James should follow these principles:
 
 1. The operator can determine what the assistant is doing.
 2. Tool actions have explicit permission boundaries.
@@ -562,7 +561,7 @@ Project TARS should follow these principles:
 
 | Source | Primary contribution | Secondary contribution | Avoid copying |
 |---|---|---|---|
-| TARS | Disciplined competence | Dry humour, configurable behaviour | Exact character/dialogue |
+| Original operator model | Disciplined competence | Dry humour, configurable behaviour | Character imitation |
 | EMO | Ambient presence | Visual reactions, idle life | Vendor-specific implementation |
 | Rocky | Collaborative engineering | Curiosity, shared victories | Character speech/story elements |
 | JARVIS | Ambient orchestration | Attention management | Omnipotent fictional capability |
@@ -576,7 +575,7 @@ Project TARS should follow these principles:
 
 The emerging design can be summarized as:
 
-**TARS = competence**  
+**Operator model = competence**
 **EMO = presence**  
 **Rocky = partnership**  
 **JARVIS = orchestration**  
@@ -605,7 +604,7 @@ KITT contributes the idea that the assistant is not merely an application the op
 - treat the adjacent PC and the compute-partner Pi as cooperating parts of one environment;
 - avoid demanding attention merely to prove the assistant is active.
 
-This reinforces the goal of making Project TARS a **workstation companion**, not simply a chatbot displayed on an embedded screen.
+This reinforces the goal of making Project James a **workstation companion**, not simply a chatbot displayed on an embedded screen.
 
 ---
 
@@ -636,7 +635,7 @@ CRITICAL severity  -> no humour, maximum clarity and confirmation
 
 ## 16. C-3PO --- Information-Overload Anti-Pattern
 
-C-3PO reminds us that technically correct information can still be badly communicated. Project TARS should avoid narrating every internal event, interrupting with low-value information, repeating acknowledged warnings, or burying required action beneath background detail.
+C-3PO reminds us that technically correct information can still be badly communicated. Project James should avoid narrating every internal event, interrupting with low-value information, repeating acknowledged warnings, or burying required action beneath background detail.
 
 The Attention Manager should optimise for **relevance**, not merely information availability.
 
@@ -654,7 +653,7 @@ Possible subtle presentation states include `focused`, `curious`, `quiet`, `busy
 
 GLaDOS demonstrates that an AI character can be recognizable through sentence construction, timing, understatement and contextual callbacks.
 
-Project TARS should develop an original linguistic identity through sentence rhythm, restraint, timing, dry understatement, selective callbacks and consistent vocabulary.
+Project James should develop an original linguistic identity through sentence rhythm, restraint, timing, dry understatement, selective callbacks and consistent vocabulary.
 
 The adversarial traits are explicit anti-patterns: manipulation, deception, humiliation, passive-aggressive obstruction, misleading instructions and treating the operator as an opponent.
 
@@ -668,7 +667,7 @@ The inspiration set must not become a "personality casserole."
 
 | Source | Contribution |
 |---|---|
-| TARS | disciplined competence |
+| James | disciplined competence |
 | EMO | ambient presence |
 | Rocky | collaborative engineering |
 | JARVIS | orchestration and attention |
@@ -1149,7 +1148,7 @@ Possible workflow:
 ``` text
 User voice/touch request
         |
-Project TARS orchestrator
+Project James orchestrator
         |
 Development intent
         |
@@ -1157,7 +1156,7 @@ Codex/CLI agent on Pi 5 or desktop PC
         |
 Repository changes / tests / result
         |
-TARS summarizes outcome
+James summarizes outcome
 ```
 
 Because the companion will sit beside the main PC, a particularly
@@ -1305,7 +1304,7 @@ the primary development workstation.
 ### D008 --- Trusted Wi-Fi is the preferred ESP32-P4-to-Pi transport
 
 **Reason:** a trusted Wi-Fi LAN with static private addressing where
-practical gives internal TARS traffic a clearer trust boundary while
+practical gives internal James traffic a clearer trust boundary while
 keeping the ESP32-P4 physically independent of wired infrastructure.
 
 ------------------------------------------------------------------------
@@ -1324,8 +1323,7 @@ keeping the ESP32-P4 physically independent of wired infrastructure.
 -   What routing policy should choose Pi 5-local versus cloud providers?
 -   Which workstation services, if any, should the Acer expose?
 -   How much initiative should the assistant have by default?
--   Should the final personality retain the "TARS" working name or
-    receive an original name?
+-   Complete trademark clearance for the approved user-facing name, James.
 -   Should an M5/ESP32 device be repurposed as a sensor/control
     peripheral?
 -   What information is allowed into persistent memory?
@@ -1348,8 +1346,8 @@ This section should be updated throughout development.
 -   The project does not need a large local LLM on the Pi 5 to be
     meaningfully local.
 -   EMO's strongest lesson is ambient presence and expressive state.
--   TARS's strongest lesson is competent personality with adjustable
-    behavioural parameters.
+-   The original operator model's strongest requirement is competent
+    personality with adjustable behavioural parameters.
 -   Keeping the AI provider behind an adapter is a foundational
     requirement, not a later refactor.
 
@@ -1389,12 +1387,8 @@ inspiration study:
 
 -   LivingAI's official EMO material: https://living.ai/emo/
 -   LivingAI EMO product material: https://living.ai/product/emo/
--   Interstellar Wiki pages describing TARS and the adjustable robot
-    personality settings: https://interstellarfilm.fandom.com/wiki/TARS
-    and https://interstellarfilm.fandom.com/wiki/Robot
-
 These references are inspiration/research inputs only. Hardware and
-software choices in this specification are proposed Project TARS
+software choices in this specification are proposed Project James
 architecture, not claims about EMO's internal implementation.
 
 ------------------------------------------------------------------------
@@ -1432,7 +1426,7 @@ architecture, not claims about EMO's internal implementation.
                                                   implementation phases
 
   0.1                     2026-08-08              Initial concept,
-                                                  TARS/EMO comparison,
+                                                  James/EMO comparison,
                                                   architecture and phased
                                                   roadmap
 

@@ -1,0 +1,24 @@
+[Unit]
+Description=Project James P4-to-Pi voice gateway
+After=network-online.target ollama.service whisper-ember.service piper-james.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ember
+Group=ember
+EnvironmentFile=-/etc/ember/ember.env
+EnvironmentFile=/etc/james/james.env
+WorkingDirectory=/opt/james/gateway
+ExecStart=/opt/ember/venv/bin/uvicorn james_gateway.main:app --host 0.0.0.0 --port 8090
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/james
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

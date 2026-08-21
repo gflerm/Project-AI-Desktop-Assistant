@@ -5,14 +5,14 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
-os.environ.setdefault("TARS_TOKEN", "test-token-that-is-at-least-24-characters")
-os.environ.setdefault("TARS_TELEMETRY_ENABLED", "false")
+os.environ.setdefault("JAMES_TOKEN", "test-token-that-is-at-least-24-characters")
+os.environ.setdefault("JAMES_TELEMETRY_ENABLED", "false")
 
 from fastapi.testclient import TestClient
 
-from tars_gateway import main
-from tars_gateway.persistent_memory import PersistentMemory
-from tars_gateway.protocol import (
+from james_gateway import main
+from james_gateway.persistent_memory import PersistentMemory
+from james_gateway.protocol import (
     BYTES_PER_FRAME,
     KIND_MICROPHONE,
     KIND_TTS,
@@ -26,7 +26,7 @@ class FakeServices:
         return {"whisper": True, "piper": True, "ollama": True}
 
     async def transcribe(self, pcm: bytes, prompt: str = "") -> str:
-        return "hello tars"
+        return "hello james"
 
     async def converse(
         self, device_id: str, transcript: str, provider_override: str | None = None
@@ -90,7 +90,7 @@ class WebSocketProtocolTests(unittest.TestCase):
             str(Path(self.memory_directory.name) / "memory.json")
         )
         self.client = TestClient(main.app)
-        self.headers = {"X-Tars-Token": os.environ["TARS_TOKEN"]}
+        self.headers = {"X-James-Token": os.environ["JAMES_TOKEN"]}
 
     def test_complete_turn(self) -> None:
         with self.client.websocket_connect("/ws/v1", headers=self.headers) as websocket:
@@ -163,7 +163,7 @@ class WebSocketProtocolTests(unittest.TestCase):
         self.assertEqual(payload["route"], "system:identity")
         self.assertEqual(payload["provider"], "identity-registry")
         self.assertIn("My name is James", payload["text"])
-        self.assertNotIn("My name is TARS", payload["text"])
+        self.assertNotIn("My name is JAMES", payload["text"])
 
     def test_sequence_gap_cancels_turn(self) -> None:
         with self.client.websocket_connect("/ws/v1", headers=self.headers) as websocket:
@@ -203,7 +203,7 @@ class WebSocketProtocolTests(unittest.TestCase):
             content=bytes(BYTES_PER_FRAME),
         )
         self.assertEqual(stt.status_code, 200)
-        self.assertEqual(stt.json()["transcript"], "hello tars")
+        self.assertEqual(stt.json()["transcript"], "hello james")
         chat = self.client.post(
             "/v1/test/chat",
             headers=self.headers,

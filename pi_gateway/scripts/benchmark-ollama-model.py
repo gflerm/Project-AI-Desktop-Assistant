@@ -28,7 +28,7 @@ for index, prompt in enumerate(prompts, start=1):
                 {
                     "role": "system",
                     "content": (
-                        "You are TARS, a concise truthful desktop assistant. "
+                        "You are James, a concise truthful desktop assistant. "
                         "Use an available tool for live measurements instead of guessing."
                     ),
                 },

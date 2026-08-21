@@ -1,8 +1,8 @@
-# Project TARS - Consolidated Documentation Summary
+# Project James - Consolidated Documentation Summary
 
 ## Project Overview
 
-Project TARS is an AI desktop assistant project with a modular, extensible architecture designed around replaceable modules and provider adapters. The project emphasizes competence, collaboration, and operator control while maintaining flexibility for future commercial use.
+Project James is an AI desktop assistant project with a modular, extensible architecture designed around replaceable modules and provider adapters. The project emphasizes competence, collaboration, and operator control while maintaining flexibility for future commercial use.
 
 ## Key Documentation Files Analysis
 
@@ -57,7 +57,7 @@ The personality framework is implemented through a layered approach that separat
 This consolidated summary provides a comprehensive overview that connects all key documentation elements into a unified framework for both development and future commercialization efforts.
 - Core values are defined in the design specification and personality distillation documents
 - These values are enforced through the runtime system rather than being tied to specific AI models
-- The service boundary interfaces ensure that personality decisions (like when to interrupt or how much humor to use) are made by the TARS runtime, not by individual AI components
+- The service boundary interfaces ensure that personality decisions (like when to interrupt or how much humor to use) are made by the James runtime, not by individual AI components
    - Quiet presence with appropriate interruption behavior
    - Intellectual honesty about certainty levels
    - Operator control maintained throughout interactions
@@ -66,11 +66,11 @@ This consolidated summary provides a comprehensive overview that connects all ke
 
 5. **Privacy and Security**: Strong emphasis on privacy considerations and maintaining operator control over the assistant's behavior.
 ### 4. Speech & AI Runtime Evaluation
-- **Service Boundaries**: Clear separation of speech and AI components behind stable Project TARS interfaces
+- **Service Boundaries**: Clear separation of speech and AI components behind stable Project James interfaces
 - **Hardware Compatibility**: Designed for ESP32-P4, Raspberry Pi 5, NVIDIA Jetson Nano, Acer i7 development workstation, and cloud platforms
 - **Runtime Components**: Evaluation of STT (whisper.cpp, faster-whisper), TTS (Piper, sherpa-onnx), local LLM (Ollama, llama.cpp) with focus on replaceable service interfaces
 
 ### 5. Personality Distillation
 - **Core Identity**: Highly competent technical companion with dry warmth, quiet presence, intellectual honesty, engineering curiosity and excellent judgement
 - **Implementation Approach**: Personality implemented in layers including core values, trust/safety policy, personality parameters, contextual mode, severity governor, attention policy, behavioural state, linguistic renderer, and animation/sound renderer
-- **Key Principle**: The model does not own the personality - the Project TARS runtime owns the personality to ensure provider independence
+- **Key Principle**: The model does not own the personality - the Project James runtime owns the personality to ensure provider independence

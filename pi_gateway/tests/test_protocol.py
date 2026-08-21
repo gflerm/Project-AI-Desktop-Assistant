@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from tars_gateway.protocol import (
+from james_gateway.protocol import (
     BYTES_PER_FRAME,
     KIND_MICROPHONE,
     ProtocolError,

@@ -5,7 +5,7 @@ import unittest
 
 import httpx
 
-from tars_gateway.search import SearchResult, WikipediaSearchClient
+from james_gateway.search import SearchResult, WikipediaSearchClient
 
 
 class SearchTests(unittest.TestCase):

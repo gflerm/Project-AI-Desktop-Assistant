@@ -1,4 +1,4 @@
-# Project TARS — VAD TODO Moved
+# Project James — VAD TODO Moved
 
 The former VAD implementation checklist has expanded into the project's single
 authoritative implementation, testing, and verification tracker.

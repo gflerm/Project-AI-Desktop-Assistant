@@ -1,22 +1,26 @@
-# Project TARS --- Open-Source Licensing Strategy
+# Project James --- Open-Source Licensing Strategy
 
 **Status:** Version 0.3 --- Adopted licensing strategy / Living Work in Progress\
 **Date:** 2026-08-09\
 **Default open-source software licence:** Apache License 2.0\
-**Working project name:** Project TARS\
+**Working project name:** Project James\
 **Important:** This is an engineering/licensing plan, not legal advice.
 Obtain qualified IP/legal review before public or commercial release.
+
+**Repository baseline (2026-08-21):** the root `LICENSE`, `NOTICE` and
+`LICENSE-SCOPE.md` files are present. A public release still requires the
+component, dependency, provenance and notice audit below.
 
 ------------------------------------------------------------------------
 
 ## 1. Decision
 
-For original Project TARS **software source code explicitly selected for
+For original Project James **software source code explicitly selected for
 open-source release**, the adopted default licence is:
 
 > **Apache License 2.0 ΓÇö adopted default for original software explicitly released as open source.**
 
-This is preferred over MIT for Project TARS because the project is
+This is preferred over MIT for Project James because the project is
 intended to be modular, extensible, AI-assisted, potentially
 collaborative, and may later have commercial/OEM uses. Apache-2.0
 remains permissive while adding an explicit patent licence and
@@ -29,9 +33,9 @@ terms.
 
 ------------------------------------------------------------------------
 
-## 2. Why Apache-2.0 Fits Project TARS
+## 2. Why Apache-2.0 Fits Project James
 
-Project TARS is designed around replaceable modules and provider
+Project James is designed around replaceable modules and provider
 adapters:
 
 ``` text
@@ -63,7 +67,7 @@ Apache-2.0 provides:
 -   compatibility with a modular plugin/service architecture.
 
 The explicit patent grant is the main reason to prefer Apache-2.0 over
-MIT as the **Project TARS default software licence**.
+MIT as the **Project James default software licence**.
 
 ------------------------------------------------------------------------
 
@@ -74,7 +78,7 @@ One licence should not be forced onto every type of project material.
   -----------------------------------------------------------------------
   Material                            Recommended treatment
   ----------------------------------- -----------------------------------
-  Original Project TARS software code **Apache-2.0**
+  Original Project James software code **Apache-2.0**
 
   API/protocol definitions and SDK    **Apache-2.0**
   code                                
@@ -113,7 +117,7 @@ One licence should not be forced onto every type of project material.
 
   Product name/logo/trademarks        **Not granted by Apache-2.0**
 
-  Fictional-character IP              Not part of Project TARS licensing
+  Fictional-character IP              Not part of Project James licensing
                                       rights
   -----------------------------------------------------------------------
 
@@ -158,7 +162,7 @@ BSD-3-Clause
 ISC
 ```
 
-These are generally easier to combine with an Apache-2.0 Project TARS
+These are generally easier to combine with an Apache-2.0 Project James
 core, subject to their notice requirements.
 
 ### 5.2 Copyleft dependencies
@@ -168,7 +172,7 @@ require deliberate architectural and distribution review.
 
 Rules:
 
--   do not copy GPL source into Apache-licensed Project TARS code;
+-   do not copy GPL source into Apache-licensed Project James code;
 -   do not assume a process boundary automatically resolves every
     licensing issue;
 -   keep separately installed services genuinely separate where
@@ -188,7 +192,7 @@ linking or distributing modified libraries.
 
 Current upstream project licence: **MIT**.
 
-Generally suitable as a permissive Project TARS dependency. However,
+Generally suitable as a permissive Project James dependency. However,
 optional/example integrations may carry additional licences. In
 particular, FFmpeg-enabled/example code must be audited rather than
 assuming every optional build path has identical licensing.
@@ -229,7 +233,7 @@ The active `OHF-Voice/piper1-gpl` project is **GPL-3.0-or-later**.
 This is the most obvious current licensing caution in the proposed
 stack.
 
-Project TARS should:
+Project James should:
 
 -   keep Piper optional;
 -   avoid making Piper a mandatory linked component of the
@@ -248,7 +252,7 @@ licensing obligations without a technical/security/maintenance review.
 The code is **Apache-2.0**, but upstream states that its included
 pretrained models are **CC BY-NC-SA 4.0**.
 
-That means the code licence fits Project TARS very well, while the
+That means the code licence fits Project James very well, while the
 included pretrained wake-word models are not suitable for unrestricted
 commercial distribution.
 
@@ -292,10 +296,10 @@ This applies to:
 ## 8. Fictional Characters and Original Identity
 
 The project documents use fictional/commercial characters as
-design-analysis references, including TARS, Rocky, JARVIS, KITT and
+design-analysis references, including Rocky, JARVIS, KITT and
 others.
 
-An Apache-2.0 licence **cannot grant rights the Project TARS
+An Apache-2.0 licence **cannot grant rights the Project James
 contributors do not own**.
 
 Therefore public releases must not include unlicensed:
@@ -317,7 +321,7 @@ language, original visuals and original sounds.
 
 ## 9. Project Name and Trademark Boundary
 
-`Project TARS` should remain a **working/internal project name** until
+`Project James` should remain a **working/internal project name** until
 trademark and branding review is complete.
 
 Apache-2.0 grants copyright and patent permissions described by the
@@ -388,7 +392,7 @@ SPDX-License-Identifier: Apache-2.0
 Where useful:
 
 ``` text
-Copyright 2026 Project TARS contributors
+Copyright 2026 Project James contributors
 SPDX-License-Identifier: Apache-2.0
 ```
 
@@ -424,7 +428,7 @@ released until the following are checked:
 The existing modular architecture helps enormously.
 
 ``` text
-PROJECT TARS CORE (Apache-2.0)
+PROJECT James CORE (Apache-2.0)
         |
         +-- STT adapter -------- permissive runtime / cloud API
         |
@@ -473,7 +477,7 @@ A sensible candidate public structure is:
 - CAD/hardware design;
 - branding.
 
-**Never claimed as Project TARS IP:**
+**Never claimed as Project James IP:**
 
 - fictional characters and their assets;
 - third-party models and APIs;
@@ -493,7 +497,7 @@ not categorically open or categorically proprietary.
 ### Why not GPL as the project licence?
 
 GPL is excellent when reciprocal source sharing is the project's primary
-goal. Project TARS is likely to benefit more from broad integration,
+goal. Project James is likely to benefit more from broad integration,
 embedded/OEM experimentation, proprietary plugins and cloud/local
 provider combinations. Apache-2.0 gives that flexibility while
 preserving attribution and providing an explicit patent grant.
@@ -501,13 +505,13 @@ preserving attribution and providing an explicit patent grant.
 ### Why not MIT as the project licence?
 
 MIT would also work and many important dependencies already use it.
-Apache-2.0 is preferred because Project TARS may grow into a
+Apache-2.0 is preferred because Project James may grow into a
 multi-contributor hardware/software platform and Apache-2.0 provides
 clearer patent terms.
 
 ### Hardware
 
-If Project TARS later publishes manufacturing-ready CAD/PCB source,
+If Project James later publishes manufacturing-ready CAD/PCB source,
 evaluate **CERN-OHL-P-2.0** as a separate permissive hardware licence
 rather than assuming the software licence is ideal for hardware design
 files.

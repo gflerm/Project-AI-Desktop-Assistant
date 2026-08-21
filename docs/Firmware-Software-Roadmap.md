@@ -1,10 +1,10 @@
-# Project TARS --- Firmware & Software Development Roadmap
+# Project James --- Firmware & Software Development Roadmap
 
 **Status:** Version 0.5 --- Living Work in Progress\
 **Date:** 2026-08-21\
 **Scope:** Firmware/software only; mechanical enclosure and hardware
 construction are tracked separately\
-**Companion documents:** Project TARS Design Specification, Personality
+**Companion documents:** Project James Design Specification, Personality
 Distillation Specification, Hardware Architecture & Inventory, License &
 IP Policy
 
@@ -12,7 +12,7 @@ IP Policy
 
 # 1. Purpose
 
-This document turns the Project TARS specifications into a **modular
+This document turns the Project James specifications into a **modular
 development roadmap with time estimates, milestones, dependencies,
 integration gates and definitions of done**.
 
@@ -136,8 +136,8 @@ The current ESP32-P4 deployment baseline is:
 ```text
 ESP-IDF (FreeRTOS) baseline
 + minimal graphics/display stack
-+ Project TARS fullscreen UI
-+ supervised Project TARS services
++ Project James fullscreen UI
++ supervised Project James services
 + admin/remote tooling
 ```
 
@@ -152,7 +152,7 @@ deployments pushed to the ESP32-P4.
 
 ### 2.4.1 Toolchain baseline
 
-Project TARS firmware is a **native ESP-IDF project** (not PlatformIO).
+Project James firmware is a **native ESP-IDF project** (not PlatformIO).
 
 -   **Board:** Waveshare ESP32-P4-WIFI6 Kit A (SKU 32021)
 -   **Chip:** ESP32-P4 (dual-core RISC-V, up to 360 MHz) with onboard
@@ -357,11 +357,11 @@ configuration, repetitive tests and documentation.
 ## Definition of done
 
 A clean machine can clone the repository, install dependencies, run
-tests and launch a minimal Project TARS service from documented
+tests and launch a minimal Project James service from documented
 instructions.
 
 A clean Pi OS Lite image can also be provisioned into a working Project
-TARS runtime using documented or scripted steps.
+James runtime using documented or scripted steps.
 
 ------------------------------------------------------------------------
 
@@ -599,7 +599,7 @@ and visible microphone/listening state.
 
 ## Definition of done
 
-TARS can speak a streamed answer, animate while speaking, and stop
+James can speak a streamed answer, animate while speaking, and stop
 quickly when interrupted.
 
 ------------------------------------------------------------------------
@@ -660,7 +660,7 @@ Includes:
 ## Definition of done
 
 Changing the underlying AI provider does not noticeably replace the
-Project TARS identity.
+Project James identity.
 
 ------------------------------------------------------------------------
 
@@ -867,12 +867,12 @@ Target workflow:
 
 ``` text
 VOICE / TOUCH REQUEST
- -> TARS ORCHESTRATOR
+ -> James ORCHESTRATOR
  -> DEVELOPMENT INTENT
  -> PERMISSION / SCOPE
  -> CODEX AGENT ON DEVELOPMENT PC
  -> DIFF / TESTS / RESULT
- -> TARS SUMMARY
+ -> James SUMMARY
 ```
 
 This should come **after** the generic tool framework and workstation
@@ -886,7 +886,7 @@ Repository modifications should remain reviewable.
 
 ## Definition of done
 
-A bounded development task can be requested through TARS, executed
+A bounded development task can be requested through James, executed
 through the development toolchain, tested, and summarized with the
 resulting changes inspectable.
 
@@ -1055,7 +1055,7 @@ this iteration using `Project-TODO-and-Verification.md` and the private recordin
 workflow under `../VED Training/`; retain push-to-talk until automatic VAD has
 passed the recorded-corpus and live-P4 acceptance tests.
 
-## Iteration D --- It Becomes TARS
+## Iteration D --- It Becomes James
 
 **Estimate:** additional 4--7 FDD
 
@@ -1102,7 +1102,7 @@ Not required before useful deployment.
 
 Goal:
 
-> TARS can delegate bounded development work to Codex and report the
+> James can delegate bounded development work to Codex and report the
 > result.
 
 ## Iteration I --- Harden v1
@@ -1161,7 +1161,7 @@ tools built before permissions/contracts exist
 
 # 29. Multi-Agent Development Strategy
 
-Multiple coding agents may work on Project TARS concurrently. This is an
+Multiple coding agents may work on Project James concurrently. This is an
 explicit development strategy, not an accidental side effect of using AI
 tools.
 
@@ -1226,9 +1226,9 @@ defined ownership boundary.
 Preferred:
 
 ```text
-Agent A -> tars/display/*
-Agent B -> tars/audio/stt/*
-Agent C -> tars/providers/*
+Agent A -> james/display/*
+Agent B -> james/audio/stt/*
+Agent C -> james/providers/*
 Agent D -> tests/contracts/*
 ```
 
@@ -1323,7 +1323,7 @@ ORCHESTRATOR -> TOOL -> RESULT
 
 ### Level 4 ΓÇö System tests
 
-Run on the actual Project TARS hardware/environment.
+Run on the actual Project James hardware/environment.
 
 These measure real behaviour that mocks cannot prove:
 
@@ -1446,7 +1446,7 @@ benchmark/spike, but should be intentional rather than normal workflow.
 
 More agents do not automatically mean more speed.
 
-For early Project TARS development, a practical starting point is:
+For early Project James development, a practical starting point is:
 
 ```text
 2ΓÇô4 implementation agents
@@ -1581,7 +1581,7 @@ It needs to:
 8.  speak the answer;
 9.  allow interruption/cancellation;
 10. expose failures honestly;
-11. preserve the Project TARS identity;
+11. preserve the Project James identity;
 12. recover cleanly enough for repeated desk use.
 
 This prevents optional sophistication from delaying the moment the
@@ -1753,7 +1753,7 @@ same integration cycle.
 **Status:** Adopted.
 
 The ESP32-P4 should run ESP-IDF / FreeRTOS with only the packages/services
-required for Project TARS, while the Raspberry Pi 5 provides the
+required for Project James, while the Raspberry Pi 5 provides the
 CPU-first local-compute baseline without a full desktop environment.
 
 ## R012 --- Development and runtime environments are intentionally separated

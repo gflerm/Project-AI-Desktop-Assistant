@@ -1,4 +1,4 @@
-# Project TARS --- Hardware Architecture & Inventory
+# Project James --- Hardware Architecture & Inventory
 
 **Status:** Version 0.15 --- Living Work in Progress\
 **Date:** 2026-08-21\
@@ -244,7 +244,7 @@ verification.
 
 **Current baseline:** ESP-IDF / FreeRTOS.
 
-Project TARS should run the ESP32-P4 as a purpose-built embedded appliance
+Project James should run the ESP32-P4 as a purpose-built embedded appliance
 rather than as a conventional Linux desktop. The ESP32-P4 is **not a Linux
 host**: it runs bare-metal/RTOS firmware built with ESP-IDF and FreeRTOS.
 
@@ -255,9 +255,9 @@ ESP-IDF / FreeRTOS
         |
 display / touch / audio / networking drivers
         |
-Project TARS embedded UI
+Project James embedded UI
         |
-Project TARS services
+Project James services
         |
 firmware task supervision / watchdog
 ```
@@ -304,7 +304,7 @@ reproducible.
 
 The ESP32-P4 should eventually:
 
-- boot directly into Project TARS;
+- boot directly into Project James;
 - start required services automatically;
 - restart failed tasks via watchdog/supervision;
 - expose a local diagnostics path;
@@ -363,7 +363,7 @@ be physically verified.
 
 ## 5.4 Display Options ΓÇö Gen-1 DSI vs Touch Display 2 vs HDMI
 
-Project TARS currently has three realistic display paths:
+Project James currently has three realistic display paths:
 
 1. keep the existing first-generation official 7-inch DSI touchscreen;
 2. upgrade later to the official Raspberry Pi 7-inch Touch Display 2;
@@ -388,7 +388,7 @@ interface is inherently faster.
 | Text/diagnostic sharpness | Limited | Significantly improved | Potentially highest |
 | Touch/UI flexibility | Good | Very good | Varies |
 | Replaceability / panel choice | Limited | Limited to official panel | Excellent |
-| Best Project TARS role | Initial prototype baseline | Preferred official upgrade candidate | Alternative if resolution/format needs exceed DSI options |
+| Best Project James role | Initial prototype baseline | Preferred official upgrade candidate | Alternative if resolution/format needs exceed DSI options |
 
 ### 5.4.1 Touch Display 2 candidate
 
@@ -413,7 +413,7 @@ provides:
 - 120 ├ù 189.5 mm overall dimensions;
 - 87 ├ù 154.5 mm active area.
 
-For landscape Project TARS UI design, the effective working orientation can
+For landscape Project James UI design, the effective working orientation can
 be treated as **1280├ù720** after rotation.
 
 ### 5.4.2 Why Touch Display 2 is attractive
@@ -457,7 +457,7 @@ This does not mean the ESP32-P4 will be slow. It means the UI benchmark
 should verify that the additional visual quality is worth the additional
 rendering load.
 
-For Project TARS, animation architecture, compositor behaviour, asset
+For Project James, animation architecture, compositor behaviour, asset
 complexity and frame pacing may matter more than DSI versus HDMI alone.
 
 ### 5.4.4 Current recommendation
@@ -467,7 +467,7 @@ complexity and frame pacing may matter more than DSI versus HDMI alone.
 It is already owned, has the lowest rendering workload, and is sufficient
 to prove the display architecture.
 
-**Stage 2 ΓÇö Benchmark the actual Project TARS UI.**
+**Stage 2 ΓÇö Benchmark the actual Project James UI.**
 
 Measure:
 
@@ -491,7 +491,7 @@ before moving to an HDMI panel.
 
 ### 5.4.5 When HDMI would still win
 
-HDMI remains preferable if Project TARS later requires:
+HDMI remains preferable if Project James later requires:
 
 - a substantially larger panel;
 - a resolution beyond available DSI options;
@@ -593,9 +593,9 @@ codec, NS4150B power amplifier and speaker connector. The codec supports both
 recording and playback over I2S and is configured over I2C. The board does not
 include the external speaker itself or a 3.5 mm analogue audio-output jack.
 
-Available audio paths relevant to Project TARS include:
+Available audio paths relevant to Project James include:
 
-| Audio path | Input | Output | Project TARS relevance |
+| Audio path | Input | Output | Project James relevance |
 |---|---:|---:|---|
 | Onboard ES8311 / I2S | Yes, onboard microphone | Yes, through NS4150B and speaker connector | **Preferred first-prototype baseline** |
 | USB audio | Yes with supported device | Yes with supported device | Alternative/debug path |
@@ -809,7 +809,7 @@ The installed memory is **8 GB total RAM**.
 | Hostname | `titanium` |
 | Power supply | **To verify** |
 | OS | Debian GNU/Linux 12 (bookworm), AArch64 |
-| Status | Available; isolated TARS gateway/voice baseline deployed |
+| Status | Available; isolated James gateway/voice baseline deployed |
 
 ## 9.2 Proposed role
 
@@ -886,7 +886,7 @@ Priorities:
 A model that fits in 8 GB but produces poor conversational latency is not
 a useful default.
 
-## 9.6 Deployed TARS runtime baseline
+## 9.6 Deployed James runtime baseline
 
 The Pi named `titanium` is reachable at `192.168.8.107`. The deployment audit
 confirmed Debian GNU/Linux 12 (bookworm) on AArch64, four Cortex-A76 cores,
@@ -895,16 +895,16 @@ The following isolated baseline is active:
 
 | Component | Current selection | Bind/port | Verification |
 |---|---|---|---|
-| TARS gateway | FastAPI/Uvicorn, protocol v1 | LAN TCP 8090 | Healthy; authenticated HTTP and WebSocket |
+| James gateway | FastAPI/Uvicorn, protocol v1 | LAN TCP 8090 | Healthy; authenticated HTTP and WebSocket |
 | STT | Existing local Whisper service | localhost TCP 8080 | Healthy |
 | Cloud LLM | `gemini-3.5-flash-lite`, intent-aware Google Search grounding | HTTPS | General/current queries verified, HTTP 200 |
 | Local LLM fallback | Ollama `qwen3:1.7b`, thinking off | localhost TCP 11434 | Installed and response-tested |
-| TARS TTS | Piper `en_GB-northern_english_male-medium` | localhost TCP 5001 | Healthy; WAV generated |
+| James TTS | Piper `en_GB-northern_english_male-medium` | localhost TCP 5001 | Healthy; WAV generated |
 | Current weather | Open-Meteo with named-place geocoding | HTTPS | Cape Town live response verified |
 
 `auto` routing uses Gemini first and falls back to the local Ollama model on a
 cloud/request failure. The earlier Ember application remains isolated on port
-8088 and its Piper voice remains on port 5000. TARS owns separate code, token,
+8088 and its Piper voice remains on port 5000. James owns separate code, token,
 state, male voice service, and port; only the existing localhost inference
 engines and Python environment are reused where appropriate.
 
@@ -977,7 +977,7 @@ the user works. Exact model, CPU, GPU and storage remain to be recorded.
 
 ## 10.3 Boundary
 
-Project TARS should not silently take control of workstation
+Project James should not silently take control of workstation
 applications.
 
 The workstation must not be a production dependency or an automatic inference
@@ -1245,7 +1245,7 @@ traffic.
                     \               /
                      \             /
                   TRUSTED WI-FI LAN
-                     TARS SERVICE PATH
+                     James SERVICE PATH
 ```
 
 The **trusted Wi-Fi LAN** is the preferred ESP32-P4↔Pi 5 service path.
@@ -1255,7 +1255,7 @@ cloud/internet services.
 
 ## 20A.2 Wi-Fi service role
 
-The Wi-Fi connection should carry latency-sensitive and internal TARS
+The Wi-Fi connection should carry latency-sensitive and internal James
 traffic such as:
 
 - STT audio/data streams;
@@ -1306,7 +1306,7 @@ according to the orchestrator's routing policy.
 
 ## 20A.5 Service exposure
 
-Where practical, Pi 5-hosted internal TARS services should be restricted to
+Where practical, Pi 5-hosted internal James services should be restricted to
 the trusted LAN rather than being exposed broadly to the internet.
 
 Candidate internal services include:
@@ -1400,7 +1400,7 @@ Measure:
 
 ## Workstation
 
-Measure only what is relevant to tasks Project TARS may delegate.
+Measure only what is relevant to tasks Project James may delegate.
 
 ------------------------------------------------------------------------
 
@@ -1427,8 +1427,8 @@ Measure only what is relevant to tasks Project TARS may delegate.
 -   [ ] Install/verify ESP-IDF / FreeRTOS baseline (ESP-IDF 6.0.2 verified).
 -   [ ] Record ESP-IDF version/toolchain used for the prototype.
 -   [ ] Select display interface required by the chosen UI framework (MIPI-DSI / parallel RGB / HDMI bridge).
--   [ ] Verify firmware autostart and boot into Project TARS UI.
--   [ ] Measure idle memory/CPU before and after TARS tasks start.
+-   [ ] Verify firmware autostart and boot into Project James UI.
+-   [ ] Measure idle memory/CPU before and after James tasks start.
 -   [ ] Verify task restart and watchdog recovery behaviour.
 -   [ ] Identify 7-inch display revision and interface.
 -   [ ] Confirm correct ESP32-P4 display-interface/connector requirements.
@@ -1562,7 +1562,7 @@ resolution, touch behaviour, visibility, enclosure fit or performance.
 **Status:** Architectural requirement.
 
 DSI versus HDMI should not be decided on assumed interface speed alone.
-Project TARS should measure actual frame timing, input latency, resource
+Project James should measure actual frame timing, input latency, resource
 usage and usability with the intended UI.
 
 ## H012 --- Touch Display 2 is the preferred official display upgrade candidate
@@ -1579,7 +1579,7 @@ met.
 **Status:** Adopted for prototyping.
 
 The ESP32-P4 should run ESP-IDF / FreeRTOS with only the display, input,
-audio, networking and service components required by Project TARS.
+audio, networking and service components required by Project James.
 
 A conventional Linux desktop is not applicable on the ESP32-P4.
 
@@ -1612,7 +1612,7 @@ the added hardware.
 
 **Status:** Adopted for prototyping.
 
-Use the trusted Wi-Fi LAN for normal internal TARS service traffic
+Use the trusted Wi-Fi LAN for normal internal James service traffic
 between ESP32-P4 and Pi 5, with static private addressing where practical.
 
 ## H018 --- Trusted Wi-Fi LAN serves both the service and external paths
@@ -1620,14 +1620,14 @@ between ESP32-P4 and Pi 5, with static private addressing where practical.
 **Status:** Adopted for prototyping.
 
 ESP32-P4 and Pi 5 connect over the trusted Wi-Fi LAN, which serves both
-internal TARS service traffic and development/SSH access, updates, model
+internal James service traffic and development/SSH access, updates, model
 downloads and cloud AI inference.
 
 ## H019 --- Internal Pi 5 services should stay on the trusted LAN
 
 **Status:** Architectural requirement.
 
-Where practical, internal TARS APIs on the Pi 5 should bind to or firewall
+Where practical, internal James APIs on the Pi 5 should bind to or firewall
 toward the trusted LAN rather than being unnecessarily exposed to the
 internet.
 
@@ -1636,7 +1636,7 @@ internet.
 **Status:** Adopted for prototyping.
 
 The Raspberry Pi 5 with quad-core Cortex-A76 and 8 GB RAM becomes the
-baseline local compute node for Project TARS.
+baseline local compute node for Project James.
 
 Its initial evaluation should prioritize local LLM serving, STT, TTS,
 memory/index services and sustained CPU performance.

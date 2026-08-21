@@ -1,4 +1,4 @@
-# Project TARS — Firmware Build Guide
+# Project James — Firmware Build Guide
 
 **Status:** Reproducible Windows build procedure
 
@@ -39,7 +39,7 @@ The C compiler identification is unknown.
 Failed to get path name. Error code: 5
 ```
 
-This is not a Project TARS source-code or compiler installation failure. The
+This is not a Project James source-code or compiler installation failure. The
 repository wrapper makes the build independent of that inherited setting by:
 
 - activating the pinned ESP-IDF 6.0.2 environment;
@@ -87,8 +87,8 @@ These can be overridden without editing the script:
 A successful build ends with `Project build complete` and creates:
 
 ```text
-build/project_tars.bin
-build/project_tars.elf
+build/project_james.bin
+build/project_james.elf
 build/bootloader/bootloader.bin
 build/partition_table/partition-table.bin
 ```

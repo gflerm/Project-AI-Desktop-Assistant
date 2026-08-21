@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 import unittest
 
-from tars_gateway.telemetry import TelemetryRecorder
+from james_gateway.telemetry import TelemetryRecorder
 
 
 class TelemetryTests(unittest.TestCase):

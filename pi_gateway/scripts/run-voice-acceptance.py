@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Project TARS ten-question chat/TTS/STT acceptance set."""
+"""Run the Project James ten-question chat/TTS/STT acceptance set."""
 
 from __future__ import annotations
 
@@ -15,11 +15,11 @@ import uuid
 import wave
 
 
-TOKEN = os.environ.get("TARS_TOKEN", "").strip()
-BASE = os.environ.get("TARS_GATEWAY_URL", "http://127.0.0.1:8090").rstrip("/")
-OUTPUT = Path(os.environ.get("TARS_ACCEPTANCE_OUTPUT", "/tmp/tars-voice-acceptance.json"))
+TOKEN = os.environ.get("JAMES_TOKEN", "").strip()
+BASE = os.environ.get("JAMES_GATEWAY_URL", "http://127.0.0.1:8090").rstrip("/")
+OUTPUT = Path(os.environ.get("JAMES_ACCEPTANCE_OUTPUT", "/tmp/james-voice-acceptance.json"))
 if len(TOKEN) < 24:
-    raise SystemExit("TARS_TOKEN is not configured")
+    raise SystemExit("JAMES_TOKEN is not configured")
 
 
 CASES = [
@@ -87,7 +87,7 @@ def post_json(path: str, payload: dict, timeout: int = 120) -> tuple[dict, float
     request = urllib.request.Request(
         BASE + path,
         data=json.dumps(payload).encode(),
-        headers={"X-Tars-Token": TOKEN, "Content-Type": "application/json"},
+        headers={"X-James-Token": TOKEN, "Content-Type": "application/json"},
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         result = json.load(response)
@@ -102,7 +102,7 @@ def post_audio(
     extra_headers: dict[str, str] | None = None,
 ) -> tuple[bytes, float]:
     started = time.perf_counter()
-    headers = {"X-Tars-Token": TOKEN, "Content-Type": content_type}
+    headers = {"X-James-Token": TOKEN, "Content-Type": content_type}
     headers.update(extra_headers or {})
     request = urllib.request.Request(
         BASE + path,
@@ -126,7 +126,7 @@ def transcribe_pcm(pcm: bytes, turn_id: str) -> tuple[str, float, int]:
             "/v1/test/stt",
             payload,
             "application/octet-stream",
-            extra_headers={"X-Tars-Turn-Id": turn_id},
+            extra_headers={"X-James-Turn-Id": turn_id},
         )
         transcripts.append(str(json.loads(stt_data).get("transcript", "")).strip())
         wall_ms += chunk_wall_ms

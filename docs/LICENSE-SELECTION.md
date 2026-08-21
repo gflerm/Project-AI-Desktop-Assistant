@@ -1,13 +1,15 @@
-# Project TARS --- Apache License 2.0 Selection
+# Project James --- Apache License 2.0 Selection
 
-**Status:** Version 0.2 --- Reconciled selection record\
-**Date:** 2026-08-09
+**Status:** Version 0.3 --- Adopted and installed\
+**Date:** 2026-08-21
 
-The adopted default licence for original Project TARS software deliberately
+The adopted default licence for original Project James software deliberately
 selected for open-source release is the **Apache License, Version 2.0**.
 
-Before a public release, place the unmodified official Apache License 2.0
-text in the repository root as `LICENSE`.
+The unmodified official Apache License 2.0 text is installed in the repository
+root as `LICENSE`. `NOTICE` records the project notice, and
+`LICENSE-SCOPE.md` states which original software is covered and which assets
+or third-party materials retain separate terms.
 
 ```text
 SPDX-License-Identifier: Apache-2.0
@@ -15,7 +17,7 @@ SPDX-License-Identifier: Apache-2.0
 
 Important boundaries:
 
-- This selection applies only to original Project TARS software explicitly
+- This selection applies only to original Project James software explicitly
   released under Apache-2.0.
 - Private or unreleased project material remains All Rights Reserved unless
   explicitly licensed otherwise.

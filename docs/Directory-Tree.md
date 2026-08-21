@@ -1,4 +1,4 @@
-# Project TARS — Directory Tree
+# Project James — Directory Tree
 
 **Status:** Living document
 
@@ -108,7 +108,7 @@ Project-AI-Desktop-Assistant/
 │   ├── P4-Voice-Activity-Detection-Plan.md
 │   ├── Personality-Distillation.md
 │   ├── Speech-and-AI-Runtime-Evaluation.md
-│   ├── TARS-Teaching-and-Response-Improvement-Plan.md
+│   ├── James-Teaching-and-Response-Improvement-Plan.md
 │   ├── Project-TODO-and-Verification.md
 │   └── VAD-Implementation-TODO.md       Compatibility pointer to master TODO
 │
@@ -134,9 +134,9 @@ Project-AI-Desktop-Assistant/
 │   │   ├── verify-adaptive-settings.py
 │   │   └── verify-teaching-upgrade.py
 │   ├── systemd/
-│   │   ├── piper-tars.service
-│   │   └── tars-gateway.service
-│   ├── tars_gateway/
+│   │   ├── piper-james.service
+│   │   └── james-gateway.service
+│   ├── james_gateway/
 │   │   ├── __init__.py
 │   │   ├── capabilities.py
 │   │   ├── config.py
@@ -169,35 +169,35 @@ Project-AI-Desktop-Assistant/
 │       └── test_websocket.py
 │
 ├── tests/
-│   ├── test_tars_feedback.py
-│   ├── test_tars_regression_replay.py
-│   └── test_tars_windows_tester.py
+│   ├── test_james_feedback.py
+│   ├── test_james_regression_replay.py
+│   └── test_james_windows_tester.py
 │
 ├── main/
     ├── CMakeLists.txt
     ├── Kconfig.projbuild
     ├── idf_component.yml
     ├── app_main.c
-    ├── tars_audio_capture.c
-    ├── tars_audio_capture.h
-    ├── tars_audio_frame.h
-    ├── tars_audio_ring.c
-    ├── tars_audio_ring.h
-    ├── tars_endpoint.c
-    ├── tars_endpoint.h
-    ├── tars_ptt_client.c
-    ├── tars_ptt_client.h
-    ├── tars_wifi.c
-    └── tars_wifi.h
+    ├── james_audio_capture.c
+    ├── james_audio_capture.h
+    ├── james_audio_frame.h
+    ├── james_audio_ring.c
+    ├── james_audio_ring.h
+    ├── james_endpoint.c
+    ├── james_endpoint.h
+    ├── james_ptt_client.c
+    ├── james_ptt_client.h
+    ├── james_wifi.c
+    └── james_wifi.h
 └── tools/
-    ├── analyze_tars_sessions.py
-    ├── analyze_tars_telemetry.py
-    ├── build_tars_review_queue.py
+    ├── analyze_james_sessions.py
+    ├── analyze_james_telemetry.py
+    ├── build_james_review_queue.py
     ├── build-firmware.ps1
-    ├── Launch-TARS-Tester.ps1
-    ├── replay_tars_review_queue.py
-    ├── tars_feedback.py
-    ├── tars_windows_tester.py
+    ├── Launch-James-Tester.ps1
+    ├── replay_james_review_queue.py
+    ├── james_feedback.py
+    ├── james_windows_tester.py
     └── render-project-todo-pdf.py
 ```
 
@@ -213,7 +213,7 @@ Project-AI-Desktop-Assistant/
 | `images/` | Hardware reference images and complete-device mockups | Commit project-relevant references |
 | `main/` | ESP32-P4 firmware component and application configuration | Build and hardware-test before marking goals complete |
 | `output/` | Reviewed project artifacts generated from tracked sources | Commit stable deliverables; exclude temporary renders |
-| `pi_gateway/` | Authenticated P4/Pi protocol receiver, provider adapters, TARS personality, Pi services, deployment, and tests | Commit source/configuration; never commit tokens, downloaded models, or runtime state |
+| `pi_gateway/` | Authenticated P4/Pi protocol receiver, provider adapters, James personality, Pi services, deployment, and tests | Commit source/configuration; never commit tokens, downloaded models, or runtime state |
 | `tools/` | Reproducible project-level build and developer helpers | Commit scripts; keep generated output elsewhere |
 | `build/` | Generated ESP-IDF build products | Never commit |
 | `managed_components/` | Downloaded ESP-IDF component dependencies | Never commit; versions come from dependency configuration |

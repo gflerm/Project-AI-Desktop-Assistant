@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tars_gateway.local_learning import LocalLearning
+from james_gateway.local_learning import LocalLearning
 
 
 class LocalLearningTests(unittest.TestCase):

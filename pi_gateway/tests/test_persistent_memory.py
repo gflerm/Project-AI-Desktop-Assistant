@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tars_gateway.persistent_memory import PersistentMemory
+from james_gateway.persistent_memory import PersistentMemory
 
 
 class PersistentMemoryTests(unittest.TestCase):

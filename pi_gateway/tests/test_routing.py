@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from tars_gateway.services import automatic_provider, local_reply_needs_cloud
+from james_gateway.services import automatic_provider, local_reply_needs_cloud
 
 
 class RoutingPolicyTests(unittest.TestCase):

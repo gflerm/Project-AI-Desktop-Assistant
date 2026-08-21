@@ -1,6 +1,6 @@
 # VED Training — Start Here
 
-This folder is the complete beginner setup for testing Project TARS voice
+This folder is the complete beginner setup for testing Project James voice
 activity detection (VAD), speech-to-text (STT), and recognition of the enrolled
 operator's voice.
 
@@ -82,7 +82,7 @@ Windows must allow desktop applications to use the microphone under **Settings
 
 Record this sentence in your normal voice:
 
-> Project TARS, this is my first microphone test.
+> Project James, this is my first microphone test.
 
 Leave roughly half a second of silence before and after the sentence. Do not
 apply noise reduction, normalization, compression, reverb, or other effects.

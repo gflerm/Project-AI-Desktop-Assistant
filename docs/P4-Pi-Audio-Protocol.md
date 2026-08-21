@@ -1,10 +1,14 @@
-# Project TARS — P4-to-Pi Audio Protocol
+# Project James — P4-to-Pi Audio Protocol
 
 **Status:** Version 0.4 — physical P4↔Pi PTT voice round trip verified
 
 **Date:** 2026-08-21
 
 **Scope:** Reliable utterance transport between the ESP32-P4 and Raspberry Pi 5
+
+> 🟠 **PROTOCOL RENAME PENDING DEPLOYMENT — 2026-08-21:** Source now uses the
+> `JAM1` binary magic and James configuration identifiers. Do not flash this
+> firmware until the matching Pi gateway migration is ready.
 
 > 🟢 **PHYSICAL INTEGRATION RESUMED — 2026-08-21:** The first P4 client uses
 > GPIO35 BOOT as active-low push-to-talk, the onboard microphone and the
@@ -112,7 +116,7 @@ header, followed by PCM bytes:
 
 | Offset | Size | Field | Meaning |
 |---:|---:|---|---|
-| 0 | 4 | magic | ASCII `TAR1` |
+| 0 | 4 | magic | ASCII `JAM1` |
 | 4 | 1 | version | `1` |
 | 5 | 1 | kind | `1` = microphone PCM, `2` = TTS PCM |
 | 6 | 2 | header_bytes | `24` |
@@ -159,15 +163,15 @@ changing capture or endpoint frame sizes.
 | Host | `titanium` / `192.168.8.107` |
 | WebSocket | `ws://192.168.8.107:8090/ws/v1` |
 | HTTP diagnostics | `/health`, `/capabilities` |
-| Authentication | `X-Tars-Token` or `Authorization: Bearer`; secret in `/etc/tars/tars.env` |
+| Authentication | `X-James-Token` or `Authorization: Bearer`; secret in `/etc/james/james.env` |
 | TTS response | Binary 16 kHz mono PCM, kind `2` |
 | Conversation route | `auto`: Gemini primary, local Ollama fallback |
 | Live information | Open-Meteo current weather; intent-aware Gemini Google Search grounding |
-| Spoken assistant identity | James; Project TARS remains the internal protocol/project label |
+| Spoken assistant identity | James; Project James remains the internal protocol/project label |
 | Temporary PTT input | GPIO35 BOOT, active-low; hold to capture and release to send |
 | P4 audio mode | Half-duplex; capture is gated while response PCM plays |
 | P4 speaker level | ES8311 95%; NS4150B has fixed hardware gain and GPIO53 enable only |
-| Firmware secrets | Git-ignored `main/tars_private_config.h`; never Kconfig or tracked source |
+| Firmware secrets | Git-ignored `main/james_private_config.h`; never Kconfig or tracked source |
 | Capture buffering | 25 × 20 ms frames = 500 ms; 16,400 B PCM/frame metadata plus queue overhead |
 | Network chunk | Five frames / 100 ms / 3,200 PCM bytes plus 24-byte header |
 | Playback buffering | 8 KiB WebSocket assembly buffer; chunks write directly to ES8311/I2S |

@@ -1,0 +1,20 @@
+[Unit]
+Description=Project James male Piper speech synthesis
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ember
+Group=ember
+WorkingDirectory=/opt/james/models/piper
+ExecStart=/opt/ember/venv/bin/python -m piper.http_server -m en_GB-northern_english_male-medium --data-dir /opt/james/models/piper --host 127.0.0.1 --port 5001
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
