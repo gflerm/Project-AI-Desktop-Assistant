@@ -30,9 +30,10 @@
   fictional-character name from first-party source, paths and documentation.
 - [x] Add a GitHub-detectable root Apache License 2.0, `NOTICE`, and a clear
   `LICENSE-SCOPE.md` that excludes third-party and separately licensed assets.
-- [ ] Migrate the live Pi services and P4 firmware to the renamed `james_*`
+- [x] Migrate the live Pi services and P4 firmware to the renamed `james_*`
   packages, service units, configuration names and `JAM1` wire identifier in one
-  coordinated deployment; retain the current live build until that migration.
+  coordinated, rollback-safe deployment. Verified end to end on 2026-08-22;
+  the retained legacy services are disabled and available for rollback.
 - [x] Route identity questions deterministically without an LLM call; live Pi
   verification returned `system:identity` / `identity-registry` in 1 ms.
 - [x] Pass all 49 gateway tests on the Pi after the James identity update.
@@ -192,12 +193,16 @@ this bounded sequence before enabling the camera, displays, VAD or wake word:
   its WebSocket session and report “Gateway ready.”
 - [x] Hold BOOT, ask “Who are you and what do you do?”, release BOOT, and hear
   a complete response beginning “My name is James.”
-- [ ] Record capture, STT, routing, TTS and release-to-audio timing evidence.
+- [x] Record capture, STT/routing, TTS and release-to-audio timing evidence.
 
 The first physical turn captured 2.50 seconds without clipping, transcribed the
 question exactly, returned the deterministic James identity answer and played
 it successfully. Speaker output was tuned to 95% ES8311 volume and accepted as
-substantially improved. Detailed stage timing remains the next measurement.
+substantially improved. The post-migration acceptance turn on 2026-08-22
+captured 2.14 seconds, produced the exact transcript and deterministic identity
+response 2.29 seconds after release, began speaker output after 3.82 seconds and
+finished the complete response 15.02 seconds after release. These P4 timestamps
+provide the first physical capture-to-response timing baseline.
 
 The always-on inference-host evaluation remains a later decision:
 
@@ -255,6 +260,9 @@ until the user explicitly resumes that separate project-host decision.
 | 2026-08-21 | Physical P4 voice round trip | Passed: 2.50 s BOOT capture, exact STT, deterministic James identity response and completed 16 kHz TTS playback |
 | 2026-08-21 | P4 speaker-volume tuning | Passed at ES8311 95%; user reported the result much better; NS4150B remains fixed-gain/enable-only |
 | 2026-08-21 | P4 firmware/memory baseline | ~0.98 MiB app; 88% app partition free; connected runtime used 250.4 KiB internal heap and 7.7 KiB PSRAM heap, with 350.9 KiB and 31.10 MiB respectively free |
+| 2026-08-22 | Coordinated James Pi/P4 migration | Passed: 49/49 gateway tests; `james-gateway.service` and `piper-james.service` active; legacy services disabled and retained for rollback; P4 flashed with `JAM1` firmware and authenticated from `192.168.8.131` |
+| 2026-08-22 | Post-migration physical PTT acceptance | Passed: 2.14 s BOOT capture, exact STT, deterministic James identity response, first audio 3.82 s after release and complete 16 kHz playback |
+| 2026-08-22 | Operator audio/response acceptance | Passed: user confirmed both the returned audio and James response were good |
 
 ## Not yet proven
 
@@ -445,7 +453,7 @@ validation clips.
 - [ ] Allow Pi-side endpointing only as a secondary diagnostic/safety check.
 - [ ] Test 100 consecutive automatic utterances.
 - [ ] Measure P4-to-Pi latency and throughput under idle and inference load.
-- [ ] Record the first complete capture-to-transcript-to-response latency.
+- [x] Record the first complete capture-to-transcript-to-response latency.
 
 **Evidence:** Protocol trace, sequence-gap counter, latency distribution, and
 saved receiver audio.

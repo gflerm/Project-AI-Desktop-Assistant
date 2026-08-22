@@ -2,12 +2,13 @@
 
 **Status:** Deployed integration baseline
 
-**Last verified:** 2026-08-21
+**Last verified:** 2026-08-22
 
-> 🟠 **SOURCE RENAME READY; LIVE MIGRATION PENDING — 2026-08-21:** The repository
-> now uses James package, service, configuration and storage names plus the
-> `JAM1` wire identifier. The last verified Pi/P4 runtime remains on the legacy
-> deployment until both ends can be changed together and rolled back safely.
+> 🟢 **JAMES MIGRATION DEPLOYED — 2026-08-22:** The live Pi now runs
+> `james-gateway.service` and `piper-james.service` with `/etc/james`,
+> `/opt/james` and `/var/lib/james`. The P4 runs the matching `JAM1` firmware.
+> The former services are disabled but retained with a migration backup for
+> rollback.
 
 > 🔴 **RUNTIME HOST DECISION PAUSED — 2026-08-20:** Continue treating this
 > Windows tester and Pi gateway as the active phase-one prototype, but do not
@@ -321,6 +322,14 @@ test on 2026-08-21 also completed G2's first end-to-end BOOT-button PTT turn:
 2.50 seconds of captured speech produced exact STT, a deterministic James
 identity response and returned speaker audio. G5 still requires automatic VAD
 endpointing, detailed timing, reconnect/failure injection and repeated turns.
+
+On 2026-08-22 the coordinated rename deployment passed 49/49 gateway tests,
+activated the two James services, disabled the retained legacy units and
+flashed the matching P4 firmware. A fresh physical BOOT-button turn captured
+2.14 seconds, transcribed “Who are you and what do you do?” exactly, returned
+the deterministic James identity response, started audio 3.82 seconds after
+button release and completed playback 15.02 seconds after release. The user
+confirmed that both the audio and the response were good.
 
 ## Deployment and diagnostics
 

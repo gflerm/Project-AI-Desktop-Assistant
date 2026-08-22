@@ -1,10 +1,10 @@
 # Project James Pi 5 Gateway
 
-> 🟠 **RENAME MIGRATION PENDING — 2026-08-21:** Repository source now uses the
-> `james_gateway` package, `/etc/james`, `/opt/james`, `/var/lib/james`, James
-> service units and the `JAM1` wire identifier. The working Pi/P4 deployment has
-> deliberately not been switched yet; deploy the Pi services and flash the P4
-> as one coordinated, rollback-safe change.
+> 🟢 **JAMES MIGRATION DEPLOYED — 2026-08-22:** The Pi runs the `james_gateway`
+> package from `/opt/james/gateway` with `/etc/james`, `/var/lib/james`, James
+> service units and the `JAM1` wire identifier. The matching P4 firmware passed
+> a physical BOOT-button voice round trip. Disabled legacy units and the
+> migration backup remain available for rollback.
 
 > 🔴 **DEPLOYMENT HOLD — 2026-08-20:** Do not change the production inference
 > host while the user reviews the architecture. The intended direction is to

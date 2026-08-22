@@ -1,14 +1,15 @@
 # Project James — P4-to-Pi Audio Protocol
 
-**Status:** Version 0.4 — physical P4↔Pi PTT voice round trip verified
+**Status:** Version 0.4 — James/JAM1 deployment and physical PTT round trip verified
 
-**Date:** 2026-08-21
+**Date:** 2026-08-22
 
 **Scope:** Reliable utterance transport between the ESP32-P4 and Raspberry Pi 5
 
-> 🟠 **PROTOCOL RENAME PENDING DEPLOYMENT — 2026-08-21:** Source now uses the
-> `JAM1` binary magic and James configuration identifiers. Do not flash this
-> firmware until the matching Pi gateway migration is ready.
+> 🟢 **JAMES/JAM1 DEPLOYED — 2026-08-22:** The matching James Pi services and P4
+> firmware are live. The coordinated deployment passed the Pi test suite and a
+> fresh physical BOOT-button voice round trip; the previous services remain
+> disabled and retained for rollback.
 
 > 🟢 **PHYSICAL INTEGRATION RESUMED — 2026-08-21:** The first P4 client uses
 > GPIO35 BOOT as active-low push-to-talk, the onboard microphone and the
@@ -193,6 +194,11 @@ measurement, repeated-turn testing and automatic VAD endpointing.
 `tts.end.timings_ms` reports Pi transcription, conversation/tool, synthesis,
 and total gateway durations. The Windows PTT harness additionally records
 capture and LAN round-trip timing for pre-P4 integration measurements.
+
+The post-migration acceptance turn on 2026-08-22 captured 2.14 seconds of audio,
+produced an exact transcript and deterministic identity answer 2.29 seconds
+after release, began 16 kHz playback after 3.82 seconds and completed playback
+15.02 seconds after release.
 
 See [Pi Gateway and Windows Voice Test](Pi-Gateway-and-Windows-Voice-Test.md)
 for deployment, provider, voice, and push-to-talk test procedures.
